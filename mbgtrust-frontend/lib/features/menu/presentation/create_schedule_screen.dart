@@ -90,10 +90,12 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                       const Divider(height: 12, color: AppColors.border),
                   itemBuilder: (context, index) {
                     final item = _masterMenus[index];
-                    final name = item['name'] ?? '';
-                    final calories = item['calories']?.toString() ?? '500';
-                    final photoUrl = item['photoUrl'] ?? '';
+                    final name = item['nama_menu'] ?? item['name'] ?? '';
+                    final calories = item['kalori_kkal']?.toString() ?? item['calories']?.toString() ?? '500';
+                    final photoUrl = item['foto_url'] ?? item['photoUrl'] ?? '';
+                    final category = item['kategori'] ?? item['category'] ?? 'Makanan Berat';
                     final isCurrentlySelected =
+                        _weeklySchedule[day]?['id_menu'] == item['id_menu'] ||
                         _weeklySchedule[day]?['id'] == item['id'];
 
                     return ListTile(
@@ -133,7 +135,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                         ),
                       ),
                       subtitle: Text(
-                        '$calories kcal • ${item['category'] ?? "Makan Siang"}',
+                        '$calories kcal • $category',
                         softWrap: true,
                         style: const TextStyle(
                           fontSize: 12,
@@ -303,7 +305,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
-                                      assignedMenu['photoUrl'] ?? '',
+                                      assignedMenu['foto_url'] ?? assignedMenu['photoUrl'] ?? '',
                                       width: 60,
                                       height: 60,
                                       fit: BoxFit.cover,
@@ -326,7 +328,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          assignedMenu['name'] ?? '',
+                                          assignedMenu['nama_menu'] ?? assignedMenu['name'] ?? '',
                                           softWrap: true,
                                           style: const TextStyle(
                                             fontSize: 14,
@@ -336,7 +338,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '${assignedMenu['calories'] ?? 500} kcal • Protein: ${assignedMenu['protein'] ?? "25g"}',
+                                          '${assignedMenu['kalori_kkal'] ?? assignedMenu['calories'] ?? 500} kcal • Protein: ${assignedMenu['protein_gram'] != null ? "${assignedMenu['protein_gram']}g" : (assignedMenu['protein'] ?? "25g")}',
                                           softWrap: true,
                                           style: const TextStyle(
                                             fontSize: 12,

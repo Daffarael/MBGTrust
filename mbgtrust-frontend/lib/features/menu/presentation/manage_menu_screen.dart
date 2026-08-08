@@ -175,11 +175,11 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                     itemCount: _menuList.length,
                     itemBuilder: (context, index) {
                       final menu = _menuList[index];
-                      final title = menu['name'] ?? '';
-                      final calories = menu['calories']?.toString() ?? '500';
-                      final protein = menu['protein'] ?? '25g';
-                      final photoUrl = menu['photoUrl'] ?? '';
-                      final category = menu['category'] ?? 'Makan Siang';
+                      final title = menu['nama_menu'] ?? menu['name'] ?? '';
+                      final calories = menu['kalori_kkal']?.toString() ?? menu['calories']?.toString() ?? '500';
+                      final protein = menu['protein_gram'] != null ? '${menu['protein_gram']}g' : (menu['protein'] ?? '25g');
+                      final photoUrl = menu['foto_url'] ?? menu['photoUrl'] ?? '';
+                      final category = menu['kategori'] ?? menu['category'] ?? 'MAKANAN_BERAT';
 
                       return Container(
                         decoration: BoxDecoration(
