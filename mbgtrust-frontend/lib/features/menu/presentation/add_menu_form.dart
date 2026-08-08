@@ -37,6 +37,26 @@ class AddMenuForm extends StatefulWidget {
   State<AddMenuForm> createState() => _AddMenuFormState();
 }
 
+class _IngredientFieldControllers {
+  final TextEditingController name;
+  final TextEditingController sub;
+  final TextEditingController portion;
+
+  _IngredientFieldControllers({
+    required String nameText,
+    required String subText,
+    required String portionText,
+  })  : name = TextEditingController(text: nameText),
+        sub = TextEditingController(text: subText),
+        portion = TextEditingController(text: portionText);
+
+  void dispose() {
+    name.dispose();
+    sub.dispose();
+    portion.dispose();
+  }
+}
+
 class _AddMenuFormState extends State<AddMenuForm> {
   final _formKey = GlobalKey<FormState>();
 
@@ -46,9 +66,10 @@ class _AddMenuFormState extends State<AddMenuForm> {
   late TextEditingController _carbsController;
   late TextEditingController _fatsController;
   late TextEditingController _costController;
-  late TextEditingController _ingredientsController;
   late TextEditingController _allergensController;
   late TextEditingController _photoUrlController;
+
+  final List<_IngredientFieldControllers> _ingredientFields = [];
 
   String _selectedCategory = 'MAKANAN_BERAT';
   final List<String> _categories = ['MAKANAN_BERAT', 'SUSU_DAN_BUAH', 'SNACK_SEHAT'];
@@ -68,9 +89,6 @@ class _AddMenuFormState extends State<AddMenuForm> {
         text: (data?['lemak_gram'] ?? 14.2).toString());
     _costController = TextEditingController(
         text: (data?['estimasi_biaya_per_porsi'] ?? 15000).toString());
-    _ingredientsController = TextEditingController(
-        text: (data?['komposisi_bahan'] as List<dynamic>?)?.join(', ') ??
-            'Dada Ayam Bakar, Nasi Putih, Tumis Buncis, Wortel');
     _allergensController = TextEditingController(
         text: (data?['potensi_alergen'] as List<dynamic>?)?.join(', ') ?? 'Kedelai');
     _photoUrlController = TextEditingController(
@@ -78,6 +96,46 @@ class _AddMenuFormState extends State<AddMenuForm> {
 
     if (data?['kategori'] != null && _categories.contains(data!['kategori'])) {
       _selectedCategory = data['kategori'];
+    }
+
+    // Inisialisasi daftar rincian bahan makanan
+    final richList = (data?['komposisi_bahan_detail'] as List<dynamic>?);
+    if (richList != null && richList.isNotEmpty) {
+      for (var item in richList) {
+        _ingredientFields.add(_IngredientFieldControllers(
+          nameText: item['nama']?.toString() ?? '',
+          subText: item['sub']?.toString() ?? '',
+          portionText: item['berat']?.toString() ?? '',
+        ));
+      }
+    } else {
+      final simpleList = (data?['komposisi_bahan'] as List<dynamic>?);
+      if (simpleList != null && simpleList.isNotEmpty) {
+        for (var item in simpleList) {
+          _ingredientFields.add(_IngredientFieldControllers(
+            nameText: item.toString(),
+            subText: 'Sumber Gizi Pilihan SPPG',
+            portionText: '80 gram',
+          ));
+        }
+      } else {
+        // Default 3 item jika baru
+        _ingredientFields.add(_IngredientFieldControllers(
+          nameText: 'Dada Ayam Bakar Kecap',
+          subText: 'Sumber Utama Protein & Zat Besi',
+          portionText: '80 gram',
+        ));
+        _ingredientFields.add(_IngredientFieldControllers(
+          nameText: 'Tumis Buncis & Wortel',
+          subText: 'Kaya Serat & Vitamin A',
+          portionText: '60 gram',
+        ));
+        _ingredientFields.add(_IngredientFieldControllers(
+          nameText: 'Nasi Putih Warm',
+          subText: 'Karbohidrat Kompleks',
+          portionText: '150 gram',
+        ));
+      }
     }
   }
 
@@ -89,19 +147,51 @@ class _AddMenuFormState extends State<AddMenuForm> {
     _carbsController.dispose();
     _fatsController.dispose();
     _costController.dispose();
-    _ingredientsController.dispose();
     _allergensController.dispose();
     _photoUrlController.dispose();
+    for (var field in _ingredientFields) {
+      field.dispose();
+    }
     super.dispose();
+  }
+
+  void _addIngredientField() {
+    setState(() {
+      _ingredientFields.add(_IngredientFieldControllers(
+        nameText: '',
+        subText: 'Kaya Nutrisi Sehat',
+        portionText: '50 gram',
+      ));
+    });
+  }
+
+  void _removeIngredientField(int index) {
+    if (_ingredientFields.length > 1) {
+      setState(() {
+        _ingredientFields[index].dispose();
+        _ingredientFields.removeAt(index);
+      });
+    }
   }
 
   void _handleSave() {
     if (_formKey.currentState!.validate()) {
-      List<String> ingredients = _ingredientsController.text
-          .split(',')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList();
+      List<Map<String, String>> ingredientsDetail = [];
+      List<String> ingredientsSimple = [];
+
+      for (var field in _ingredientFields) {
+        final name = field.name.text.trim();
+        final sub = field.sub.text.trim();
+        final portion = field.portion.text.trim();
+        if (name.isNotEmpty) {
+          ingredientsDetail.add({
+            'nama': name,
+            'sub': sub.isNotEmpty ? sub : 'Sumber Gizi Sehat',
+            'berat': portion.isNotEmpty ? portion : '50 gram',
+          });
+          ingredientsSimple.add(name);
+        }
+      }
 
       List<String> allergens = _allergensController.text
           .split(',')
@@ -115,14 +205,17 @@ class _AddMenuFormState extends State<AddMenuForm> {
         'nama_menu': _nameController.text.trim(),
         'name': _nameController.text.trim(),
         'kategori': _selectedCategory,
-        'category': _selectedCategory == 'MAKANAN_BERAT' ? 'Makanan Berat' : (_selectedCategory == 'SUSU_DAN_BUAH' ? 'Susu & Buah' : 'Snack Sehat'),
+        'category': _selectedCategory == 'MAKANAN_BERAT'
+            ? 'Makanan Berat'
+            : (_selectedCategory == 'SUSU_DAN_BUAH' ? 'Susu & Buah' : 'Snack Sehat'),
         'kalori_kkal': int.tryParse(_caloriesController.text.trim()) ?? 550,
         'calories': int.tryParse(_caloriesController.text.trim()) ?? 550,
         'protein_gram': double.tryParse(_proteinController.text.trim()) ?? 28.5,
         'protein': '${_proteinController.text.trim()}g',
         'karbohidrat_gram': double.tryParse(_carbsController.text.trim()) ?? 65.0,
         'lemak_gram': double.tryParse(_fatsController.text.trim()) ?? 14.2,
-        'komposisi_bahan': ingredients,
+        'komposisi_bahan': ingredientsSimple,
+        'komposisi_bahan_detail': ingredientsDetail,
         'potensi_alergen': allergens,
         'estimasi_biaya_per_porsi':
             double.tryParse(_costController.text.trim()) ?? 15000.0,
@@ -141,7 +234,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
     final isEditing = widget.initialData != null;
 
     return Container(
-      constraints: const BoxConstraints(maxWidth: 540, maxHeight: 680),
+      constraints: const BoxConstraints(maxWidth: 580, maxHeight: 720),
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Form(
@@ -173,10 +266,6 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const Divider(),
               const SizedBox(height: 12),
-
-              // ==========================================
-              // UX STRICT: 1 PERTANYAAN 1 BARIS INPUT FIELD (VERTIKAL FULL WIDTH)
-              // ==========================================
 
               // 1. Nama Menu MBG
               CustomTextField(
@@ -233,7 +322,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 3. Kandungan Kalori (kkal) - 1 Baris Penuh
+              // 3. Kandungan Kalori (kkal)
               CustomTextField(
                 label: '3. Kandungan Kalori (kkal)',
                 hint: 'Contoh: 550',
@@ -244,7 +333,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 4. Kandungan Protein (gram) - 1 Baris Penuh
+              // 4. Kandungan Protein (gram)
               CustomTextField(
                 label: '4. Kandungan Protein (gram)',
                 hint: 'Contoh: 28.5',
@@ -255,7 +344,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 5. Kandungan Karbohidrat (gram) - 1 Baris Penuh
+              // 5. Kandungan Karbohidrat (gram)
               CustomTextField(
                 label: '5. Kandungan Karbohidrat (gram)',
                 hint: 'Contoh: 65.0',
@@ -267,7 +356,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 6. Kandungan Lemak (gram) - 1 Baris Penuh
+              // 6. Kandungan Lemak (gram)
               CustomTextField(
                 label: '6. Kandungan Lemak (gram)',
                 hint: 'Contoh: 14.2',
@@ -278,7 +367,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 7. Estimasi Biaya Per Porsi (Rp) - 1 Baris Penuh
+              // 7. Estimasi Biaya Per Porsi (Rp)
               CustomTextField(
                 label: '7. Estimasi Biaya Per Porsi (Rp)',
                 hint: 'Contoh: 15000',
@@ -290,18 +379,101 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 8. Komposisi Bahan Makanan Sehat - 1 Baris Penuh
-              CustomTextField(
-                label: '8. Komposisi Bahan Makanan Sehat (Pisahkan Koma)',
-                controller: _ingredientsController,
-                hint: 'Dada Ayam Bakar 80g, Nasi Putih 150g, Tumis Buncis 60g',
-                validator: (val) => val == null || val.trim().isEmpty
-                    ? 'Bahan makanan wajib diisi'
-                    : null,
+              // =========================================================
+              // 8. RINCIAN BAHAN MAKANAN SEHAT (NAMA, SUBJUDUL, GRAMASI)
+              // =========================================================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '8. Rincian Bahan Makanan Sehat',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: _addIngredientField,
+                    icon: const Icon(Icons.add_circle_outline_rounded, size: 16),
+                    label: const Text('Tambah Bahan',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  children: [
+                    for (int i = 0; i < _ingredientFields.length; i++) ...[
+                      if (i > 0) const Divider(height: 16, color: AppColors.border),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: CircleAvatar(
+                              radius: 12,
+                              backgroundColor: AppColors.primaryLight,
+                              child: Text(
+                                '${i + 1}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                CustomTextField(
+                                  label: 'Nama Bahan Baku',
+                                  hint: 'Dada Ayam Bakar Kecap',
+                                  controller: _ingredientFields[i].name,
+                                  validator: (v) => v == null || v.trim().isEmpty
+                                      ? 'Nama bahan wajib'
+                                      : null,
+                                ),
+                                const SizedBox(height: 8),
+                                CustomTextField(
+                                  label: 'Subjudul Nutrisi / Manfaat',
+                                  hint: 'Sumber Utama Protein & Zat Besi',
+                                  controller: _ingredientFields[i].sub,
+                                ),
+                                const SizedBox(height: 8),
+                                CustomTextField(
+                                  label: 'Berat Gramasi Porsi',
+                                  hint: '80 gram',
+                                  controller: _ingredientFields[i].portion,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (_ingredientFields.length > 1)
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline_rounded,
+                                  color: AppColors.error, size: 20),
+                              onPressed: () => _removeIngredientField(i),
+                            ),
+                        ],
+                      ),
+                    ]
+                  ],
+                ),
               ),
               const SizedBox(height: 14),
 
-              // 9. Potensi Alergen - 1 Baris Penuh
+              // 9. Potensi Alergen
               CustomTextField(
                 label: '9. Potensi Alergen Siswa (Pisahkan Koma)',
                 controller: _allergensController,
@@ -309,11 +481,11 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 14),
 
-              // 10. URL Foto Makanan HD - 1 Baris Penuh
+              // 10. URL Foto Makanan HD
               CustomTextField(
-                label: '10. URL Foto Makanan HD (Unsplash/Web)',
+                label: '10. URL Foto Makanan (Unsplash / Google Drive Link)',
                 controller: _photoUrlController,
-                hint: 'https://images.unsplash.com/...',
+                hint: 'https://images.unsplash.com/... atau Drive Link',
               ),
               const SizedBox(height: 24),
 
