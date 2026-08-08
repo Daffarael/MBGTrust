@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/widgets.dart';
 
@@ -155,12 +156,12 @@ class _AddMenuFormState extends State<AddMenuForm> {
     super.dispose();
   }
 
-  void _addIngredientField() {
+  void _addIngredientField({String? name, String? sub, String? portion}) {
     setState(() {
       _ingredientFields.add(_IngredientFieldControllers(
-        nameText: '',
-        subText: 'Kaya Nutrisi Sehat',
-        portionText: '50 gram',
+        nameText: name ?? '',
+        subText: sub ?? 'Kaya Nutrisi Sehat',
+        portionText: portion ?? '50 gram',
       ));
     });
   }
@@ -172,6 +173,83 @@ class _AddMenuFormState extends State<AddMenuForm> {
         _ingredientFields.removeAt(index);
       });
     }
+  }
+
+  void _showMasterPresetsModal() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          constraints: const BoxConstraints(maxHeight: 500),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '🍱 Pilih dari Bank Master Bahan Sehat',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const Divider(),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: MockData.masterHealthyIngredients.length,
+                  separatorBuilder: (ctx, i) => const Divider(height: 1, color: AppColors.border),
+                  itemBuilder: (ctx, i) {
+                    final item = MockData.masterHealthyIngredients[i];
+                    return ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.check_circle_outline_rounded,
+                          color: AppColors.primary, size: 20),
+                      title: Text(
+                        item['nama']!,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      subtitle: Text(
+                        '${item['sub']} • ${item['berat']}',
+                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      ),
+                      trailing: const Icon(Icons.add_rounded, color: AppColors.primary),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _addIngredientField(
+                          name: item['nama'],
+                          sub: item['sub'],
+                          portion: item['berat'],
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Bahan "${item['nama']}" ditambahkan!'),
+                            duration: const Duration(seconds: 1),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _handleSave() {
@@ -380,24 +458,32 @@ class _AddMenuFormState extends State<AddMenuForm> {
               const SizedBox(height: 14),
 
               // =========================================================
-              // 8. RINCIAN BAHAN MAKANAN SEHAT (NAMA, SUBJUDUL, GRAMASI)
+              // 8. RINCIAN BAHAN MAKANAN SEHAT (BEBAS OVERFLOW & QUICK PRESETS)
               // =========================================================
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '8. Rincian Bahan Makanan Sehat',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                  const Expanded(
+                    child: Text(
+                      '8. Rincian Bahan Makanan Sehat',
+                      softWrap: true,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
-                  TextButton.icon(
-                    onPressed: _addIngredientField,
-                    icon: const Icon(Icons.add_circle_outline_rounded, size: 16),
-                    label: const Text('Tambah Bahan',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  IconButton(
+                    icon: const Icon(Icons.playlist_add_rounded,
+                        color: AppColors.primaryDark, size: 22),
+                    onPressed: _showMasterPresetsModal,
+                    tooltip: 'Pilih dari Bank Master Bahan',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_rounded,
+                        color: AppColors.primary, size: 22),
+                    onPressed: () => _addIngredientField(),
+                    tooltip: 'Tambah Baris Bahan Kosong',
                   ),
                 ],
               ),

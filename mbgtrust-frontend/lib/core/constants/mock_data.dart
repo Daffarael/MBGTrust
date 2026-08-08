@@ -506,4 +506,68 @@ class MockData {
     'status': 'Dalam Pengiriman',
     'confirmationPercentage': 90.0,
   };
+
+  // 6. Master Bank Preset Bahan Makanan Sehat SPPG (Tinggal Pilih & Tambah)
+  static const List<Map<String, String>> masterHealthyIngredients = [
+    {
+      'nama': 'Dada Ayam Bakar Kecap',
+      'sub': 'Sumber Utama Protein & Zat Besi',
+      'berat': '80 gram',
+    },
+    {
+      'nama': 'Daging Sapi Semur Empuk',
+      'sub': 'Kaya Asam Amino & Protein Sapi',
+      'berat': '90 gram',
+    },
+    {
+      'nama': 'Ikan Kembung Bakar Rempah',
+      'sub': 'Tinggi Omega-3 & DHA',
+      'berat': '85 gram',
+    },
+    {
+      'nama': 'Udang Segar Tumis Paprika',
+      'sub': 'Tinggi Protein & Zinc',
+      'berat': '80 gram',
+    },
+    {
+      'nama': 'Telur Rebus Organik',
+      'sub': 'Sumber Kolin & Vitamin B12',
+      'berat': '50 gram',
+    },
+    {
+      'nama': 'Nasi Putih Warm',
+      'sub': 'Karbohidrat Kompleks Utama',
+      'berat': '150 gram',
+    },
+    {
+      'nama': 'Tumis Buncis & Wortel',
+      'sub': 'Kaya Serat & Vitamin A',
+      'berat': '60 gram',
+    },
+    {
+      'nama': 'Tumis Bayam & Jagung Manis',
+      'sub': 'Asam Folat & Zat Besi',
+      'berat': '65 gram',
+    },
+    {
+      'nama': 'Capcay Sayur Kombinasi',
+      'sub': 'Kembang Kol, Wortel & Sawi',
+      'berat': '70 gram',
+    },
+    {
+      'nama': 'Tahu & Tempe Bacem Kukus',
+      'sub': 'Isoflavon & Protein Nabati',
+      'berat': '50 gram',
+    },
+    {
+      'nama': 'Susu Sapi Segar UHT 200ml',
+      'sub': 'Kalsium & Vitamin D',
+      'berat': '200 ml',
+    },
+    {
+      'nama': 'Pisang Ambon Organik',
+      'sub': 'Kalium & Energi Cepat',
+      'berat': '120 gram',
+    },
+  ];
 }
