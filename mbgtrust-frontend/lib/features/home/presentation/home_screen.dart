@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/image_utils.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -521,7 +522,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(20)),
                         child: Image.network(
-                          todayMenu['foto_url'] as String,
+                          ImageUtils.getDirectImageUrl(todayMenu['foto_url'] as String),
                           height: 150,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -724,7 +725,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               : const ColorFilter.mode(
                                   Colors.grey, BlendMode.saturation),
                           child: Image.network(
-                            tomorrowMenu['foto_url'] as String,
+                            ImageUtils.getDirectImageUrl(tomorrowMenu['foto_url'] as String),
                             height: 140,
                             width: double.infinity,
                             fit: BoxFit.cover,

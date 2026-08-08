@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/image_utils.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../production/presentation/widgets/sppg_admin_layout.dart';
 import 'add_menu_form.dart';
@@ -166,7 +167,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.network(
-                      photoUrl,
+                      ImageUtils.getDirectImageUrl(photoUrl),
                       height: 200,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -579,7 +580,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                     borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(16)),
                                     child: Image.network(
-                                      photoUrl,
+                                      ImageUtils.getDirectImageUrl(photoUrl),
                                       height: 130,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
