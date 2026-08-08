@@ -3,7 +3,7 @@
 
 **Nama Proyek:** MBGTrust (Sistem Pendukung Keputusan Program Makan Bergizi Gratis)  
 **Target Kompetisi:** GEMASTIK — Bidang Pengembangan Perangkat Lunak  
-**Versi API:** 3.0.0 (Exhaustive Contract - 26 Endpoints)  
+**Versi API:** 4.0.0 (Schema v5 Aligned — 26 Endpoints)  
 **URL Utama (Base URL):** `https://api.mbgtrust.id/api/v1`  
 **Standar Otentikasi:** Header Otorisasi HTTP (`Authorization: Bearer <TOKEN_JWT>`)  
 **Format Data:** JSON (`Content-Type: application/json`)  
@@ -68,7 +68,7 @@
 {
   "nik_nisn": "3171012345670001",
   "nama_lengkap": "Budi Santoso",
-  "id_sekolah": "sch_78192a8c",
+  "id_sekolah": 1,
   "tingkat_kelas": "5-A",
   "kata_sandi": "KataSandi123!",
   "riwayat_alergi": ["Kacang Tanah", "Udang"]
@@ -81,7 +81,7 @@
   "kode_status": 201,
   "pesan": "Pendaftaran akun penerima manfaat berhasil.",
   "data": {
-    "id_pengguna": "usr_991823ab",
+    "id_pengguna": 1,
     "nik_nisn": "3171012345670001",
     "nama_lengkap": "Budi Santoso",
     "peran": "PENERIMA_MANFAAT",
@@ -151,7 +151,7 @@
 }
 ```
 
-#### 1.4 Perbarui Token Sesi (Refresh Token)
+#### 1.3 Perbarui Token Sesi (Refresh Token)
 * **Endpoint:** `POST /api/v1/otentikasi/perbarui-token`
 * **Hak Akses:** `[PUBLIC]`
 * **Request Body:**
@@ -174,7 +174,7 @@
 }
 ```
 
-#### 1.5 Ambil Profil Pengguna Aktif
+#### 1.4 Ambil Profil Pengguna Aktif
 * **Endpoint:** `GET /api/v1/pengguna/profil-saya`
 * **Hak Akses:** `[AUTH: SEMUA]`
 * **Respon Berhasil (200 OK):**
@@ -197,7 +197,7 @@
 }
 ```
 
-#### 1.6 Perbarui Profil Pengguna
+#### 1.5 Perbarui Profil Pengguna
 * **Endpoint:** `PATCH /api/v1/pengguna/profil-saya`
 * **Hak Akses:** `[AUTH: SEMUA]`
 * **Request Body:**
@@ -251,7 +251,7 @@
   "kode_status": 201,
   "pesan": "Master menu MBG berhasil ditambahkan.",
   "data": {
-    "id_menu": "mnu_441209cc",
+    "id_menu": 1,
     "nama_menu": "Nasi Ayam Bakar Kecap & Tumis Buncis"
   }
 }
@@ -295,7 +295,7 @@
   "kode_status": 200,
   "pesan": "Detail menu berhasil diambil.",
   "data": {
-    "id_menu": "mnu_441209cc",
+    "id_menu": 1,
     "nama_menu": "Nasi Ayam Bakar Kecap & Tumis Buncis",
     "kalori_kkal": 550,
     "protein_gram": 28.5,
@@ -337,8 +337,8 @@
 * **Request Body:**
 ```json
 {
-  "id_menu": "mnu_441209cc",
-  "daftar_id_sekolah": ["sch_78192a8c"],
+  "id_menu": 1,
+  "id_sekolah": 1,
   "tanggal_jadwal": "2026-08-08",
   "target_total_porsi": 450
 }
@@ -350,7 +350,7 @@
   "kode_status": 201,
   "pesan": "Jadwal menu MBG berhasil dipublikasikan.",
   "data": {
-    "id_jadwal": "schd_10928374",
+    "id_jadwal": 1,
     "tanggal_jadwal": "2026-08-08"
   }
 }
@@ -359,7 +359,7 @@
 #### 2.6 Ambil Menu Hari Ini
 * **Endpoint:** `GET /api/v1/jadwal/hari-ini`
 * **Hak Akses:** `[AUTH: SEMUA]`
-* **Query Parameters:** `?idSekolah=sch_78192a8c`
+* **Query Parameters:** `?id_sekolah=1`
 * **Respon Berhasil (200 OK):**
 ```json
 {
@@ -384,7 +384,7 @@
 #### 2.7 Ambil Rencana Menu Besok (H+1)
 * **Endpoint:** `GET /api/v1/jadwal/besok`
 * **Hak Akses:** `[AUTH: SEMUA]`
-* **Query Parameters:** `?idSekolah=sch_78192a8c`
+* **Query Parameters:** `?id_sekolah=1`
 * **Respon Berhasil (200 OK):**
 ```json
 {
@@ -419,8 +419,8 @@
 {
   "menerima_porsi": true,
   "penilaian_rasa": 5,
-  "penilaian_kesukaan": 4,
-  "penilaian_porsi": 4,
+  "tingkat_kesukaan": 4,
+  "kesesuaian_porsi": 4,
   "persentase_sisa_makanan": 10.0,
   "masukan_kualitatif": "Daging ayamnya empuk."
 }
@@ -432,26 +432,26 @@
   "kode_status": 201,
   "pesan": "Umpan balik evaluasi menu berhasil disimpan.",
   "data": {
-    "id_evaluasi": "eval_88712390"
+    "id_evaluasi": 1
   }
 }
 ```
 
 #### 3.2 Kirim Evaluasi Kolektif (Petugas Sekolah)
 * **Endpoint:** `POST /api/v1/jadwal/:idJadwal/evaluasi-kolektif`
-* **Hak Akses:** `[AUTH: PETUGAS_SEKOLAH]`
+* **Hak Akses:** `[AUTH: PETUGAS]`
 * **Request Body:**
 ```json
 {
-  "id_sekolah": "sch_78192a8c",
+  "id_sekolah": 1,
   "tingkat_kelas": "5-A",
   "daftar_evaluasi": [
     {
       "nisn_siswa": "3171012345670002",
       "menerima_porsi": true,
       "penilaian_rasa": 4,
-      "penilaian_kesukaan": 4,
-      "penilaian_porsi": 3,
+      "tingkat_kesukaan": 4,
+      "kesesuaian_porsi": 3,
       "persentase_sisa_makanan": 25.0
     }
   ]
@@ -475,9 +475,9 @@
 * **Request Body:**
 ```json
 {
-  "status_kehadiran": "MENOLAK",
+  "status_kehadiran": "TIDAK_HADIR",
   "kode_alasan_penolakan": "ALERGI",
-  "catatan_khusus": "Alergi udang"
+  "catatan_khusus": "Alergi udang berat"
 }
 ```
 * **Respon Berhasil (200 OK):**
@@ -487,8 +487,8 @@
   "kode_status": 200,
   "pesan": "Konfirmasi kehadiran H+1 berhasil dicatat.",
   "data": {
-    "id_konfirmasi": "conf_33190284",
-    "status_kehadiran": "MENOLAK"
+    "id_konfirmasi": 1,
+    "status_kehadiran": "TIDAK_HADIR"
   }
 }
 ```
@@ -503,10 +503,10 @@
   "kode_status": 200,
   "pesan": "Daftar alasan penolakan berhasil diambil.",
   "data": [
-    { "kode": "ALERGI", "label": "Alergi Makanan / Pantangan Medis" },
-    { "kode": "SAKIT", "label": "Sakit / Tidak Masuk Sekolah" },
-    { "kode": "PANTANGAN_AGAMA", "label": "Pantangan Kepercayaan / Agama" },
-    { "kode": "IZIN_ABSEN", "label": "Izin / Kegiatan Luar Sekolah" }
+    { "id": 1, "kode": "ALERGI",          "label": "Alergi Makanan / Pantangan Medis" },
+    { "id": 2, "kode": "SAKIT",           "label": "Sakit / Tidak Masuk Sekolah" },
+    { "id": 3, "kode": "PANTANGAN_AGAMA", "label": "Pantangan Kepercayaan / Agama" },
+    { "id": 4, "kode": "IZIN_ABSEN",      "label": "Izin / Kegiatan Luar Sekolah" }
   ]
 }
 ```
@@ -567,7 +567,7 @@
   "pesan": "Siklus produksi aktif berhasil diambil.",
   "data": [
     {
-      "id_produksi": "prod_771029",
+      "id_produksi": 1,
       "nama_menu": "Nasi Ayam Bakar Kecap",
       "status_produksi": "PERSIAPAN",
       "total_porsi_dimasak": 450
@@ -592,7 +592,7 @@
   "kode_status": 200,
   "pesan": "Status produksi berhasil diperbarui.",
   "data": {
-    "id_produksi": "prod_771029",
+    "id_produksi": 1,
     "status_produksi": "MEMASAK"
   }
 }
@@ -600,7 +600,7 @@
 
 #### 5.3 Update Status Pengiriman Armada Distribusi
 * **Endpoint:** `PATCH /api/v1/distribusi/:idDistribusi/status`
-* **Hak Akses:** `[AUTH: SPPG_ADMIN, PETUGAS_SEKOLAH]`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN, PETUGAS]`
 * **Request Body:**
 ```json
 {
@@ -615,7 +615,7 @@
   "kode_status": 200,
   "pesan": "Status pengiriman berhasil diperbarui.",
   "data": {
-    "id_distribusi": "dist_990182",
+    "id_distribusi": 1,
     "status_distribusi": "TIBA_DI_SEKOLAH"
   }
 }
@@ -633,7 +633,7 @@
 {
   "tanggal_mulai": "2026-08-01",
   "tanggal_selesai": "2026-08-07",
-  "daftar_id_menu": ["mnu_441209cc", "mnu_551902aa"]
+  "daftar_id_menu": [1, 2]
 }
 ```
 * **Respon Berhasil (200 OK):**
@@ -643,7 +643,7 @@
   "kode_status": 200,
   "pesan": "Kalkulasi SPK TOPSIS selesai dieksekusi.",
   "data": {
-    "id_eksekusi": "topsis_exec_990182",
+    "id_eksekusi": 1,
     "peringkat_menu": [
       {
         "peringkat": 1,
@@ -666,7 +666,7 @@
   "kode_status": 200,
   "pesan": "Rincian matriks TOPSIS berhasil diambil.",
   "data": {
-    "id_eksekusi": "topsis_exec_990182",
+    "id_eksekusi": 1,
     "solusi_ideal_positif_A_plus": [0.142, 0.105, 0.071, 0.045, 0.032],
     "solusi_ideal_negatif_A_minus": [0.080, 0.050, 0.030, 0.150, 0.120]
   }
@@ -697,7 +697,7 @@
 #### 7.1 Ambil Metrik Ringkasan Dasbor
 * **Endpoint:** `GET /api/v1/analitik/ringkasan-dasbor`
 * **Hak Akses:** `[AUTH: SPPG_ADMIN]`
-* **Query Parameters:** `?tanggalMulai=2026-08-01&tanggalSelesai=2026-08-07`
+* **Query Parameters:** `?tanggal_mulai=2026-08-01&tanggal_selesai=2026-08-07`
 * **Respon Berhasil (200 OK):**
 ```json
 {
@@ -708,133 +708,18 @@
     "skor_kepuasan_keseluruhan": 4.52,
     "persentase_tingkat_penerimaan_menu": 91.4,
     "food_waste_tercegah_kg": 142.5,
-    "estimasi_efisiensi_anggaran_rupiah": 2137500
+    "estimasi_efisiensi_anggaran_rupiah": 2137500,
+    "catatan": "food_waste_tercegah_kg dihitung dengan asumsi berat rata-rata 300g per porsi"
   }
 }
 ```
 
-#### 7.2 Unduh Laporan Laporan Evaluasi & Audit Program (PDF / Excel)
+#### 7.2 Unduh Laporan Evaluasi & Audit Program (PDF / Excel)
 * **Endpoint:** `GET /api/v1/laporan/unduh`
 * **Hak Akses:** `[AUTH: SPPG_ADMIN]`
-* **Query Parameters:** `?format=pdf&tanggalMulai=2026-08-01&tanggalSelesai=2026-08-07`
+* **Query Parameters:** `?format=pdf&tanggal_mulai=2026-08-01&tanggal_selesai=2026-08-07`
 * **Respon Berhasil (200 OK - Binary File Stream):**
 * *(Mengembalikan berkas `Content-Type: application/pdf` atau `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`)*
 
 ---
-
-### 🟢 Modul 2.B: Manajemen Master Bahan Makanan Sehat (CRUD Master Bahan)
-
-#### 2.7 Tambah Master Bahan Makanan Sehat Baru
-* **Endpoint:** `POST /api/v1/bahan`
-* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
-* **Request Body:**
-```json
-{
-  "nama_bahan": "Dada Ayam Bakar Kecap",
-  "kategori_bahan": "PROTEIN_HEWANI",
-  "subjudul_nutrisi": "Sumber Utama Protein & Zat Besi",
-  "takaran_default": "80 gram",
-  "kalori_per_100g": 165,
-  "potensi_alergen": []
-}
-```
-* **Respon Berhasil (201 Created):**
-```json
-{
-  "sukses": true,
-  "kode_status": 201,
-  "pesan": "Master bahan makanan sehat berhasil ditambahkan.",
-  "data": {
-    "id_bahan": "bhn_10293847",
-    "nama_bahan": "Dada Ayam Bakar Kecap"
-  }
-}
-```
-
-#### 2.8 Ambil Daftar Master Bahan Makanan Sehat (Katalog & Pencarian)
-* **Endpoint:** `GET /api/v1/bahan`
-* **Hak Akses:** `[AUTH: SEMUA]`
-* **Query Parameters:** `?halaman=1&batas=10&kategori=PROTEIN_HEWANI&cari=Ayam`
-* **Respon Berhasil (200 OK):**
-```json
-{
-  "sukses": true,
-  "kode_status": 200,
-  "pesan": "Daftar master bahan makanan sehat berhasil diambil.",
-  "data": [
-    {
-      "id_bahan": "bhn_10293847",
-      "nama_bahan": "Dada Ayam Bakar Kecap",
-      "kategori_bahan": "PROTEIN_HEWANI",
-      "subjudul_nutrisi": "Sumber Utama Protein & Zat Besi",
-      "takaran_default": "80 gram",
-      "kalori_per_100g": 165
-    }
-  ],
-  "meta": {
-    "halaman": 1,
-    "batas": 10,
-    "total_item": 12,
-    "total_halaman": 2
-  }
-}
-```
-
-#### 2.9 Ambil Detail Master Bahan Makanan Sehat
-* **Endpoint:** `GET /api/v1/bahan/:idBahan`
-* **Hak Akses:** `[AUTH: SEMUA]`
-* **Respon Berhasil (200 OK):**
-```json
-{
-  "sukses": true,
-  "kode_status": 200,
-  "pesan": "Detail master bahan makanan sehat berhasil diambil.",
-  "data": {
-    "id_bahan": "bhn_10293847",
-    "nama_bahan": "Dada Ayam Bakar Kecap",
-    "kategori_bahan": "PROTEIN_HEWANI",
-    "subjudul_nutrisi": "Sumber Utama Protein & Zat Besi",
-    "takaran_default": "80 gram",
-    "kalori_per_100g": 165,
-    "potensi_alergen": []
-  }
-}
-```
-
-#### 2.10 Perbarui Data Master Bahan Makanan Sehat
-* **Endpoint:** `PATCH /api/v1/bahan/:idBahan`
-* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
-* **Request Body:**
-```json
-{
-  "subjudul_nutrisi": "Sumber Tinggi Protein Organik & Zat Besi",
-  "takaran_default": "85 gram"
-}
-```
-* **Respon Berhasil (200 OK):**
-```json
-{
-  "sukses": true,
-  "kode_status": 200,
-  "pesan": "Master bahan makanan sehat berhasil diperbarui.",
-  "data": {
-    "id_bahan": "bhn_10293847",
-    "nama_bahan": "Dada Ayam Bakar Kecap"
-  }
-}
-```
-
-#### 2.11 Hapus Master Bahan Makanan Sehat
-* **Endpoint:** `DELETE /api/v1/bahan/:idBahan`
-* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
-* **Respon Berhasil (200 OK):**
-```json
-{
-  "sukses": true,
-  "kode_status": 200,
-  "pesan": "Master bahan makanan sehat berhasil dihapus."
-}
-```
-
----
-*Akhir dari Dokumen Kontrak Spesifikasi API Eksklusif (v3.1.0 — 31 Endpoints)*
+*Akhir dari Dokumen Kontrak Spesifikasi API Eksklusif (v3.0.0 — 26 Endpoints)*
