@@ -38,7 +38,63 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
     super.dispose();
   }
 
-  Future<void> _handleSubmit() async {
+  void _showPreSubmitConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (confirmCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.lock_clock_rounded, color: AppColors.primary, size: 24),
+            SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                'Konfirmasi Pengiriman',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Apakah Anda yakin ingin mengirim evaluasi menu hari ini?\n\nUlasan yang telah dikirim bersifat permanen dan tidak dapat diubah kembali.',
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(confirmCtx),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: AppColors.textLight),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(confirmCtx);
+              _executeSubmit();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Ya, Kirim Ulasan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _executeSubmit() async {
     setState(() => _isSubmitting = true);
     final repo = EvaluationRepository();
 
@@ -62,8 +118,8 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
 
       if (widget.onSubmitted != null) widget.onSubmitted!();
 
-      // MUNCULKAN GAMIFICATION CELEBRATION DIALOG TANPA OVERFLOW
-      _showGamificationCelebrationDialog(context);
+      // MUNCULKAN DIALOG SUKSES BERSIH TANPA XP GAMIFIKASI
+      _showCleanSuccessDialog(context);
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSubmitting = false);
@@ -77,7 +133,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
     }
   }
 
-  void _showGamificationCelebrationDialog(BuildContext parentContext) {
+  void _showCleanSuccessDialog(BuildContext parentContext) {
     showDialog(
       context: parentContext,
       barrierDismissible: false,
@@ -86,28 +142,28 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 380),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Trophy Badge
+                // Icon Centang Sukses Green
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
-                    color: AppColors.secondaryLight,
+                    color: AppColors.primaryLight,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons.emoji_events_rounded,
-                    color: AppColors.secondaryDark,
+                    Icons.check_circle_rounded,
+                    color: AppColors.primary,
                     size: 48,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
                 const Text(
-                  '🏆 Ulasan Berhasil Dikirim!',
+                  '✓ Evaluasi Menu Berhasil Dikirim!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
@@ -115,37 +171,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 8),
-
-                // XP Points Banner Card (dengan Flexible agar tidak overflow)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.stars_rounded,
-                          color: AppColors.primary, size: 18),
-                      SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          '+50 XP Pahlawan Anti-Food Waste',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 const Text(
                   'Terima kasih Faizullatif Fajran!\nUlasan Anda membantu Dapur SPPG Unit Kota Padang 01 menjaga kualitas gizi di MAN 2 Kota Padang.',
@@ -153,19 +179,20 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
-                    height: 1.35,
+                    height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
-                // Status Unlock Banner (dengan Flexible agar tidak overflow)
+                // Status Unlock Banner
                 Container(
                   width: double.infinity,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -175,7 +202,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                       SizedBox(width: 6),
                       Flexible(
                         child: Text(
-                          'Konfirmasi Presensi Menu Besok Resmi Terbuka!',
+                          'Konfirmasi Ketersediaan Menu Besok Terbuka!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 11,
@@ -187,11 +214,11 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Tombol Utama: Lanjut Konfirmasi Menu Besok
                 CustomButton(
-                  text: 'Lanjut Konfirmasi Menu Besok ➔',
+                  text: 'Lanjut Konfirmasi Ketersediaan Besok ➔',
                   prefixIcon: const Icon(Icons.event_available_rounded,
                       color: Colors.white, size: 18),
                   onPressed: () {
@@ -333,7 +360,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Evaluasi & Ulasan Makanan Hari Ini',
+            'Evaluasi Menu Hari Ini',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -414,7 +441,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                   ),
                   const SizedBox(height: 16),
                   CustomButton(
-                    text: 'Lanjut Konfirmasi Menu Besok ➔',
+                    text: 'Lanjut Konfirmasi Ketersediaan Besok ➔',
                     prefixIcon: const Icon(Icons.event_available_rounded,
                         size: 20, color: Colors.white),
                     onPressed: () {
@@ -576,11 +603,11 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
             const SizedBox(height: 20),
 
             CustomButton(
-              text: 'Kirim Evaluasi Makanan',
+              text: 'Kirim Evaluasi Menu Hari Ini',
               prefixIcon:
                   const Icon(Icons.send_rounded, size: 18, color: Colors.white),
               isLoading: _isSubmitting,
-              onPressed: _handleSubmit,
+              onPressed: _showPreSubmitConfirmationDialog,
             ),
           ],
         ],

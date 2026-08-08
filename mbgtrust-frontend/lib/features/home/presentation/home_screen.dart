@@ -14,8 +14,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // Status alur evaluasi hari ini
+  // Status alur evaluasi hari ini & konfirmasi besok
   bool _hasEvaluatedToday = false;
+  bool _hasConfirmedTomorrow = false;
   final bool _didNotReceiveFoodToday = false;
 
   bool get _isNextDayUnlocked => _hasEvaluatedToday || _didNotReceiveFoodToday;
@@ -56,6 +57,135 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     return '$hours Jam : $minutes Menit : $seconds Detik';
+  }
+
+  void _showQrTicketDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 380),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '🎫 Tiket MBG Digital',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const Divider(),
+              const SizedBox(height: 12),
+
+              // QR Code Graphic Placeholder
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.qr_code_2_rounded,
+                      size: 140,
+                      color: AppColors.primaryDark,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'STATUS: VERIFIED / TERDAFTAR PORSI',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryDark,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Student Info Text
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Nama: ${MockData.studentProfile['name']}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Sekolah: ${MockData.studentProfile['school']} (${MockData.studentProfile['classGrade']})',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    Text(
+                      'Target Menu: ${MockData.tomorrowMenu['tanggal_jadwal']}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Tunjukkan QR Code ini kepada Guru Piket / Petugas Sekolah saat pengambilan porsi di sekolah.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textLight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -236,101 +366,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 24),
 
                 // ==========================================
-                // BANNER LIVE COUNTDOWN TIMER DI HALAMAN DEPAN
+                // BANNER LIVE COUNTDOWN TIMER (HILANG JIKA SUDAH KONFIRMASI)
                 // ==========================================
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.secondaryDark, Colors.deepOrange],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.orange.withValues(alpha: 0.25),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                if (!_hasConfirmedTomorrow) ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.secondaryDark, Colors.deepOrange],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: const [
-                                Icon(Icons.timer_rounded,
-                                    color: Colors.white, size: 20),
-                                SizedBox(width: 8),
-                                Flexible(
-                                  child: Text(
-                                    'Sisa Waktu Konfirmasi Besok',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withValues(alpha: 0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.timer_rounded,
+                                      color: Colors.white, size: 20),
+                                  SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      'Sisa Waktu Konfirmasi Besok',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Batas 17:00 WIB',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
+                                ],
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'Batas 17:00 WIB',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _formatDuration(_remainingTime),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.8,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _formatDuration(_remainingTime),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.8,
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'Dapur SPPG Unit Kota Padang 01 membutuhkan konfirmasi sebelum pukul 17:00 WIB.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 11,
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Dapur SPPG Unit Kota Padang 01 membutuhkan konfirmasi sebelum pukul 17:00 WIB.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
+                ],
 
                 // ==========================================
-                // KARTU 1: EVALUASI & ULASAN MAKANAN HARI INI
+                // KARTU 1: EVALUASI MENU HARI INI
                 // ==========================================
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      '1. Evaluasi Makanan Hari Ini',
+                      '1. Evaluasi Menu Hari Ini',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -431,44 +563,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                final result = await context.push<bool>(
-                                    '/menu-detail',
-                                    extra: todayMenu);
-                                if (result == true) {
-                                  setState(() => _hasEvaluatedToday = true);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _hasEvaluatedToday
-                                    ? AppColors.surface
-                                    : AppColors.primary,
-                                foregroundColor: _hasEvaluatedToday
-                                    ? AppColors.primary
-                                    : Colors.white,
-                                side: _hasEvaluatedToday
-                                    ? const BorderSide(color: AppColors.primary)
-                                    : BorderSide.none,
-                                minimumSize: const Size(double.infinity, 46),
-                                shape: RoundedRectangleBorder(
+
+                            // SELESAI ULASAN: HILANGKAN TOMBOL EDIT & TAMPILKAN BADGE PERMANEN
+                            if (_hasEvaluatedToday) ...[
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.primary),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(Icons.check_circle_rounded,
+                                        color: AppColors.primaryDark, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      '✓ Evaluasi Menu Telah Dikirim (Permanen)',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryDark,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              icon: Icon(
-                                _hasEvaluatedToday
-                                    ? Icons.check_circle_rounded
-                                    : Icons.rate_review_rounded,
-                                size: 18,
+                            ] else ...[
+                              ElevatedButton.icon(
+                                onPressed: () async {
+                                  final result = await context.push<bool>(
+                                      '/menu-detail',
+                                      extra: todayMenu);
+                                  if (result == true) {
+                                    setState(() => _hasEvaluatedToday = true);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(double.infinity, 46),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.rate_review_rounded,
+                                    size: 18),
+                                label: const Text(
+                                  'Isi Evaluasi Menu Hari Ini',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              label: Text(
-                                _hasEvaluatedToday
-                                    ? 'Lihat / Edit Ulasan Hari Ini'
-                                    : 'Isi Ulasan & Evaluasi Rasa Hari Ini',
-                                style:
-                                    const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                            ],
                           ],
                         ),
                       ),
@@ -478,7 +627,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 32),
 
                 // ==========================================
-                // KARTU 2: KONFIRMASI KETERSEDIAAN MENERIMA BESOK
+                // KARTU 2: KONFIRMASI KETERSEDIAAN BESOK
                 // ==========================================
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -518,7 +667,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            _isNextDayUnlocked ? 'Terbuka' : 'Terkunci',
+                            _hasConfirmedTomorrow
+                                ? 'Selesai'
+                                : (_isNextDayUnlocked ? 'Terbuka' : 'Terkunci'),
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -641,10 +792,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ],
                                 ),
                               ),
+                            ] else if (_hasConfirmedTomorrow) ...[
+                              // SUDAH KONFIRMASI: TAMPILKAN TOMBOL LIHAT QR TIKET MBG
+                              ElevatedButton.icon(
+                                onPressed: () => _showQrTicketDialog(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.secondaryDark,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(double.infinity, 46),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.qr_code_2_rounded,
+                                    size: 20),
+                                label: const Text(
+                                  '🎫 Lihat QR Tiket MBG Saya',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ] else ...[
                               ElevatedButton.icon(
-                                onPressed: () {
-                                  context.push('/next-day-confirmation');
+                                onPressed: () async {
+                                  final result = await context.push<dynamic>(
+                                      '/next-day-confirmation');
+                                  if (result == true || result != null) {
+                                    setState(() => _hasConfirmedTomorrow = true);
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
