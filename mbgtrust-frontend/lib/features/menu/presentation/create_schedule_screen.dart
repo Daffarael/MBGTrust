@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../production/presentation/widgets/sppg_admin_layout.dart';
 
 class CreateScheduleScreen extends StatefulWidget {
   final List<Map<String, dynamic>>? availableMenus;
@@ -67,7 +68,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                   Expanded(
                     child: Text(
                       'Pilih Menu Hari $day',
-                      overflow: TextOverflow.ellipsis,
+                      softWrap: true,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -122,6 +123,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                       ),
                       title: Text(
                         name,
+                        softWrap: true,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -132,6 +134,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                       ),
                       subtitle: Text(
                         '$calories kcal • ${item['category'] ?? "Makan Siang"}',
+                        softWrap: true,
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -180,14 +183,13 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Buat Jadwal Mingguan'),
-        centerTitle: true,
-      ),
+    return SppgAdminLayout(
+      currentRoute: '/create-schedule',
+      title: 'Plotting Jadwal Menu',
+      subtitle: 'Pengaturan Menu Harian SPPG',
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
+          constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
             children: [
               // Subtitle Banner
@@ -203,6 +205,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                     Expanded(
                       child: Text(
                         'Pilihlah menu terbaik untuk setiap hari kerja (Senin - Jumat) dari Master Menu SPPG.',
+                        softWrap: true,
                         style: TextStyle(
                           fontSize: 12,
                           color: AppColors.primaryDark,
@@ -260,6 +263,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                   ),
                                   child: Text(
                                     'Hari $day',
+                                    softWrap: true,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 12,
@@ -280,6 +284,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                     assignedMenu != null
                                         ? 'Ganti Menu'
                                         : 'Pilih Menu',
+                                    softWrap: true,
                                     style: const TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -291,7 +296,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                             ),
                             const SizedBox(height: 10),
 
-                            // Menu Item Preview
+                            // Menu Item Preview (TEKS DIBACA UTUH 100%)
                             if (assignedMenu != null)
                               Row(
                                 children: [
@@ -322,17 +327,17 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                       children: [
                                         Text(
                                           assignedMenu['name'] ?? '',
+                                          softWrap: true,
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.textPrimary,
                                           ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
                                           '${assignedMenu['calories'] ?? 500} kcal • Protein: ${assignedMenu['protein'] ?? "25g"}',
+                                          softWrap: true,
                                           style: const TextStyle(
                                             fontSize: 12,
                                             color: AppColors.textSecondary,
@@ -368,6 +373,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                 child: const Text(
                                   'Belum ada menu yang dipilih untuk hari ini.',
                                   textAlign: TextAlign.center,
+                                  softWrap: true,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textLight,

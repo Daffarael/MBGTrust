@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/widgets.dart';
 import '../data/models/production_plan_model.dart';
 import '../data/repositories/production_repository.dart';
+import 'widgets/sppg_admin_layout.dart';
 
 class EstimationScreen extends StatefulWidget {
   const EstimationScreen({super.key});
@@ -103,6 +104,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                   const Expanded(
                     child: Text(
                       '🧮 Detail Matriks SPK TOPSIS',
+                      softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -120,16 +122,19 @@ class _EstimationScreenState extends State<EstimationScreen> {
               const SizedBox(height: 10),
               const Text(
                 'Bobot Kriteria Penilaian (Wj):',
+                softWrap: true,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 6),
               const Text(
                 '• C1 Rasa (30%) • C2 Kesukaan (25%) • C3 Porsi (20%) • C4 Sisa Makanan (25%)',
+                softWrap: true,
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 16),
               const Text(
                 'Matriks Terbobot & Jarak Solusi Ideal (D+, D-):',
+                softWrap: true,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               const SizedBox(height: 8),
@@ -164,12 +169,13 @@ class _EstimationScreenState extends State<EstimationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(menuName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                Text('$dPlus | $dMinus', style: const TextStyle(fontSize: 10, color: AppColors.textLight)),
+                Text(menuName, softWrap: true, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                Text('$dPlus | $dMinus', softWrap: true, style: const TextStyle(fontSize: 10, color: AppColors.textLight)),
               ],
             ),
           ),
-          Text(vScore, style: TextStyle(fontWeight: FontWeight.bold, color: statusColor, fontSize: 13)),
+          const SizedBox(width: 8),
+          Text(vScore, softWrap: true, style: TextStyle(fontWeight: FontWeight.bold, color: statusColor, fontSize: 13)),
         ],
       ),
     );
@@ -190,37 +196,20 @@ class _EstimationScreenState extends State<EstimationScreen> {
     final rejected = plan.totalSiswaMenolak;
     final precisionPortions = plan.totalPorsiPresisiWajibDimasak;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Dasbor Dapur SPPG',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'SPPG Unit Kota Padang 01',
-              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
-            ),
-          ],
+    return SppgAdminLayout(
+      currentRoute: '/estimation',
+      title: 'Dasbor & Presisi H+1',
+      subtitle: 'SPPG Unit Dapur Kota Padang 01',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+          tooltip: 'Hitung Ulang Presisi Porsi',
+          onPressed: _recalculateEstimate,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
-            tooltip: 'Hitung Ulang Presisi Porsi',
-            onPressed: _recalculateEstimate,
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-            tooltip: 'Keluar',
-            onPressed: () => context.go('/login'),
-          ),
-        ],
-      ),
+      ],
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
+          constraints: const BoxConstraints(maxWidth: 720),
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
@@ -268,6 +257,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                 children: [
                                   const Text(
                                     'Dapur SPPG Unit Kota Padang 01',
+                                    softWrap: true,
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 15,
@@ -277,6 +267,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                   const SizedBox(height: 2),
                                   Text(
                                     'Target Wajib Dimasak: $precisionPortions Porsi Presisi H+1',
+                                    softWrap: true,
                                     style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 12,
@@ -293,6 +284,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       // 4 Stat Cards Analitik Utama
                       const Text(
                         'Ringkasan Analitik Eksekutif',
+                        softWrap: true,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -360,6 +352,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: Text(
                               'Presisi Porsi Memasak H+1',
+                              softWrap: true,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -431,7 +424,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             ),
                             const SizedBox(height: 16),
 
-                            // Rincian Alasan Penolakan
+                            // Rincian Alasan Penolakan (TEKS DIBACA UTUH 100%)
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
@@ -445,6 +438,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                 children: const [
                                   Text(
                                     'Rincian Alasan Penolakan Siswa (50 Porsi):',
+                                    softWrap: true,
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -453,14 +447,17 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                   ),
                                   SizedBox(height: 6),
                                   Text('• 30 Siswa: Alergi Makanan (Kacang / Udang)',
+                                      softWrap: true,
                                       style: TextStyle(
                                           fontSize: 11,
                                           color: AppColors.secondaryDark)),
                                   Text('• 10 Siswa: Sakit / Tidak Masuk Sekolah',
+                                      softWrap: true,
                                       style: TextStyle(
                                           fontSize: 11,
                                           color: AppColors.textSecondary)),
                                   Text('• 10 Siswa: Izin / Kegiatan Luar Sekolah',
+                                      softWrap: true,
                                       style: TextStyle(
                                           fontSize: 11,
                                           color: AppColors.textSecondary)),
@@ -480,6 +477,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           const Expanded(
                             child: Text(
                               '🧮 Engine SPK TOPSIS Evaluasi Menu',
+                              softWrap: true,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -524,6 +522,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           children: [
                             const Text(
                               'Hasil Ranking Preferensi Menu (Vi):',
+                              softWrap: true,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -562,6 +561,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       // NAVIGASI AKSI UTAMA SPPG
                       const Text(
                         'Aksi Pintas Pengelola SPPG',
+                        softWrap: true,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -625,6 +625,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
             children: [
               Text(
                 rank,
+                softWrap: true,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -641,6 +642,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 ),
                 child: Text(
                   badgeText,
+                  softWrap: true,
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -650,12 +652,13 @@ class _EstimationScreenState extends State<EstimationScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Row(
             children: [
               Expanded(
                 child: Text(
                   menuName,
+                  softWrap: true,
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -666,6 +669,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
               const SizedBox(width: 8),
               Text(
                 score,
+                softWrap: true,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -748,7 +752,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
               Flexible(
                 child: Text(
                   value,
-                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
@@ -761,6 +765,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
           const SizedBox(height: 10),
           Text(
             title,
+            softWrap: true,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
@@ -769,6 +774,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
           ),
           Text(
             subtitle,
+            softWrap: true,
             style: const TextStyle(
               fontSize: 11,
               color: AppColors.textLight,
@@ -804,6 +810,7 @@ class _ChartLegendTile extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
+          softWrap: true,
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../production/presentation/widgets/sppg_admin_layout.dart';
 
 class DistributionTrackerScreen extends StatefulWidget {
   const DistributionTrackerScreen({super.key});
@@ -76,14 +77,13 @@ class _DistributionTrackerScreenState
     final currentStatusTitle = _statusSteps[_currentStep]['title'];
     final progressRatio = (_currentStep + 1) / _statusSteps.length;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pelacak Logistik Distribusi'),
-        centerTitle: true,
-      ),
+    return SppgAdminLayout(
+      currentRoute: '/distribution-tracker',
+      title: 'Pelacak Logistik',
+      subtitle: 'Armada Pengiriman Dapur SPPG',
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
+          constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
             children: [
               Expanded(
@@ -116,7 +116,7 @@ class _DistributionTrackerScreenState
                                 const Expanded(
                                   child: Text(
                                     'Pengiriman #MBG-20260808-01',
-                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -134,6 +134,7 @@ class _DistributionTrackerScreenState
                                   ),
                                   child: Text(
                                     currentStatusTitle as String,
+                                    softWrap: true,
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
@@ -146,6 +147,7 @@ class _DistributionTrackerScreenState
                             const SizedBox(height: 12),
                             const Text(
                               'Target: MAN 2 Kota Padang',
+                              softWrap: true,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -155,6 +157,7 @@ class _DistributionTrackerScreenState
                             const SizedBox(height: 4),
                             const Text(
                               'Kurir: Ahmad Supriadi (Armada Box Hino #04)',
+                              softWrap: true,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
@@ -172,6 +175,7 @@ class _DistributionTrackerScreenState
                                   children: [
                                     const Text(
                                       'Progres Pengiriman:',
+                                      softWrap: true,
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -180,6 +184,7 @@ class _DistributionTrackerScreenState
                                     ),
                                     Text(
                                       '${(progressRatio * 100).round()}%',
+                                      softWrap: true,
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -209,6 +214,7 @@ class _DistributionTrackerScreenState
 
                       const Text(
                         'Timeline Status Pengiriman Dapur:',
+                        softWrap: true,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -217,7 +223,7 @@ class _DistributionTrackerScreenState
                       ),
                       const SizedBox(height: 16),
 
-                      // Stepper List View
+                      // Stepper List View (TEKS DIBACA UTUH 100%)
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -304,7 +310,7 @@ class _DistributionTrackerScreenState
                                           Expanded(
                                             child: Text(
                                               step['title'] as String,
-                                              overflow: TextOverflow.ellipsis,
+                                              softWrap: true,
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
@@ -319,6 +325,7 @@ class _DistributionTrackerScreenState
                                           const SizedBox(width: 8),
                                           Text(
                                             step['time'] as String,
+                                            softWrap: true,
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: isCurrent
@@ -334,6 +341,7 @@ class _DistributionTrackerScreenState
                                       const SizedBox(height: 4),
                                       Text(
                                         step['subtitle'] as String,
+                                        softWrap: true,
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: isCurrent

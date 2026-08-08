@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/widgets.dart';
+import '../../production/presentation/widgets/sppg_admin_layout.dart';
 import 'add_menu_form.dart';
 
 class ManageMenuScreen extends StatefulWidget {
@@ -18,7 +19,6 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
   @override
   void initState() {
     super.initState();
-    // Copy initial data locally
     _menuList = List<Map<String, dynamic>>.from(MockData.foodMenuList);
   }
 
@@ -107,21 +107,20 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Kelola Master Menu'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month_rounded,
-                color: AppColors.primary),
-            tooltip: 'Buat Jadwal Menu',
-            onPressed: () {
-              context.push('/create-schedule', extra: _menuList);
-            },
-          ),
-        ],
-      ),
+    return SppgAdminLayout(
+      currentRoute: '/manage-menu',
+      title: 'Kelola Master Menu',
+      subtitle: 'Katalog Menu Seimbang SPPG',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.calendar_month_rounded,
+              color: AppColors.primary),
+          tooltip: 'Buat Jadwal Menu',
+          onPressed: () {
+            context.push('/create-schedule', extra: _menuList);
+          },
+        ),
+      ],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _handleAddMenu,
         backgroundColor: AppColors.primary,
@@ -163,13 +162,15 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
               padding: const EdgeInsets.all(16.0),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+                  final crossAxisCount = constraints.maxWidth > 800
+                      ? 3
+                      : (constraints.maxWidth > 500 ? 2 : 1);
                   return GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
                       crossAxisSpacing: 14,
                       mainAxisSpacing: 14,
-                      childAspectRatio: 0.72,
+                      mainAxisExtent: 310,
                     ),
                     itemCount: _menuList.length,
                     itemBuilder: (context, index) {
@@ -202,20 +203,20 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                 ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(16)),
-                                  child: AspectRatio(
-                                    aspectRatio: 16 / 10,
-                                    child: Image.network(
-                                      photoUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              Container(
-                                        color: AppColors.primaryLight,
-                                        child: const Icon(
-                                          Icons.restaurant_menu_rounded,
-                                          color: AppColors.primary,
-                                          size: 32,
-                                        ),
+                                  child: Image.network(
+                                    photoUrl,
+                                    height: 130,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Container(
+                                      height: 130,
+                                      color: AppColors.primaryLight,
+                                      child: const Icon(
+                                        Icons.restaurant_menu_rounded,
+                                        color: AppColors.primary,
+                                        size: 36,
                                       ),
                                     ),
                                   ),
@@ -232,6 +233,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                     ),
                                     child: Text(
                                       category,
+                                      softWrap: true,
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -243,23 +245,22 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                               ],
                             ),
 
-                            // Card Content
+                            // Card Content (TEKS DIBACA UTUH 100%)
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.all(10.0),
+                                padding: const EdgeInsets.all(12.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       title,
+                                      softWrap: true,
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textPrimary,
                                         height: 1.2,
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     const Spacer(),
                                     Row(
@@ -272,6 +273,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                         const SizedBox(width: 4),
                                         Text(
                                           '$calories kcal',
+                                          softWrap: true,
                                           style: const TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -280,7 +282,8 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                         ),
                                         const Spacer(),
                                         Text(
-                                          protein,
+                                          'Protein: $protein',
+                                          softWrap: true,
                                           style: const TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.bold,
@@ -309,6 +312,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                                 SizedBox(width: 4),
                                                 Text(
                                                   'Edit',
+                                                  softWrap: true,
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
@@ -338,6 +342,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                                                 SizedBox(width: 4),
                                                 Text(
                                                   'Hapus',
+                                                  softWrap: true,
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
