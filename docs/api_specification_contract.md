@@ -721,4 +721,120 @@
 * *(Mengembalikan berkas `Content-Type: application/pdf` atau `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`)*
 
 ---
-*Akhir dari Dokumen Kontrak Spesifikasi API Eksklusif (v3.0.0 — 26 Endpoints)*
+
+### 🟢 Modul 2.B: Manajemen Master Bahan Makanan Sehat (CRUD Master Bahan)
+
+#### 2.7 Tambah Master Bahan Makanan Sehat Baru
+* **Endpoint:** `POST /api/v1/bahan`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Request Body:**
+```json
+{
+  "nama_bahan": "Dada Ayam Bakar Kecap",
+  "kategori_bahan": "PROTEIN_HEWANI",
+  "subjudul_nutrisi": "Sumber Utama Protein & Zat Besi",
+  "takaran_default": "80 gram",
+  "kalori_per_100g": 165,
+  "potensi_alergen": []
+}
+```
+* **Respon Berhasil (201 Created):**
+```json
+{
+  "sukses": true,
+  "kode_status": 201,
+  "pesan": "Master bahan makanan sehat berhasil ditambahkan.",
+  "data": {
+    "id_bahan": "bhn_10293847",
+    "nama_bahan": "Dada Ayam Bakar Kecap"
+  }
+}
+```
+
+#### 2.8 Ambil Daftar Master Bahan Makanan Sehat (Katalog & Pencarian)
+* **Endpoint:** `GET /api/v1/bahan`
+* **Hak Akses:** `[AUTH: SEMUA]`
+* **Query Parameters:** `?halaman=1&batas=10&kategori=PROTEIN_HEWANI&cari=Ayam`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Daftar master bahan makanan sehat berhasil diambil.",
+  "data": [
+    {
+      "id_bahan": "bhn_10293847",
+      "nama_bahan": "Dada Ayam Bakar Kecap",
+      "kategori_bahan": "PROTEIN_HEWANI",
+      "subjudul_nutrisi": "Sumber Utama Protein & Zat Besi",
+      "takaran_default": "80 gram",
+      "kalori_per_100g": 165
+    }
+  ],
+  "meta": {
+    "halaman": 1,
+    "batas": 10,
+    "total_item": 12,
+    "total_halaman": 2
+  }
+}
+```
+
+#### 2.9 Ambil Detail Master Bahan Makanan Sehat
+* **Endpoint:** `GET /api/v1/bahan/:idBahan`
+* **Hak Akses:** `[AUTH: SEMUA]`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Detail master bahan makanan sehat berhasil diambil.",
+  "data": {
+    "id_bahan": "bhn_10293847",
+    "nama_bahan": "Dada Ayam Bakar Kecap",
+    "kategori_bahan": "PROTEIN_HEWANI",
+    "subjudul_nutrisi": "Sumber Utama Protein & Zat Besi",
+    "takaran_default": "80 gram",
+    "kalori_per_100g": 165,
+    "potensi_alergen": []
+  }
+}
+```
+
+#### 2.10 Perbarui Data Master Bahan Makanan Sehat
+* **Endpoint:** `PATCH /api/v1/bahan/:idBahan`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Request Body:**
+```json
+{
+  "subjudul_nutrisi": "Sumber Tinggi Protein Organik & Zat Besi",
+  "takaran_default": "85 gram"
+}
+```
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Master bahan makanan sehat berhasil diperbarui.",
+  "data": {
+    "id_bahan": "bhn_10293847",
+    "nama_bahan": "Dada Ayam Bakar Kecap"
+  }
+}
+```
+
+#### 2.11 Hapus Master Bahan Makanan Sehat
+* **Endpoint:** `DELETE /api/v1/bahan/:idBahan`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Master bahan makanan sehat berhasil dihapus."
+}
+```
+
+---
+*Akhir dari Dokumen Kontrak Spesifikasi API Eksklusif (v3.1.0 — 31 Endpoints)*
