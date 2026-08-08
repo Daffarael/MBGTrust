@@ -459,16 +459,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // KARTU 1: EVALUASI MENU HARI INI
                 // ==========================================
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      '1. Evaluasi Menu Hari Ini',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                    const Expanded(
+                      child: Text(
+                        '1. Evaluasi Menu Hari Ini',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
@@ -564,12 +567,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                             const SizedBox(height: 16),
 
-                            // SELESAI ULASAN: HILANGKAN TOMBOL EDIT & TAMPILKAN BADGE PERMANEN
+                            // SELESAI ULASAN: HILANGKAN TOMBOL EDIT & TAMPILKAN BADGE PERMANEN (BEBAS OVERFLOW)
                             if (_hasEvaluatedToday) ...[
                               Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 16),
+                                    vertical: 12, horizontal: 14),
                                 decoration: BoxDecoration(
                                   color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(12),
@@ -581,12 +584,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     Icon(Icons.check_circle_rounded,
                                         color: AppColors.primaryDark, size: 20),
                                     SizedBox(width: 8),
-                                    Text(
-                                      '✓ Evaluasi Menu Telah Dikirim (Permanen)',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryDark,
+                                    Flexible(
+                                      child: Text(
+                                        '✓ Evaluasi Menu Telah Dikirim',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryDark,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -630,16 +636,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // KARTU 2: KONFIRMASI KETERSEDIAAN BESOK
                 // ==========================================
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      '2. Konfirmasi Ketersediaan Besok',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                    const Expanded(
+                      child: Text(
+                        '2. Konfirmasi Ketersediaan Besok',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
