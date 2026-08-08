@@ -1,0 +1,590 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/widgets.dart';
+import '../data/models/evaluation_model.dart';
+import '../data/repositories/evaluation_repository.dart';
+
+class RatingSection extends ConsumerStatefulWidget {
+  final String scheduleId;
+  final VoidCallback? onSubmitted;
+  final VoidCallback? onOpenNextDayConfirmation;
+
+  const RatingSection({
+    super.key,
+    this.scheduleId = 'schd_10928374',
+    this.onSubmitted,
+    this.onOpenNextDayConfirmation,
+  });
+
+  @override
+  ConsumerState<RatingSection> createState() => _RatingSectionState();
+}
+
+class _RatingSectionState extends ConsumerState<RatingSection> {
+  bool _menerimaPorsi = true;
+  int _penilaianRasa = 5;
+  int _penilaianKesukaan = 4;
+  int _penilaianPorsi = 4;
+  double _sisaMakananPercentage = 0.0; // 0.0 - 100.0
+  final TextEditingController _commentController =
+      TextEditingController(text: 'Daging ayamnya empuk dan bumbunya pas.');
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSubmit() async {
+    setState(() => _isSubmitting = true);
+    final repo = EvaluationRepository();
+
+    try {
+      final req = SubmitEvaluationRequest(
+        menerimaPorsi: _menerimaPorsi,
+        penilaianRasa: _menerimaPorsi ? _penilaianRasa : 1,
+        penilaianKesukaan: _menerimaPorsi ? _penilaianKesukaan : 1,
+        penilaianPorsi: _menerimaPorsi ? _penilaianPorsi : 1,
+        persentaseSisaMakanan: _menerimaPorsi ? _sisaMakananPercentage : 100.0,
+        masukanKualitatif: _menerimaPorsi ? _commentController.text.trim() : 'Tidak menerima porsi.',
+      );
+
+      await repo.submitEvaluation(
+        idJadwal: widget.scheduleId,
+        request: req,
+      );
+
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+
+      if (widget.onSubmitted != null) widget.onSubmitted!();
+
+      // MUNCULKAN GAMIFICATION CELEBRATION DIALOG TANPA OVERFLOW
+      _showGamificationCelebrationDialog(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal mengirim evaluasi: ${e.toString()}'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
+
+  void _showGamificationCelebrationDialog(BuildContext parentContext) {
+    showDialog(
+      context: parentContext,
+      barrierDismissible: false,
+      builder: (dialogCtx) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 380),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Trophy Badge
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: AppColors.secondaryLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.emoji_events_rounded,
+                    color: AppColors.secondaryDark,
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                const Text(
+                  '🏆 Ulasan Berhasil Dikirim!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // XP Points Banner Card (dengan Flexible agar tidak overflow)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.stars_rounded,
+                          color: AppColors.primary, size: 18),
+                      SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          '+50 XP Pahlawan Anti-Food Waste',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                const Text(
+                  'Terima kasih Faizullatif Fajran!\nUlasan Anda membantu Dapur SPPG Unit Kota Padang 01 menjaga kualitas gizi di MAN 2 Kota Padang.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Status Unlock Banner (dengan Flexible agar tidak overflow)
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.lock_open_rounded,
+                          size: 16, color: AppColors.primary),
+                      SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Konfirmasi Presensi Menu Besok Resmi Terbuka!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Tombol Utama: Lanjut Konfirmasi Menu Besok
+                CustomButton(
+                  text: 'Lanjut Konfirmasi Menu Besok ➔',
+                  prefixIcon: const Icon(Icons.event_available_rounded,
+                      color: Colors.white, size: 18),
+                  onPressed: () {
+                    Navigator.pop(dialogCtx);
+                    if (Navigator.canPop(parentContext)) {
+                      Navigator.pop(parentContext, true);
+                    }
+                    parentContext.push('/next-day-confirmation');
+                  },
+                ),
+                const SizedBox(height: 8),
+
+                // Tombol Sekunder: Kembali ke Beranda
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogCtx);
+                    if (Navigator.canPop(parentContext)) {
+                      Navigator.pop(parentContext, true);
+                    } else {
+                      parentContext.go('/home');
+                    }
+                  },
+                  child: const Text(
+                    'Kembali ke Beranda',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStarRatingRow({
+    required String title,
+    required String subtitle,
+    required int currentValue,
+    required ValueChanged<int> onChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                '$currentValue / 5 ⭐',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.secondaryDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(5, (index) {
+              final starVal = index + 1;
+              final isFilled = starVal <= currentValue;
+              return GestureDetector(
+                onTap: () => onChanged(starVal),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: Icon(
+                    isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: isFilled ? AppColors.secondary : AppColors.textLight,
+                    size: 32,
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getWasteColor(double pct) {
+    if (pct == 0.0) return AppColors.primary;
+    if (pct < 50.0) return AppColors.secondaryDark;
+    return AppColors.error;
+  }
+
+  String _getWasteLabel(double pct) {
+    if (pct == 0.0) return 'Habis Dimakan (0%)';
+    if (pct < 50.0) return 'Tersisa Sedikit (${pct.round()}%)';
+    if (pct < 100.0) return 'Tersisa Sebagian Besar (${pct.round()}%)';
+    return 'Tersisa Utuh (100%)';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Evaluasi & Ulasan Makanan Hari Ini',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Berikan masukan jujur untuk membantu SPPG menjaga kualitas gizi',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Switch Status Menerima Porsi
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: _menerimaPorsi ? AppColors.primaryLight : AppColors.secondaryLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: _menerimaPorsi ? AppColors.primary : AppColors.secondary,
+              ),
+            ),
+            child: SwitchListTile(
+              title: const Text(
+                'Apakah Anda Menerima Makanan Hari Ini?',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              subtitle: Text(
+                _menerimaPorsi
+                    ? 'Ya, Menerima dan Mengonsumsi Paket Makanan'
+                    : 'Tidak Menerima (Tidak Hadir / Izin / Sakit)',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _menerimaPorsi ? AppColors.primaryDark : AppColors.secondaryDark,
+                ),
+              ),
+              value: _menerimaPorsi,
+              activeThumbColor: AppColors.primary,
+              onChanged: (val) => setState(() => _menerimaPorsi = val),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          if (!_menerimaPorsi) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.info_outline_rounded,
+                      size: 40, color: AppColors.secondaryDark),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Anda Tidak Menerima Makanan Hari Ini',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Pengisian ulasan dikunci karena Anda tidak mengonsumsi makanan hari ini. Anda dapat langsung mengonfirmasi presensi menu untuk esok hari.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  CustomButton(
+                    text: 'Lanjut Konfirmasi Menu Besok ➔',
+                    prefixIcon: const Icon(Icons.event_available_rounded,
+                        size: 20, color: Colors.white),
+                    onPressed: () {
+                      context.push('/next-day-confirmation');
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            // Pertanyaan 1: Rasa Makanan
+            _buildStarRatingRow(
+              title: '1. Penilaian Rasa Makanan',
+              subtitle: 'Bagaimana kelezatan dan bumbu masakan hari ini?',
+              currentValue: _penilaianRasa,
+              onChanged: (val) => setState(() => _penilaianRasa = val),
+            ),
+
+            // Pertanyaan 2: Kesukaan Menu
+            _buildStarRatingRow(
+              title: '2. Tingkat Kesukaan Menu',
+              subtitle: 'Seberapa suka Anda dengan variasi menu hari ini?',
+              currentValue: _penilaianKesukaan,
+              onChanged: (val) => setState(() => _penilaianKesukaan = val),
+            ),
+
+            // Pertanyaan 3: Ukuran Porsi
+            _buildStarRatingRow(
+              title: '3. Kecukupan Ukuran Porsi',
+              subtitle: 'Apakah porsi makanan cukup membuat Anda kenyang?',
+              currentValue: _penilaianPorsi,
+              onChanged: (val) => setState(() => _penilaianPorsi = val),
+            ),
+
+            // Pertanyaan 4: Sisa Makanan SLIDER (0% - 100%)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '4. Estimasi Sisa Makanan',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Geser garis slider dari 0% (habis) hingga 100% (sisa semua)',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Slider Theme & Component
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: _getWasteColor(_sisaMakananPercentage),
+                      inactiveTrackColor: AppColors.border,
+                      thumbColor: _getWasteColor(_sisaMakananPercentage),
+                      overlayColor: _getWasteColor(_sisaMakananPercentage).withValues(alpha: 0.2),
+                      valueIndicatorColor: _getWasteColor(_sisaMakananPercentage),
+                      valueIndicatorTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    child: Slider(
+                      value: _sisaMakananPercentage,
+                      min: 0.0,
+                      max: 100.0,
+                      divisions: 100,
+                      label: '${_sisaMakananPercentage.round()}%',
+                      onChanged: (val) {
+                        setState(() => _sisaMakananPercentage = val);
+                      },
+                    ),
+                  ),
+
+                  // Legend Range 0% - 50% - 100%
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text('0% (Habis)',
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary)),
+                      Text('50%',
+                          style: TextStyle(
+                              fontSize: 10, color: AppColors.textLight)),
+                      Text('100% (Sisa Utuh)',
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.error)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // DEDICATED STATUS CARD DI BAWAH GARIS SLIDER
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: _getWasteColor(_sisaMakananPercentage).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: _getWasteColor(_sisaMakananPercentage).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _sisaMakananPercentage == 0.0
+                              ? Icons.check_circle_rounded
+                              : (_sisaMakananPercentage < 50.0
+                                  ? Icons.info_rounded
+                                  : Icons.warning_rounded),
+                          size: 18,
+                          color: _getWasteColor(_sisaMakananPercentage),
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Status: ${_getWasteLabel(_sisaMakananPercentage)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: _getWasteColor(_sisaMakananPercentage),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Pertanyaan 5: Masukan Kualitatif
+            CustomTextField(
+              label: '5. Saran & Catatan Kualitatif',
+              hint: 'Tuliskan masukan untuk perbaikan menu...',
+              controller: _commentController,
+              maxLines: 2,
+            ),
+            const SizedBox(height: 20),
+
+            CustomButton(
+              text: 'Kirim Evaluasi Makanan',
+              prefixIcon:
+                  const Icon(Icons.send_rounded, size: 18, color: Colors.white),
+              isLoading: _isSubmitting,
+              onPressed: _handleSubmit,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
