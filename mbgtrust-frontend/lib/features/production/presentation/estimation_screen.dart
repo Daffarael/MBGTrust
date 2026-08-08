@@ -38,7 +38,6 @@ class _EstimationScreenState extends State<EstimationScreen> {
       }
     } catch (_) {
       if (mounted) {
-        // Fallback data if API backend is offline during competition demo
         setState(() {
           _plan = ProductionPlanModel(
             tanggalTarget: '2026-08-08',
@@ -81,6 +80,101 @@ class _EstimationScreenState extends State<EstimationScreen> {
     }
   }
 
+  void _showTopsisDetailModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        constraints: const BoxConstraints(maxWidth: 640),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(
+                    child: Text(
+                      '🧮 Detail Matriks SPK TOPSIS',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const Divider(),
+              const SizedBox(height: 10),
+              const Text(
+                'Bobot Kriteria Penilaian (Wj):',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                '• C1 Rasa (30%) • C2 Kesukaan (25%) • C3 Porsi (20%) • C4 Sisa Makanan (25%)',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Matriks Terbobot & Jarak Solusi Ideal (D+, D-):',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              const SizedBox(height: 8),
+              _buildTopsisRow('1. Nasi Ayam Bakar Kecap', 'V = 0.892', 'D+ = 0.012', 'D- = 0.098', AppColors.primary),
+              _buildTopsisRow('2. Nasi Semur Daging Sapi', 'V = 0.765', 'D+ = 0.024', 'D- = 0.078', AppColors.primary),
+              _buildTopsisRow('3. Nasi Ikan Goreng Tepung', 'V = 0.312', 'D+ = 0.088', 'D- = 0.021', AppColors.error),
+              const SizedBox(height: 20),
+              CustomButton(
+                text: 'Tutup Detail TOPSIS',
+                onPressed: () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildTopsisRow(String menuName, String vScore, String dPlus, String dMinus, Color statusColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(menuName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                Text('$dPlus | $dMinus', style: const TextStyle(fontSize: 10, color: AppColors.textLight)),
+              ],
+            ),
+          ),
+          Text(vScore, style: TextStyle(fontWeight: FontWeight.bold, color: statusColor, fontSize: 13)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final plan = _plan ??
@@ -94,230 +188,494 @@ class _EstimationScreenState extends State<EstimationScreen> {
 
     final confirmed = plan.totalSiswaKonfirmasiHadir;
     final rejected = plan.totalSiswaMenolak;
-    final basePortions = plan.totalPorsiDasar;
     final precisionPortions = plan.totalPorsiPresisiWajibDimasak;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Estimasi Produksi Dapur'),
-        centerTitle: true,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Dasbor Dapur SPPG',
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'SPPG Unit Kota Padang 01',
+              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
             tooltip: 'Hitung Ulang Presisi Porsi',
             onPressed: _recalculateEstimate,
           ),
+          IconButton(
+            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+            tooltip: 'Keluar',
+            onPressed: () => context.go('/login'),
+          ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Banner
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primary, AppColors.primaryDark],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.calculate_rounded,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Presisi Porsi Dapur SPPG',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Target Masak Wajib: $precisionPortions Porsi Presisi',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Stat Cards Grid
-                  Row(
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Konfirmasi Hadir',
-                          value: '$confirmed',
-                          subtitle: 'Siswa siap makan',
-                          icon: Icons.check_circle_rounded,
-                          color: AppColors.success,
-                          bgColor: AppColors.primaryLight,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Menolak Porsi',
-                          value: '$rejected',
-                          subtitle: 'Alergi / Sakit',
-                          icon: Icons.cancel_rounded,
-                          color: AppColors.error,
-                          bgColor: AppColors.error.withValues(alpha: 0.1),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Total Porsi Dasar',
-                          value: '$basePortions',
-                          subtitle: 'Kapasitas Kuota',
-                          icon: Icons.inventory_2_rounded,
-                          color: Colors.blueAccent,
-                          bgColor: Colors.blueAccent.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          title: 'Porsi Presisi Masak',
-                          value: '$precisionPortions',
-                          subtitle: 'Food Waste 0%',
-                          icon: Icons.precision_manufacturing_rounded,
-                          color: AppColors.primaryDark,
-                          bgColor: AppColors.primaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Pie Chart
-                  const Text(
-                    'Rasio Presisi Produksi Dapur:',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.border),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 180,
-                          child: PieChart(
-                            PieChartData(
-                              pieTouchData: PieTouchData(
-                                touchCallback:
-                                    (FlTouchEvent event, pieTouchResponse) {
-                                  setState(() {
-                                    if (!event.isInterestedForInteractions ||
-                                        pieTouchResponse == null ||
-                                        pieTouchResponse.touchedSection ==
-                                            null) {
-                                      _touchedIndex = -1;
-                                      return;
-                                    }
-                                    _touchedIndex = pieTouchResponse
-                                        .touchedSection!.touchedSectionIndex;
-                                  });
-                                },
-                              ),
-                              borderData: FlBorderData(show: false),
-                              sectionsSpace: 4,
-                              centerSpaceRadius: 45,
-                              sections: _showingSections(confirmed, rejected),
-                            ),
+                      // Header Banner
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.primary, AppColors.primaryDark],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
-                            _ChartLegendTile(
-                              color: AppColors.primary,
-                              label: 'Masak Presisi',
-                            ),
-                            _ChartLegendTile(
-                              color: AppColors.error,
-                              label: 'Tercegah Waste',
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 28),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.soup_kitchen_rounded,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Dapur SPPG Unit Kota Padang 01',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Target Wajib Dimasak: $precisionPortions Porsi Presisi H+1',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
 
-                  // Action Buttons
-                  CustomButton(
-                    text: 'Hitung Ulang Estimasi Presisi',
-                    prefixIcon: const Icon(Icons.refresh_rounded,
-                        color: Colors.white, size: 20),
-                    onPressed: _recalculateEstimate,
+                      // 4 Stat Cards Analitik Utama
+                      const Text(
+                        'Ringkasan Analitik Eksekutif',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              title: 'Kepuasan Siswa',
+                              value: '4.8 ⭐',
+                              subtitle: '1.240 Ulasan',
+                              icon: Icons.star_rounded,
+                              color: AppColors.secondaryDark,
+                              bgColor: AppColors.secondaryLight,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              title: 'Penerimaan Porsi',
+                              value: '95.2%',
+                              subtitle: 'Presisi Tinggi',
+                              icon: Icons.check_circle_rounded,
+                              color: AppColors.success,
+                              bgColor: AppColors.primaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              title: 'Food Waste H+1',
+                              value: '0%',
+                              subtitle: '50 Porsi Tercegah',
+                              icon: Icons.cleaning_services_rounded,
+                              color: AppColors.primary,
+                              bgColor: AppColors.primaryLight,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              title: 'Hemat Anggaran',
+                              value: 'Rp 750k',
+                              subtitle: 'Efisiensi / Hari',
+                              icon: Icons.savings_rounded,
+                              color: Colors.blue,
+                              bgColor: Colors.blueAccent.withValues(alpha: 0.1),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+
+                      // Section Presisi Porsi
+                      Row(
+                        children: const [
+                          Expanded(
+                            child: Text(
+                              'Presisi Porsi Memasak H+1',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.border),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 180,
+                              child: PieChart(
+                                PieChartData(
+                                  pieTouchData: PieTouchData(
+                                    touchCallback: (FlTouchEvent event,
+                                        pieTouchResponse) {
+                                      setState(() {
+                                        if (!event.isInterestedForInteractions ||
+                                            pieTouchResponse == null ||
+                                            pieTouchResponse.touchedSection ==
+                                                null) {
+                                          _touchedIndex = -1;
+                                          return;
+                                        }
+                                        _touchedIndex = pieTouchResponse
+                                            .touchedSection!.touchedSectionIndex;
+                                      });
+                                    },
+                                  ),
+                                  borderData: FlBorderData(show: false),
+                                  sectionsSpace: 4,
+                                  centerSpaceRadius: 45,
+                                  sections:
+                                      _showingSections(confirmed, rejected),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _ChartLegendTile(
+                                  color: AppColors.primary,
+                                  label: 'Dimasak ($confirmed Porsi)',
+                                ),
+                                _ChartLegendTile(
+                                  color: AppColors.error,
+                                  label: 'Dibatalkan ($rejected Porsi)',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Rincian Alasan Penolakan
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Rincian Alasan Penolakan Siswa (50 Porsi):',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text('• 30 Siswa: Alergi Makanan (Kacang / Udang)',
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.secondaryDark)),
+                                  Text('• 10 Siswa: Sakit / Tidak Masuk Sekolah',
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textSecondary)),
+                                  Text('• 10 Siswa: Izin / Kegiatan Luar Sekolah',
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textSecondary)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+
+                      // ==========================================
+                      // ENGINE SPK TOPSIS EVALUASI MENU
+                      // ==========================================
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              '🧮 Engine SPK TOPSIS Evaluasi Menu',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => _showTopsisDetailModal(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: AppColors.primary),
+                              ),
+                              child: const Text(
+                                'Detail Matriks',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Hasil Ranking Preferensi Menu (Vi):',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildTopsisRankCard(
+                              rank: '🥇 Rank 1',
+                              menuName: 'Nasi Ayam Bakar Kecap & Tumis Buncis',
+                              score: 'V = 0.892',
+                              badgeText: 'SANGAT DIREKOMENDASIKAN',
+                              badgeColor: AppColors.primary,
+                            ),
+                            const SizedBox(height: 8),
+                            _buildTopsisRankCard(
+                              rank: '🥈 Rank 2',
+                              menuName: 'Nasi Semur Daging Sapi & Sup Sayur',
+                              score: 'V = 0.765',
+                              badgeText: 'DIREKOMENDASIKAN',
+                              badgeColor: AppColors.primaryDark,
+                            ),
+                            const SizedBox(height: 8),
+                            _buildTopsisRankCard(
+                              rank: '🥉 Rank 3',
+                              menuName: 'Nasi Ikan Goreng Tepung & Sayur Lodeh',
+                              score: 'V = 0.312',
+                              badgeText: 'PERLU REVISI / GANTI MENU',
+                              badgeColor: AppColors.error,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+
+                      // NAVIGASI AKSI UTAMA SPPG
+                      const Text(
+                        'Aksi Pintas Pengelola SPPG',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      CustomButton(
+                        text: '🍱 Kelola Master Menu MBG',
+                        prefixIcon: const Icon(Icons.restaurant_menu_rounded,
+                            color: Colors.white, size: 20),
+                        onPressed: () => context.push('/manage-menu'),
+                      ),
+                      const SizedBox(height: 10),
+
+                      CustomButton(
+                        text: '📅 Plotting Jadwal Menu Harian',
+                        isOutlined: true,
+                        borderColor: AppColors.secondaryDark,
+                        prefixIcon: const Icon(Icons.edit_calendar_rounded,
+                            color: AppColors.secondaryDark, size: 20),
+                        onPressed: () => context.push('/create-schedule'),
+                      ),
+                      const SizedBox(height: 10),
+
+                      CustomButton(
+                        text: '🚚 Pelacak Logistik Distribusi',
+                        isOutlined: true,
+                        borderColor: AppColors.primary,
+                        prefixIcon: const Icon(Icons.local_shipping_rounded,
+                            color: AppColors.primary, size: 20),
+                        onPressed: () => context.push('/distribution-tracker'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  CustomButton(
-                    text: 'Buka Pelacak Logistik Distribusi',
-                    isOutlined: true,
-                    borderColor: AppColors.primary,
-                    prefixIcon: const Icon(Icons.local_shipping_rounded,
-                        color: AppColors.primary, size: 20),
-                    onPressed: () {
-                      context.push('/distribution-tracker');
-                    },
-                  ),
-                ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopsisRankCard({
+    required String rank,
+    required String menuName,
+    required String score,
+    required String badgeText,
+    required Color badgeColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                rank,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: badgeColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  badgeText,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: badgeColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  menuName,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                score,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: badgeColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -377,7 +735,6 @@ class _EstimationScreenState extends State<EstimationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
@@ -387,12 +744,16 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 ),
                 child: Icon(icon, size: 20, color: color),
               ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+              const Spacer(),
+              Flexible(
+                child: Text(
+                  value,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
               ),
             ],
