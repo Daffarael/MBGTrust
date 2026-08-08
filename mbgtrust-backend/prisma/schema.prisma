@@ -1,0 +1,292 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ============================================================
+// TABEL 1: pengguna
+// ============================================================
+model Pengguna {
+  id            Int      @id @default(autoincrement())
+  nikNisn       String?  @unique @map("nik_nisn")
+  namaLengkap   String   @map("nama_lengkap")
+  email         String?  @unique
+  katasandi     String
+  peran         Peran    @default(PENERIMA_MANFAAT)
+  tingkatKelas  String?  @map("tingkat_kelas")
+  riwayatAlergi Json?    @map("riwayat_alergi")
+  nomorKontak   String?  @map("nomor_kontak")
+  poinXp        Int      @default(0) @map("poin_xp")
+  idSekolah     Int?     @map("id_sekolah")
+  dibuatPada    DateTime @default(now()) @map("dibuat_pada")
+  diubahPada    DateTime @updatedAt @map("diubah_pada")
+
+  sekolah       Sekolah?        @relation(fields: [idSekolah], references: [id])
+  evaluasiMenu  EvaluasiMenu[]
+  konfirmasi    Konfirmasi[]
+  tokenPenyegar TokenPenyegar[]
+
+  @@index([idSekolah])
+  @@map("pengguna")
+}
+
+// ============================================================
+// TABEL 2: token_penyegar
+// ============================================================
+model TokenPenyegar {
+  id          Int      @id @default(autoincrement())
+  idPengguna  Int      @map("id_pengguna")
+  token       String   @unique @db.VarChar(512)
+  kedaluwarsa DateTime @map("kedaluwarsa")
+  dibuatPada  DateTime @default(now()) @map("dibuat_pada")
+
+  pengguna Pengguna @relation(fields: [idPengguna], references: [id])
+
+  @@index([idPengguna])
+  @@map("token_penyegar")
+}
+
+// ============================================================
+// TABEL 3: sekolah
+// ============================================================
+model Sekolah {
+  id         Int      @id @default(autoincrement())
+  nama       String
+  alamat     String?
+  dibuatPada DateTime @default(now()) @map("dibuat_pada")
+
+  pengguna   Pengguna[]
+  jadwalMenu JadwalMenu[]
+
+  @@map("sekolah")
+}
+
+// ============================================================
+// TABEL 4: menu
+// ============================================================
+model Menu {
+  id                    Int          @id @default(autoincrement())
+  namaMenu              String       @map("nama_menu")
+  kategori              KategoriMenu @default(MAKANAN_BERAT)
+  deskripsi             String?
+  kaloriKkal            Float?       @map("kalori_kkal")
+  proteinGram           Float?       @map("protein_gram")
+  karbohidratGram       Float?       @map("karbohidrat_gram")
+  lemakGram             Float?       @map("lemak_gram")
+  komposisiBahan        Json?        @map("komposisi_bahan")
+  potensiAlergen        Json?        @map("potensi_alergen")
+  estimasiHargaPerPorsi Int?         @map("estimasi_biaya_per_porsi")
+  gambarUrl             String?      @map("gambar_url")
+  dibuatPada            DateTime     @default(now()) @map("dibuat_pada")
+  diubahPada            DateTime     @updatedAt @map("diubah_pada")
+
+  jadwalMenu JadwalMenu[]
+
+  @@map("menu")
+}
+
+// ============================================================
+// TABEL 5: jadwal_menu
+// ============================================================
+model JadwalMenu {
+  id               Int      @id @default(autoincrement())
+  idMenu           Int      @map("id_menu")
+  idSekolah        Int      @map("id_sekolah")
+  tanggal          DateTime @db.Date
+  targetTotalPorsi Int?     @map("target_total_porsi")
+  dibuatPada       DateTime @default(now()) @map("dibuat_pada")
+
+  menu            Menu             @relation(fields: [idMenu], references: [id])
+  sekolah         Sekolah          @relation(fields: [idSekolah], references: [id])
+  evaluasiMenu    EvaluasiMenu[]
+  konfirmasi      Konfirmasi[]
+  rencanaProduksi RencanaProduksi?
+  produksi        Produksi?
+  distribusi      Distribusi[]
+
+  @@unique([idSekolah, tanggal])
+  @@index([tanggal])
+  @@index([idMenu])
+  @@map("jadwal_menu")
+}
+
+// ============================================================
+// TABEL 6: evaluasi_menu
+// C1: penilaian_rasa | C2: tingkat_kesukaan
+// C3: kesesuaian_porsi | C4: persentase_sisa_makanan
+// ============================================================
+model EvaluasiMenu {
+  id                Int      @id @default(autoincrement())
+  idPengguna        Int      @map("id_pengguna")
+  idJadwal          Int      @map("id_jadwal")
+  menerimaPorsi     Boolean? @map("menerima_porsi")
+  penilaianRasa     Int?     @map("penilaian_rasa")
+  tingkatKesukaan   Int?     @map("tingkat_kesukaan")
+  kesesuaianPorsi   Int?     @map("kesesuaian_porsi")
+  persentaseSisa    Float?   @map("persentase_sisa_makanan")
+  masukanKualitatif String?  @map("masukan_kualitatif")
+  dibuatPada        DateTime @default(now()) @map("dibuat_pada")
+
+  pengguna   Pengguna   @relation(fields: [idPengguna], references: [id])
+  jadwalMenu JadwalMenu @relation(fields: [idJadwal], references: [id])
+
+  @@unique([idPengguna, idJadwal])
+  @@index([idJadwal])
+  @@map("evaluasi_menu")
+}
+
+// ============================================================
+// TABEL 7: konfirmasi
+// C5 TOPSIS: COUNT(TIDAK_HADIR) / COUNT(total) * 100
+// ============================================================
+model Konfirmasi {
+  id                Int              @id @default(autoincrement())
+  idPengguna        Int              @map("id_pengguna")
+  idJadwal          Int              @map("id_jadwal")
+  status            StatusKonfirmasi @default(BELUM_KONFIRMASI)
+  idAlasanPenolakan Int?             @map("id_alasan_penolakan")
+  catatanKhusus     String?          @map("catatan_khusus")
+  dibuatPada        DateTime         @default(now()) @map("dibuat_pada")
+  diubahPada        DateTime         @updatedAt @map("diubah_pada")
+
+  pengguna        Pengguna         @relation(fields: [idPengguna], references: [id])
+  jadwalMenu      JadwalMenu       @relation(fields: [idJadwal], references: [id])
+  alasanPenolakan AlasanPenolakan? @relation(fields: [idAlasanPenolakan], references: [id])
+
+  @@unique([idPengguna, idJadwal])
+  @@index([idJadwal])
+  @@index([status])
+  @@map("konfirmasi")
+}
+
+// ============================================================
+// TABEL 8: alasan_penolakan
+// ============================================================
+model AlasanPenolakan {
+  id    Int    @id @default(autoincrement())
+  kode  String @unique
+  label String
+
+  konfirmasi Konfirmasi[]
+
+  @@map("alasan_penolakan")
+}
+
+// ============================================================
+// TABEL 9: rencana_produksi
+// Formula: CEIL(total_hadir × (1 + buffer_persentase / 100))
+// ============================================================
+model RencanaProduksi {
+  id               Int      @id @default(autoincrement())
+  idJadwal         Int      @unique @map("id_jadwal")
+  estimasiPorsi    Int      @map("estimasi_porsi")
+  totalHadir       Int      @map("total_hadir")
+  totalTidakHadir  Int      @map("total_tidak_hadir")
+  bufferPersentase Float    @default(5.0) @map("buffer_persentase")
+  dibuatPada       DateTime @default(now()) @map("dibuat_pada")
+  diubahPada       DateTime @updatedAt @map("diubah_pada")
+
+  jadwalMenu JadwalMenu @relation(fields: [idJadwal], references: [id])
+
+  @@map("rencana_produksi")
+}
+
+// ============================================================
+// TABEL 10: produksi
+// ============================================================
+model Produksi {
+  id            Int            @id @default(autoincrement())
+  idJadwal      Int            @unique @map("id_jadwal")
+  status        StatusProduksi @default(PERSIAPAN)
+  jumlahDimasak Int?           @map("jumlah_dimasak")
+  catatanDapur  String?        @map("catatan_dapur")
+  dibuatPada    DateTime       @default(now()) @map("dibuat_pada")
+  diubahPada    DateTime       @updatedAt @map("diubah_pada")
+
+  jadwalMenu JadwalMenu @relation(fields: [idJadwal], references: [id])
+
+  @@map("produksi")
+}
+
+// ============================================================
+// TABEL 11: distribusi
+// ============================================================
+model Distribusi {
+  id           Int              @id @default(autoincrement())
+  idJadwal     Int              @map("id_jadwal")
+  status       StatusDistribusi @default(DISIAPKAN)
+  waktuTiba    DateTime?        @map("waktu_tiba")
+  catatanKurir String?          @map("catatan_kurir")
+  dibuatPada   DateTime         @default(now()) @map("dibuat_pada")
+  diubahPada   DateTime         @updatedAt @map("diubah_pada")
+
+  jadwalMenu JadwalMenu @relation(fields: [idJadwal], references: [id])
+
+  @@index([idJadwal])
+  @@map("distribusi")
+}
+
+// ============================================================
+// TABEL 12: eksekusi_topsis
+// ============================================================
+model EksekusiTopsis {
+  id              Int      @id @default(autoincrement())
+  periodeAwal     DateTime @db.Date @map("periode_awal")
+  periodeAkhir    DateTime @db.Date @map("periode_akhir")
+  hasilJson       Json     @map("hasil_json")
+  rekomendasiJson Json     @map("rekomendasi_json")
+  dibuatPada      DateTime @default(now()) @map("dibuat_pada")
+
+  @@index([periodeAwal, periodeAkhir])
+  @@map("eksekusi_topsis")
+}
+
+// ============================================================
+// ENUM: Peran
+// ============================================================
+enum Peran {
+  PENERIMA_MANFAAT
+  SPPG_ADMIN
+  PETUGAS
+}
+
+// ============================================================
+// ENUM: KategoriMenu
+// ============================================================
+enum KategoriMenu {
+  MAKANAN_BERAT
+  SNACK
+  MINUMAN
+}
+
+// ============================================================
+// ENUM: StatusKonfirmasi
+// ============================================================
+enum StatusKonfirmasi {
+  HADIR
+  TIDAK_HADIR
+  BELUM_KONFIRMASI
+}
+
+// ============================================================
+// ENUM: StatusProduksi
+// ============================================================
+enum StatusProduksi {
+  PERSIAPAN
+  MEMASAK
+  SELESAI
+  DIBATALKAN
+}
+
+// ============================================================
+// ENUM: StatusDistribusi
+// ============================================================
+enum StatusDistribusi {
+  DISIAPKAN
+  DIKIRIM
+  TIBA_DI_SEKOLAH
+  GAGAL
+}
