@@ -48,9 +48,10 @@ class _AddMenuFormState extends State<AddMenuForm> {
   late TextEditingController _costController;
   late TextEditingController _ingredientsController;
   late TextEditingController _allergensController;
+  late TextEditingController _photoUrlController;
 
   String _selectedCategory = 'MAKANAN_BERAT';
-  final List<String> _categories = ['MAKANAN_BERAT', 'CAMILAN', 'SUPLEMEN'];
+  final List<String> _categories = ['MAKANAN_BERAT', 'SUSU_DAN_BUAH', 'SNACK_SEHAT'];
 
   @override
   void initState() {
@@ -69,9 +70,11 @@ class _AddMenuFormState extends State<AddMenuForm> {
         text: (data?['estimasi_biaya_per_porsi'] ?? 15000).toString());
     _ingredientsController = TextEditingController(
         text: (data?['komposisi_bahan'] as List<dynamic>?)?.join(', ') ??
-            'Dada Ayam, Nasi Putih, Buncis, Wortel');
+            'Dada Ayam Bakar, Nasi Putih, Tumis Buncis, Wortel');
     _allergensController = TextEditingController(
         text: (data?['potensi_alergen'] as List<dynamic>?)?.join(', ') ?? 'Kedelai');
+    _photoUrlController = TextEditingController(
+        text: data?['foto_url'] ?? data?['photoUrl'] ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80');
 
     if (data?['kategori'] != null && _categories.contains(data!['kategori'])) {
       _selectedCategory = data['kategori'];
@@ -88,6 +91,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
     _costController.dispose();
     _ingredientsController.dispose();
     _allergensController.dispose();
+    _photoUrlController.dispose();
     super.dispose();
   }
 
@@ -109,15 +113,22 @@ class _AddMenuFormState extends State<AddMenuForm> {
         'id_menu': widget.initialData?['id_menu'] ??
             'mnu_${DateTime.now().millisecondsSinceEpoch}',
         'nama_menu': _nameController.text.trim(),
+        'name': _nameController.text.trim(),
         'kategori': _selectedCategory,
+        'category': _selectedCategory == 'MAKANAN_BERAT' ? 'Makanan Berat' : (_selectedCategory == 'SUSU_DAN_BUAH' ? 'Susu & Buah' : 'Snack Sehat'),
         'kalori_kkal': int.tryParse(_caloriesController.text.trim()) ?? 550,
+        'calories': int.tryParse(_caloriesController.text.trim()) ?? 550,
         'protein_gram': double.tryParse(_proteinController.text.trim()) ?? 28.5,
+        'protein': '${_proteinController.text.trim()}g',
         'karbohidrat_gram': double.tryParse(_carbsController.text.trim()) ?? 65.0,
         'lemak_gram': double.tryParse(_fatsController.text.trim()) ?? 14.2,
         'komposisi_bahan': ingredients,
         'potensi_alergen': allergens,
         'estimasi_biaya_per_porsi':
             double.tryParse(_costController.text.trim()) ?? 15000.0,
+        'foto_url': _photoUrlController.text.trim(),
+        'photoUrl': _photoUrlController.text.trim(),
+        'rating_rata_rata': widget.initialData?['rating_rata_rata'] ?? 4.9,
       };
 
       widget.onSave(newMenuData);
@@ -130,7 +141,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
     final isEditing = widget.initialData != null;
 
     return Container(
-      constraints: const BoxConstraints(maxWidth: 500),
+      constraints: const BoxConstraints(maxWidth: 540, maxHeight: 680),
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Form(
@@ -139,15 +150,19 @@ class _AddMenuFormState extends State<AddMenuForm> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Form Title & Close Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    isEditing ? 'Edit Master Menu' : 'Tambah Master Menu',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                  Expanded(
+                    child: Text(
+                      isEditing ? 'Edit Master Menu MBG' : 'Tambah Master Menu MBG',
+                      softWrap: true,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -156,29 +171,34 @@ class _AddMenuFormState extends State<AddMenuForm> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 12),
 
-              // Menu Name Input
+              // ==========================================
+              // UX STRICT: 1 PERTANYAAN 1 BARIS INPUT FIELD (VERTIKAL FULL WIDTH)
+              // ==========================================
+
+              // 1. Nama Menu MBG
               CustomTextField(
-                label: 'Nama Menu',
-                hint: 'Nasi Ayam Bakar Kecap & Tumis Buncis',
+                label: '1. Nama Menu MBG',
+                hint: 'Contoh: Nasi Ayam Bakar Kecap & Tumis Buncis',
                 controller: _nameController,
                 validator: (val) => val == null || val.trim().isEmpty
                     ? 'Nama menu wajib diisi'
                     : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
-              // Category Dropdown
+              // 2. Kategori Menu
               const Text(
-                'Kategori Menu',
+                '2. Kategori Menu MBG',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 decoration: InputDecoration(
@@ -197,9 +217,12 @@ class _AddMenuFormState extends State<AddMenuForm> {
                   ),
                 ),
                 items: _categories.map((cat) {
+                  final label = cat == 'MAKANAN_BERAT'
+                      ? 'Makanan Berat'
+                      : (cat == 'SUSU_DAN_BUAH' ? 'Susu & Buah' : 'Snack Sehat');
                   return DropdownMenuItem(
                     value: cat,
-                    child: Text(cat),
+                    child: Text(label),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -208,79 +231,94 @@ class _AddMenuFormState extends State<AddMenuForm> {
                   }
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
-              // Nutrition Row 1
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      label: 'Kalori (kkal)',
-                      controller: _caloriesController,
-                      keyboardType: TextInputType.number,
-                      validator: (val) =>
-                          val == null || val.isEmpty ? 'Wajib' : null,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: CustomTextField(
-                      label: 'Protein (gram)',
-                      controller: _proteinController,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Nutrition Row 2
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      label: 'Karbohidrat (gram)',
-                      controller: _carbsController,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: CustomTextField(
-                      label: 'Lemak (gram)',
-                      controller: _fatsController,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Estimasi Biaya & Komposisi Bahan
+              // 3. Kandungan Kalori (kkal) - 1 Baris Penuh
               CustomTextField(
-                label: 'Estimasi Biaya Per Porsi (Rp)',
+                label: '3. Kandungan Kalori (kkal)',
+                hint: 'Contoh: 550',
+                controller: _caloriesController,
+                keyboardType: TextInputType.number,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Kalori wajib diisi' : null,
+              ),
+              const SizedBox(height: 14),
+
+              // 4. Kandungan Protein (gram) - 1 Baris Penuh
+              CustomTextField(
+                label: '4. Kandungan Protein (gram)',
+                hint: 'Contoh: 28.5',
+                controller: _proteinController,
+                keyboardType: TextInputType.number,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Protein wajib diisi' : null,
+              ),
+              const SizedBox(height: 14),
+
+              // 5. Kandungan Karbohidrat (gram) - 1 Baris Penuh
+              CustomTextField(
+                label: '5. Kandungan Karbohidrat (gram)',
+                hint: 'Contoh: 65.0',
+                controller: _carbsController,
+                keyboardType: TextInputType.number,
+                validator: (val) => val == null || val.isEmpty
+                    ? 'Karbohidrat wajib diisi'
+                    : null,
+              ),
+              const SizedBox(height: 14),
+
+              // 6. Kandungan Lemak (gram) - 1 Baris Penuh
+              CustomTextField(
+                label: '6. Kandungan Lemak (gram)',
+                hint: 'Contoh: 14.2',
+                controller: _fatsController,
+                keyboardType: TextInputType.number,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Lemak wajib diisi' : null,
+              ),
+              const SizedBox(height: 14),
+
+              // 7. Estimasi Biaya Per Porsi (Rp) - 1 Baris Penuh
+              CustomTextField(
+                label: '7. Estimasi Biaya Per Porsi (Rp)',
+                hint: 'Contoh: 15000',
                 controller: _costController,
                 keyboardType: TextInputType.number,
                 prefixIcon: const Icon(Icons.attach_money_rounded),
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Biaya porsi wajib' : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
+              // 8. Komposisi Bahan Makanan Sehat - 1 Baris Penuh
               CustomTextField(
-                label: 'Komposisi Bahan (Pisahkan Koma)',
+                label: '8. Komposisi Bahan Makanan Sehat (Pisahkan Koma)',
                 controller: _ingredientsController,
-                hint: 'Dada Ayam, Nasi Putih, Buncis, Wortel',
+                hint: 'Dada Ayam Bakar 80g, Nasi Putih 150g, Tumis Buncis 60g',
+                validator: (val) => val == null || val.trim().isEmpty
+                    ? 'Bahan makanan wajib diisi'
+                    : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
+              // 9. Potensi Alergen - 1 Baris Penuh
               CustomTextField(
-                label: 'Potensi Alergen (Pisahkan Koma)',
+                label: '9. Potensi Alergen Siswa (Pisahkan Koma)',
                 controller: _allergensController,
-                hint: 'Kedelai, Udang',
+                hint: 'Kedelai, Udang, Kacang Tanah',
+              ),
+              const SizedBox(height: 14),
+
+              // 10. URL Foto Makanan HD - 1 Baris Penuh
+              CustomTextField(
+                label: '10. URL Foto Makanan HD (Unsplash/Web)',
+                controller: _photoUrlController,
+                hint: 'https://images.unsplash.com/...',
               ),
               const SizedBox(height: 24),
 
               CustomButton(
-                text: isEditing ? 'Simpan Perubahan' : 'Tambah Menu ke Master API',
+                text: isEditing ? 'Simpan Perubahan Menu' : 'Tambah Menu ke Master API',
                 prefixIcon: Icon(
                   isEditing ? Icons.save_rounded : Icons.add_rounded,
                   color: Colors.white,
