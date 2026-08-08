@@ -117,6 +117,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
     final category = menu['kategori'] ?? menu['category'] ?? 'MAKANAN_BERAT';
     final cost = menu['estimasi_biaya_per_porsi'] ?? 15000;
     final rating = menu['rating_rata_rata'] ?? 4.9;
+    final ingredientsDetail = (menu['komposisi_bahan_detail'] as List<dynamic>?) ?? [];
     final ingredients = (menu['komposisi_bahan'] as List<dynamic>?) ??
         ['Dada Ayam Bakar 80g', 'Nasi Putih Warm 150g', 'Tumis Buncis 60g'];
     final allergens = (menu['potensi_alergen'] as List<dynamic>?) ?? ['Kedelai'];
@@ -318,29 +319,76 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
-                  children: ingredients.map((ing) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.check_circle_rounded,
-                              size: 18, color: AppColors.primary),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              ing.toString(),
+                  children: [
+                    if (ingredientsDetail.isNotEmpty)
+                      for (int i = 0; i < ingredientsDetail.length; i++) ...[
+                        if (i > 0) const Divider(height: 14, color: AppColors.border),
+                        Row(
+                          children: [
+                            const Icon(Icons.check_circle_rounded,
+                                size: 18, color: AppColors.primary),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ingredientsDetail[i]['nama']?.toString() ?? '',
+                                    softWrap: true,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  if (ingredientsDetail[i]['sub'] != null &&
+                                      ingredientsDetail[i]['sub'].toString().isNotEmpty)
+                                    Text(
+                                      ingredientsDetail[i]['sub'].toString(),
+                                      softWrap: true,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              ingredientsDetail[i]['berat']?.toString() ?? '',
                               softWrap: true,
                               style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                          ],
+                        ),
+                      ]
+                    else
+                      for (int i = 0; i < ingredients.length; i++) ...[
+                        if (i > 0) const Divider(height: 14, color: AppColors.border),
+                        Row(
+                          children: [
+                            const Icon(Icons.check_circle_rounded,
+                                size: 18, color: AppColors.primary),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                ingredients[i].toString(),
+                                softWrap: true,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ]
+                  ],
                 ),
               ),
               const SizedBox(height: 16),

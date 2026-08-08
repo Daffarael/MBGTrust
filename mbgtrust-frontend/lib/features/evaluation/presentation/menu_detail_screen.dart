@@ -253,34 +253,42 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      children: const [
-                        _IngredientTile(
-                          name: 'Dada Ayam Bakar Kecap',
-                          portion: '80 gram',
-                          note: 'Sumber Utama Protein & Zat Besi',
+                  Builder(
+                    builder: (context) {
+                      final ingredientsDetail = (_menu['komposisi_bahan_detail'] as List<dynamic>?) ?? [];
+                      final ingredients = (_menu['komposisi_bahan'] as List<dynamic>?) ?? ['Dada Ayam Bakar Kecap', 'Tumis Buncis & Wortel', 'Nasi Putih Warm'];
+
+                      return Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border),
                         ),
-                        Divider(height: 16, color: AppColors.border),
-                        _IngredientTile(
-                          name: 'Tumis Buncis & Wortel',
-                          portion: '60 gram',
-                          note: 'Kaya Serat & Vitamin A',
+                        child: Column(
+                          children: [
+                            if (ingredientsDetail.isNotEmpty)
+                              for (int i = 0; i < ingredientsDetail.length; i++) ...[
+                                if (i > 0) const Divider(height: 16, color: AppColors.border),
+                                _IngredientTile(
+                                  name: ingredientsDetail[i]['nama']?.toString() ?? '',
+                                  portion: ingredientsDetail[i]['berat']?.toString() ?? '',
+                                  note: ingredientsDetail[i]['sub']?.toString() ?? '',
+                                ),
+                              ]
+                            else
+                              for (int i = 0; i < ingredients.length; i++) ...[
+                                if (i > 0) const Divider(height: 16, color: AppColors.border),
+                                _IngredientTile(
+                                  name: ingredients[i].toString(),
+                                  portion: 'Porsi Seimbang',
+                                  note: 'Bahan Baku Pilihan SPPG',
+                                ),
+                              ]
+                          ],
                         ),
-                        Divider(height: 16, color: AppColors.border),
-                        _IngredientTile(
-                          name: 'Nasi Putih Warm',
-                          portion: '150 gram',
-                          note: 'Karbohidrat Kompleks',
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 28),
 
