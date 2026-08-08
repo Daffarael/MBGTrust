@@ -198,8 +198,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
 
     return SppgAdminLayout(
       currentRoute: '/estimation',
-      title: 'Dasbor & Presisi H+1',
+      title: 'Halaman Dasbor',
       subtitle: 'SPPG Unit Dapur Kota Padang 01',
+      onTopsisTap: () => _showTopsisDetailModal(context),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
@@ -217,10 +218,10 @@ class _EstimationScreenState extends State<EstimationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Banner
+                      // Header Banner (Target Porsi Memasak Besok - 2 Baris Besar)
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [AppColors.primary, AppColors.primaryDark],
@@ -239,7 +240,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
@@ -247,30 +248,32 @@ class _EstimationScreenState extends State<EstimationScreen> {
                               child: const Icon(
                                 Icons.soup_kitchen_rounded,
                                 color: Colors.white,
-                                size: 28,
+                                size: 32,
                               ),
                             ),
-                            const SizedBox(width: 14),
+                            const SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
-                                    'Dapur SPPG Unit Kota Padang 01',
+                                    'Target Porsi Memasak Besok',
                                     softWrap: true,
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  const SizedBox(height: 2),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    'Target Wajib Dimasak: $precisionPortions Porsi Presisi H+1',
+                                    '$precisionPortions Porsi Presisi',
                                     softWrap: true,
                                     style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.3,
                                     ),
                                   ),
                                 ],
@@ -281,7 +284,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // 4 Stat Cards Analitik Utama
+                      // 4 Stat Cards Analitik Utama (Format Bersambung Tanpa Terpisah Baris)
                       const Text(
                         'Ringkasan Analitik Eksekutif',
                         softWrap: true,
@@ -298,7 +301,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: _buildStatCard(
                               title: 'Kepuasan Siswa',
-                              value: '4.8 ⭐',
+                              valueText: '4.8 ⭐',
                               subtitle: '1.240 Ulasan',
                               icon: Icons.star_rounded,
                               color: AppColors.secondaryDark,
@@ -309,7 +312,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: _buildStatCard(
                               title: 'Penerimaan Porsi',
-                              value: '95.2%',
+                              valueText: '95.2%',
                               subtitle: 'Presisi Tinggi',
                               icon: Icons.check_circle_rounded,
                               color: AppColors.success,
@@ -323,8 +326,8 @@ class _EstimationScreenState extends State<EstimationScreen> {
                         children: [
                           Expanded(
                             child: _buildStatCard(
-                              title: 'Food Waste H+1',
-                              value: '0%',
+                              title: 'Sisa Makanan',
+                              valueText: '0%',
                               subtitle: '50 Porsi Tercegah',
                               icon: Icons.cleaning_services_rounded,
                               color: AppColors.primary,
@@ -335,7 +338,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: _buildStatCard(
                               title: 'Hemat Anggaran',
-                              value: 'Rp 750k',
+                              valueText: 'Rp 750k',
                               subtitle: 'Efisiensi / Hari',
                               icon: Icons.savings_rounded,
                               color: Colors.blue,
@@ -346,12 +349,12 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       ),
                       const SizedBox(height: 28),
 
-                      // Section Presisi Porsi
+                      // Section Presisi Porsi Memasak Besok
                       Row(
                         children: const [
                           Expanded(
                             child: Text(
-                              'Presisi Porsi Memasak H+1',
+                              'Presisi Porsi Memasak Besok',
                               softWrap: true,
                               style: TextStyle(
                                 fontSize: 16,
@@ -424,7 +427,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             ),
                             const SizedBox(height: 16),
 
-                            // Rincian Alasan Penolakan (TEKS DIBACA UTUH 100%)
+                            // Rincian Alasan Penolakan
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
@@ -720,16 +723,17 @@ class _EstimationScreenState extends State<EstimationScreen> {
     });
   }
 
+  // REDESIGNED STAT CARD: NILAI & ANGKANYA SELALU BERSAMBUNG HIZONTALLY TANPA TERPOTONG
   Widget _buildStatCard({
     required String title,
-    required String value,
+    required String valueText,
     required String subtitle,
     required IconData icon,
     required Color color,
     required Color bgColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -741,42 +745,47 @@ class _EstimationScreenState extends State<EstimationScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: bgColor,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, size: 20, color: color),
+                child: Icon(icon, size: 18, color: color),
               ),
-              const Spacer(),
-              Flexible(
-                child: Text(
-                  value,
-                  softWrap: true,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+              const SizedBox(width: 8),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    valueText,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             title,
             softWrap: true,
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
+          const SizedBox(height: 2),
           Text(
             subtitle,
             softWrap: true,
             style: const TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               color: AppColors.textLight,
             ),
           ),

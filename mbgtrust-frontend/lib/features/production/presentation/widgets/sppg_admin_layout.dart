@@ -9,6 +9,7 @@ class SppgAdminLayout extends StatefulWidget {
   final Widget body;
   final List<Widget>? actions;
   final Widget? floatingActionButton;
+  final VoidCallback? onTopsisTap;
 
   const SppgAdminLayout({
     super.key,
@@ -18,6 +19,7 @@ class SppgAdminLayout extends StatefulWidget {
     required this.body,
     this.actions,
     this.floatingActionButton,
+    this.onTopsisTap,
   });
 
   @override
@@ -30,7 +32,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
 
   final List<Map<String, dynamic>> _menuItems = [
     {
-      'title': 'Dasbor & Presisi H+1',
+      'title': 'Halaman Dasbor',
       'icon': Icons.dashboard_rounded,
       'route': '/estimation',
     },
@@ -45,15 +47,62 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
       'route': '/create-schedule',
     },
     {
+      'title': 'Engine SPK TOPSIS',
+      'icon': Icons.calculate_rounded,
+      'route': '/sppg/topsis-spk-engine',
+    },
+    {
       'title': 'Pelacak Logistik',
       'icon': Icons.local_shipping_rounded,
       'route': '/distribution-tracker',
     },
   ];
 
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.logout_rounded, color: AppColors.error, size: 24),
+            SizedBox(width: 8),
+            Text('Konfirmasi Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Apakah Anda yakin ingin keluar dari sistem Admin SPPG?',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              context.go('/login');
+            },
+            child: const Text('Ya, Keluar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _onSelectRoute(String route) {
     if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
       Navigator.pop(context);
+    }
+    if (route == '/sppg/topsis-spk-engine' && widget.onTopsisTap != null) {
+      widget.onTopsisTap!();
+      return;
     }
     if (widget.currentRoute != route) {
       context.go(route);
@@ -67,7 +116,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
         final isDesktop = constraints.maxWidth > 850;
 
         if (isDesktop) {
-          // PC / DESKTOP RESPONSIVE LAYOUT (WITH TOGGLEABLE COLLAPSIBLE SIDEBAR)
+          // PC / DESKTOP RESPONSIVE LAYOUT (COLLAPSIBLE SIDEBAR)
           return Scaffold(
             key: _scaffoldKey,
             body: Row(
@@ -129,7 +178,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                                       ),
                                     ),
                                     Text(
-                                      'Unit Kota Padang 01',
+                                      'Unit Dapur Kota Padang 01',
                                       softWrap: true,
                                       style: TextStyle(
                                         fontSize: 11,
@@ -141,7 +190,6 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                               ),
                             ],
                             const SizedBox(width: 4),
-                            // COLLAPSE / EXPAND TOGGLE BUTTON
                             IconButton(
                               icon: Icon(
                                 _isDesktopSidebarExpanded
@@ -244,7 +292,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                                     ),
                                   )
                                 : null,
-                            onTap: () => context.go('/login'),
+                            onTap: () => _confirmLogout(context),
                           ),
                         ),
                       ),
@@ -280,15 +328,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                             ),
                         ],
                       ),
-                      actions: [
-                        if (widget.actions != null) ...widget.actions!,
-                        IconButton(
-                          icon: const Icon(Icons.logout_rounded,
-                              color: AppColors.error),
-                          tooltip: 'Keluar',
-                          onPressed: () => context.go('/login'),
-                        ),
-                      ],
+                      actions: widget.actions,
                     ),
                     body: widget.body,
                     floatingActionButton: widget.floatingActionButton,
@@ -332,14 +372,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                   ),
               ],
             ),
-            actions: [
-              if (widget.actions != null) ...widget.actions!,
-              IconButton(
-                icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                tooltip: 'Keluar',
-                onPressed: () => context.go('/login'),
-              ),
-            ],
+            actions: widget.actions,
           ),
           drawer: Drawer(
             child: Column(
@@ -432,7 +465,10 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                           ),
                           onTap: () {
                             Navigator.pop(context);
-                            if (widget.currentRoute != item['route']) {
+                            if (item['route'] == '/sppg/topsis-spk-engine' &&
+                                widget.onTopsisTap != null) {
+                              widget.onTopsisTap!();
+                            } else if (widget.currentRoute != item['route']) {
                               context.go(item['route'] as String);
                             }
                           },
@@ -455,7 +491,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    context.go('/login');
+                    _confirmLogout(context);
                   },
                 ),
                 const SizedBox(height: 16),
