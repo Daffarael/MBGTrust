@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.mbgtrust.mbgtrust"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
