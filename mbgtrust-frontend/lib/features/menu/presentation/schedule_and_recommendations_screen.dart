@@ -237,7 +237,7 @@ class _ScheduleAndRecommendationsScreenState
           constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
             children: [
-              // Custom TabBar
+              // Custom TabBar (Over-flow Free)
               Container(
                 margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 decoration: BoxDecoration(
@@ -253,16 +253,23 @@ class _ScheduleAndRecommendationsScreenState
                   ),
                   labelColor: Colors.white,
                   unselectedLabelColor: AppColors.textSecondary,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                   labelStyle: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 13),
+                      fontWeight: FontWeight.bold, fontSize: 12),
                   tabs: const [
                     Tab(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.calendar_month_rounded, size: 18),
-                          SizedBox(width: 6),
-                          Text('Jadwal & Riwayat Menu'),
+                          Icon(Icons.calendar_month_rounded, size: 16),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Jadwal & Riwayat',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -270,9 +277,15 @@ class _ScheduleAndRecommendationsScreenState
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.star_rounded, size: 18),
-                          SizedBox(width: 6),
-                          Text('Top 5 Rekomendasi'),
+                          Icon(Icons.star_rounded, size: 16),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Top 5 Rekomendasi',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -308,7 +321,7 @@ class _ScheduleAndRecommendationsScreenState
         children: [
           // Card Form Plotting Jadwal Baru
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(18),
@@ -329,12 +342,15 @@ class _ScheduleAndRecommendationsScreenState
                     Icon(Icons.add_task_rounded,
                         color: AppColors.primary, size: 22),
                     SizedBox(width: 8),
-                    Text(
-                      'Buat Jadwal Menu Makanan Baru',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                    Expanded(
+                      child: Text(
+                        'Buat Jadwal Menu Makanan Baru',
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   ],
@@ -364,20 +380,26 @@ class _ScheduleAndRecommendationsScreenState
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.event_rounded,
-                                color: AppColors.primary, size: 20),
-                            const SizedBox(width: 10),
-                            Text(
-                              _formatDate(_selectedDate),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                        Expanded(
+                          child: Row(
+                            children: [
+                              const Icon(Icons.event_rounded,
+                                  color: AppColors.primary, size: 20),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  _formatDate(_selectedDate),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         const Icon(Icons.arrow_drop_down_rounded,
                             color: AppColors.textSecondary),
@@ -387,7 +409,7 @@ class _ScheduleAndRecommendationsScreenState
                 ),
                 const SizedBox(height: 14),
 
-                // 2. Pilih Menu Makanan
+                // 2. Pilih Menu Makanan (isExpanded: true to prevent 211px overflow)
                 const Text(
                   '2. Pilih Menu Makanan Seimbang',
                   style: TextStyle(
@@ -397,6 +419,7 @@ class _ScheduleAndRecommendationsScreenState
                 ),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
                   initialValue: _selectedMenuId,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
@@ -419,7 +442,12 @@ class _ScheduleAndRecommendationsScreenState
                     final cal = m['kalori_kkal'] ?? m['calories'] ?? 500;
                     return DropdownMenuItem<String>(
                       value: id,
-                      child: Text('$name ($cal kcal)'),
+                      child: Text(
+                        '$name ($cal kcal)',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 12.5),
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -430,95 +458,115 @@ class _ScheduleAndRecommendationsScreenState
                 ),
                 const SizedBox(height: 14),
 
-                Row(
-                  children: [
-                    // 3. Batas Jam Konfirmasi Siswa (Timer)
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '3. Batas Jam Konfirmasi Siswa',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textSecondary),
-                          ),
-                          const SizedBox(height: 6),
-                          DropdownButtonFormField<String>(
-                            initialValue: _selectedDeadlineTime,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 10),
-                              filled: true,
-                              fillColor: AppColors.background,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: AppColors.border),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                    color: AppColors.primary, width: 1.5),
-                              ),
-                            ),
-                            items: _deadlineOptions.map((t) {
-                              return DropdownMenuItem<String>(
-                                value: t,
-                                child: Text(t, style: const TextStyle(fontSize: 12)),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) {
-                                setState(() => _selectedDeadlineTime = val);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
+                // 3 & 4. Responsive Layout (Column on Mobile Narrow, Row on Desktop)
+                LayoutBuilder(
+                  builder: (context, boxConstraints) {
+                    final isNarrow = boxConstraints.maxWidth < 420;
 
-                    // 4. Target Porsi Sekolah
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '4. Target Porsi Masak',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textSecondary),
-                          ),
-                          const SizedBox(height: 6),
-                          TextField(
-                            controller: _portionController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: '450 porsi',
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 10),
-                              filled: true,
-                              fillColor: AppColors.background,
-                              suffixText: 'porsi',
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: AppColors.border),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                    color: AppColors.primary, width: 1.5),
-                              ),
+                    Widget field3 = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '3. Jam Batas Konfirmasi',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          initialValue: _selectedDeadlineTime,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            filled: true,
+                            fillColor: AppColors.background,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: AppColors.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primary, width: 1.5),
                             ),
                           ),
+                          items: _deadlineOptions.map((t) {
+                            return DropdownMenuItem<String>(
+                              value: t,
+                              child: Text(
+                                t,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 11.5),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _selectedDeadlineTime = val);
+                            }
+                          },
+                        ),
+                      ],
+                    );
+
+                    Widget field4 = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '4. Target Porsi Masak',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: _portionController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: '450 porsi',
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            filled: true,
+                            fillColor: AppColors.background,
+                            suffixText: 'porsi',
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: AppColors.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primary, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+
+                    if (isNarrow) {
+                      return Column(
+                        children: [
+                          field3,
+                          const SizedBox(height: 12),
+                          field4,
                         ],
-                      ),
-                    ),
-                  ],
+                      );
+                    } else {
+                      return Row(
+                        children: [
+                          Expanded(child: field3),
+                          const SizedBox(width: 12),
+                          Expanded(child: field4),
+                        ],
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(height: 18),
 
@@ -551,12 +599,14 @@ class _ScheduleAndRecommendationsScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-              Text(
-                'Riwayat Jadwal Menu per Tanggal',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+              Expanded(
+                child: Text(
+                  'Riwayat Jadwal Menu per Tanggal',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
               Text(
@@ -590,7 +640,7 @@ class _ScheduleAndRecommendationsScreenState
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(14),
@@ -607,25 +657,29 @@ class _ScheduleAndRecommendationsScreenState
                       child: const Icon(Icons.restaurant_rounded,
                           color: AppColors.primary, size: 20),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                formattedDate,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryDark,
+                              Expanded(
+                                child: Text(
+                                  formattedDate,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryDark,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 6),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: statusColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
@@ -633,7 +687,7 @@ class _ScheduleAndRecommendationsScreenState
                                 child: Text(
                                   statusLabel,
                                   style: TextStyle(
-                                    fontSize: 9.5,
+                                    fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                     color: statusColor,
                                   ),
@@ -654,6 +708,7 @@ class _ScheduleAndRecommendationsScreenState
                           const SizedBox(height: 2),
                           Text(
                             'Target: ${item['target_porsi']} Porsi • Batas Jam: ${item['batas_waktu']} • Kepuasan: ${item['kepuasan']}',
+                            softWrap: true,
                             style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.textSecondary,
@@ -849,9 +904,10 @@ class _ScheduleAndRecommendationsScreenState
                             ],
                           ),
                         ),
+                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(10),
@@ -861,7 +917,7 @@ class _ScheduleAndRecommendationsScreenState
                               Text(
                                 rec['kepuasan'],
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primaryDark,
                                 ),
@@ -869,7 +925,7 @@ class _ScheduleAndRecommendationsScreenState
                               const Text(
                                 'Kepuasan Siswa',
                                 style: TextStyle(
-                                  fontSize: 9,
+                                  fontSize: 8.5,
                                   color: AppColors.primaryDark,
                                 ),
                               ),
@@ -888,12 +944,17 @@ class _ScheduleAndRecommendationsScreenState
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                    // Wrap for Card Footer (Overflow-proof on narrow screen)
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: badgeColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
@@ -910,18 +971,18 @@ class _ScheduleAndRecommendationsScreenState
                         OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                                horizontal: 10, vertical: 6),
                             side: const BorderSide(color: AppColors.primary),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           icon: const Icon(Icons.event_available_rounded,
-                              color: AppColors.primary, size: 16),
+                              color: AppColors.primary, size: 15),
                           label: const Text(
                             'Jadwalkan Menu Ini',
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
