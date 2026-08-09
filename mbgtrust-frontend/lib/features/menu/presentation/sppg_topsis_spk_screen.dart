@@ -800,18 +800,33 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                     color: AppColors.background,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                  child: Column(
                                     children: [
-                                      _buildMetricItem(
-                                          'Rasa', '${rec['skor_rasa']} ⭐'),
-                                      _buildMetricItem('Kesukaan',
-                                          '${rec['skor_kesukaan']} ⭐'),
-                                      _buildMetricItem(
-                                          'Porsi', '${rec['skor_porsi']} ⭐'),
-                                      _buildMetricItem('Sisa Food',
-                                          '${rec['sisa_makanan_pct']}% 🗑️'),
+                                      // Baris 1: Rasa, Kesukaan, Porsi
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          _buildMetricItem(
+                                              'Rasa', '${rec['skor_rasa']} ⭐'),
+                                          _buildMetricItem('Kesukaan',
+                                              '${rec['skor_kesukaan']} ⭐'),
+                                          _buildMetricItem(
+                                              'Porsi', '${rec['skor_porsi']} ⭐'),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // Baris 2: Sisa Makanan, Penolakan
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          _buildMetricItem('Sisa Makanan',
+                                              '${rec['sisa_makanan_pct']}%'),
+                                          _buildMetricItem('Penolakan',
+                                              '${rec['penolakan_pct']}%'),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),

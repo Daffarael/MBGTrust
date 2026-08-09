@@ -134,43 +134,6 @@ class _EstimationScreenState extends State<EstimationScreen> {
     });
   }
 
-  List<PieChartSectionData> _showingSatisfactionSections() {
-    return List.generate(2, (i) {
-      final isTouched = i == _touchedIndex;
-      final fontSize = isTouched ? 15.0 : 12.0;
-      final radius = isTouched ? 54.0 : 46.0;
-
-      switch (i) {
-        case 0:
-          return PieChartSectionData(
-            color: AppColors.primary,
-            value: 96.5,
-            title: '96.5%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          );
-        case 1:
-          return PieChartSectionData(
-            color: Colors.amber.shade700,
-            value: 3.5,
-            title: '3.5%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          );
-        default:
-          throw Error();
-      }
-    });
-  }
-
   String _formatLiveDateTime() {
     const days = [
       'Minggu',
@@ -807,54 +770,6 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-
-          // PIE CHART ULASAN (HEIGHT 160px)
-          SizedBox(
-            height: 160,
-            child: PieChart(
-              PieChartData(
-                pieTouchData: PieTouchData(
-                  touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                    setState(() {
-                      if (!event.isInterestedForInteractions ||
-                          pieTouchResponse == null ||
-                          pieTouchResponse.touchedSection == null) {
-                        _touchedIndex = -1;
-                        return;
-                      }
-                      _touchedIndex =
-                          pieTouchResponse.touchedSection!.touchedSectionIndex;
-                    });
-                  },
-                ),
-                borderData: FlBorderData(show: false),
-                sectionsSpace: 4,
-                centerSpaceRadius: 40,
-                sections: _showingSatisfactionSections(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // LEGENDA ULASAN (CENTER)
-          Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 16,
-              runSpacing: 8,
-              children: const [
-              _ChartLegendTile(
-                color: AppColors.primary,
-                label: 'Suka (96.5%)',
-              ),
-              _ChartLegendTile(
-                color: Colors.amber,
-                label: 'Evaluasi (3.5%)',
-              ),
-              ],
-            ),
           ),
           const SizedBox(height: 14),
 
