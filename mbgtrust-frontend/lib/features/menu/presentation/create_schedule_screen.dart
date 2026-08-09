@@ -352,7 +352,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     return SppgAdminLayout(
       currentRoute: '/create-schedule',
       title: 'Jadwal Menu Harian',
-      subtitle: 'Pengaturan Jadwal Penyajian Makanan & Riwayat Sekolah',
+      subtitle: 'Pengaturan Jadwal Penyajian & Riwayat',
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 720),

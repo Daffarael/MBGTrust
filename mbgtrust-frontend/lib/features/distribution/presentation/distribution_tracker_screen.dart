@@ -80,7 +80,7 @@ class _DistributionTrackerScreenState
     return SppgAdminLayout(
       currentRoute: '/distribution-tracker',
       title: 'Status Pengiriman',
-      subtitle: 'Pemantauan Pengiriman Makanan ke Sekolah',
+      subtitle: 'Pemantauan Pengiriman Makanan',
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 720),

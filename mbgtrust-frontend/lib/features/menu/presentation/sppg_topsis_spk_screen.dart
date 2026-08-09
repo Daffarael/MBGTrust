@@ -108,7 +108,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
     return SppgAdminLayout(
       currentRoute: '/sppg/topsis-spk-engine',
       title: 'Rekomendasi Menu',
-      subtitle: 'Analisis Rekomendasi Menu Terfavorit Berdasarkan Ulasan & Masukan Siswa',
+      subtitle: 'Analisis Rekomendasi Menu Terfavorit Siswa',
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 720),

@@ -170,7 +170,7 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
     return SppgAdminLayout(
       currentRoute: '/manage-ingredients',
       title: 'Bahan Baku Sehat',
-      subtitle: 'Katalog Bahan Baku Sehat & Standar Nutrisi MBG',
+      subtitle: 'Katalog Bahan Baku Sehat & Nutrisi',
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _handleAddIngredient,
         backgroundColor: AppColors.primary,

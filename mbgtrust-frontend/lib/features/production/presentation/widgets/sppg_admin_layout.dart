@@ -311,13 +311,15 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                     appBar: AppBar(
                       automaticallyImplyLeading: false,
                       title: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.title,
-                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                             style: const TextStyle(
-                              fontSize: 17,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
@@ -325,7 +327,8 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                           if (widget.subtitle != null)
                             Text(
                               widget.subtitle!,
-                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textSecondary,
@@ -348,6 +351,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
         return Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
+            titleSpacing: 0,
             leading: Builder(
               builder: (ctx) => IconButton(
                 icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
@@ -356,22 +360,25 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
               ),
             ),
             title: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.title,
-                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 if (widget.subtitle != null)
                   Text(
                     widget.subtitle!,
-                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 10.5,
                       color: AppColors.textSecondary,
                     ),
                   ),

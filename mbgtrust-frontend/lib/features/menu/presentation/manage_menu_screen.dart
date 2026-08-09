@@ -551,7 +551,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
     return SppgAdminLayout(
       currentRoute: '/manage-menu',
       title: 'Katalog Menu Makanan',
-      subtitle: 'Daftar Resep & Kandungan Nutrisi Menu Seimbang',
+      subtitle: 'Daftar Resep & Kandungan Nutrisi',
       actions: [
         IconButton(
           icon: const Icon(Icons.calendar_month_rounded,
