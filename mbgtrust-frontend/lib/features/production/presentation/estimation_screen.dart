@@ -407,22 +407,25 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                     children: [
                                       Icon(
                                         Icons.how_to_reg_rounded,
-                                        size: 16,
+                                        size: 15,
                                         color:
                                             _activeDashboardTab == 'KONFIRMASI'
                                                 ? Colors.white
                                                 : AppColors.textSecondary,
                                       ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Status Konfirmasi',
-                                        style: TextStyle(
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.bold,
-                                          color: _activeDashboardTab ==
-                                                  'KONFIRMASI'
-                                              ? Colors.white
-                                              : AppColors.textSecondary,
+                                      const SizedBox(width: 5),
+                                      Flexible(
+                                        child: Text(
+                                          'Konfirmasi',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.bold,
+                                            color: _activeDashboardTab ==
+                                                    'KONFIRMASI'
+                                                ? Colors.white
+                                                : AppColors.textSecondary,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -455,20 +458,23 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                     children: [
                                       Icon(
                                         Icons.star_rounded,
-                                        size: 16,
+                                        size: 15,
                                         color: _activeDashboardTab == 'ULASAN'
                                             ? Colors.white
                                             : AppColors.textSecondary,
                                       ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        'Ulasan & Kepuasan',
-                                        style: TextStyle(
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.bold,
-                                          color: _activeDashboardTab == 'ULASAN'
-                                              ? Colors.white
-                                              : AppColors.textSecondary,
+                                      const SizedBox(width: 5),
+                                      Flexible(
+                                        child: Text(
+                                          'Ulasan',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.bold,
+                                            color: _activeDashboardTab == 'ULASAN'
+                                                ? Colors.white
+                                                : AppColors.textSecondary,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -641,12 +647,14 @@ class _EstimationScreenState extends State<EstimationScreen> {
               Icon(Icons.pie_chart_rounded,
                   color: AppColors.primary, size: 18),
               SizedBox(width: 6),
-              Text(
-                'Diagram Konfirmasi Presensi Siswa (Pra-Distribusi)',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+              Expanded(
+                child: Text(
+                  'Konfirmasi Presensi Siswa',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -766,34 +774,31 @@ class _EstimationScreenState extends State<EstimationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: const [
-                  Icon(Icons.stars_rounded,
-                      color: AppColors.secondaryDark, size: 18),
-                  SizedBox(width: 6),
-                  Text(
-                    'Tingkat Kepuasan Siswa Hari Ini',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+              const Icon(Icons.stars_rounded,
+                  color: AppColors.secondaryDark, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: const Text(
+                  'Kepuasan Siswa',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
-                ],
+                ),
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
-                  'PASCA DISTRIBUSI',
+                  'TERDISTRIBUSI',
                   style: TextStyle(
-                    fontSize: 9.5,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryDark,
                   ),
@@ -838,11 +843,11 @@ class _EstimationScreenState extends State<EstimationScreen> {
             children: const [
               _ChartLegendTile(
                 color: AppColors.primary,
-                label: 'Sangat Suka (96.5%)',
+                label: 'Suka (96.5%)',
               ),
               _ChartLegendTile(
                 color: Colors.amber,
-                label: 'Cukup Suka / Evaluasi (3.5%)',
+                label: 'Evaluasi (3.5%)',
               ),
             ],
           ),
@@ -862,7 +867,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildSubMetric('Rating Rasa', '4.9 ⭐'),
+                    _buildSubMetric('Rasa', '4.9 ⭐'),
                     _buildSubMetric('Porsi', '4.8 ⭐'),
                     _buildSubMetric('Kepuasan', '96.5%'),
                   ],
@@ -871,17 +876,18 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 const Divider(height: 1),
                 const SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(Icons.assignment_turned_in_rounded,
                         size: 14, color: AppColors.primary),
                     SizedBox(width: 6),
-                    Text(
-                      'Progres Survei: 410 / 420 Siswa Sudah Mengulas',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
+                    Expanded(
+                      child: Text(
+                        '410 / 420 siswa sudah mengulas',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryDark,
+                        ),
                       ),
                     ),
                   ],
