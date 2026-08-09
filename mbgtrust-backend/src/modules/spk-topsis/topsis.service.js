@@ -1,5 +1,6 @@
 import prisma from '../../config/prisma.js';
 import { eksekusiTopsis } from './topsis.engine.js';
+import { generateNarasi } from './ai.service.js';
 
 // ─── Helpers ───────────────────────────────────────────────────
 
@@ -74,23 +75,33 @@ export const jalankanEksekusi = async ({ tanggal_mulai, tanggal_selesai, daftar_
 
   const { hasilJson, rekomendasiJson } = eksekusiTopsis(alternatif);
 
+  // ── Injeksi Narasi AI (Gemini 2.0 Flash) ─────────────────────
+  // generateNarasi mengembalikan Map<id_menu, narasi_string>
+  // Jika Gemini gagal/timeout, otomatis fallback ke rule-based narasi.
+  const narasiMap = await generateNarasi(rekomendasiJson);
+  const rekomendasiDenganAi = rekomendasiJson.map((item) => ({
+    ...item,
+    analisis_ai: narasiMap.get(item.id_menu) ?? null,
+  }));
+
   const eksekusi = await prisma.eksekusiTopsis.create({
     data: {
       periodeAwal:    new Date(tanggal_mulai),
       periodeAkhir:   new Date(tanggal_selesai),
       hasilJson,
-      rekomendasiJson,
+      rekomendasiJson: rekomendasiDenganAi, // Simpan permanen dengan analisis_ai
     },
   });
 
   return {
     id_eksekusi: eksekusi.id,
-    peringkat_menu: rekomendasiJson.map(({ id_menu, nama_menu, skor_preferensi_v, rekomendasi, peringkat }) => ({
+    peringkat_menu: rekomendasiDenganAi.map(({ id_menu, nama_menu, skor_preferensi_v, rekomendasi, peringkat, analisis_ai }) => ({
       peringkat,
       id_menu,
       nama_menu,
       skor_preferensi_v,
       rekomendasi,
+      analisis_ai,
     })),
   };
 };
