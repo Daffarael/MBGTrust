@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../production/presentation/widgets/sppg_admin_layout.dart';
 
@@ -20,88 +21,14 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
 
   bool _isWeightExpanded = false;
 
-  final List<Map<String, dynamic>> _recommendationList = [
-    {
-      'id': 'rec_01',
-      'nama_menu': 'Nasi Ayam Bakar Kecap & Tumis Buncis',
-      'kategori': 'Makanan Berat',
-      'kalori': '550 kcal',
-      'skor_kepuasan': '96.5%',
-      'skor_rasa': 4.8,
-      'skor_kesukaan': 4.9,
-      'skor_porsi': 4.7,
-      'sisa_makanan_pct': 4.2,
-      'penolakan_pct': 2.1,
-      'keputusan': 'DIPERTAHANKAN',
-      'keputusanLabel': 'Dipertahankan (Sangat Direkomendasikan)',
-      'badgeColor': AppColors.primary,
-      'ulasan_singkat': 'Favorit utama siswa, bumbu meresap & porsi sangat pas.',
-    },
-    {
-      'id': 'rec_02',
-      'nama_menu': 'Nasi Daging Sapi Lada Hitam & Capcay',
-      'kategori': 'Makanan Berat',
-      'kalori': '620 kcal',
-      'skor_kepuasan': '94.0%',
-      'skor_rasa': 4.7,
-      'skor_kesukaan': 4.8,
-      'skor_porsi': 4.6,
-      'sisa_makanan_pct': 5.0,
-      'penolakan_pct': 3.0,
-      'keputusan': 'DIPERTAHANKAN',
-      'keputusanLabel': 'Dipertahankan (Sangat Direkomendasikan)',
-      'badgeColor': AppColors.primary,
-      'ulasan_singkat': 'Daging empuk, sisa makanan sangat rendah di sekolah.',
-    },
-    {
-      'id': 'rec_03',
-      'nama_menu': 'Nasi Ikan Gurame Asam Manis & Sup Sayur',
-      'kategori': 'Makanan Berat',
-      'kalori': '580 kcal',
-      'skor_kepuasan': '91.8%',
-      'skor_rasa': 4.6,
-      'skor_kesukaan': 4.5,
-      'skor_porsi': 4.5,
-      'sisa_makanan_pct': 7.5,
-      'penolakan_pct': 4.2,
-      'keputusan': 'DIPERTAHANKAN',
-      'keputusanLabel': 'Dipertahankan (Direkomendasikan)',
-      'badgeColor': Colors.blue,
-      'ulasan_singkat': 'Pilihan utama siswa untuk variasi olahan ikan segar.',
-    },
-    {
-      'id': 'rec_04',
-      'nama_menu': 'Nasi Ayam Goreng Lengkuas & Lalapan',
-      'kategori': 'Makanan Berat',
-      'kalori': '560 kcal',
-      'skor_kepuasan': '78.5%',
-      'skor_rasa': 4.2,
-      'skor_kesukaan': 4.0,
-      'skor_porsi': 3.8,
-      'sisa_makanan_pct': 14.8,
-      'penolakan_pct': 8.5,
-      'keputusan': 'DIPERBAIKI',
-      'keputusanLabel': 'Diperbaiki / Evaluasi Porsi & Bumbu',
-      'badgeColor': Colors.amber.shade800,
-      'ulasan_singkat': 'Siswa menyukai ayam namun sisa lalapan bumbu agak banyak.',
-    },
-    {
-      'id': 'rec_05',
-      'nama_menu': 'Nasi Ikan Asin Pedas & Sayur Lodeh',
-      'kategori': 'Makanan Berat',
-      'kalori': '490 kcal',
-      'skor_kepuasan': '42.0%',
-      'skor_rasa': 2.8,
-      'skor_kesukaan': 2.5,
-      'skor_porsi': 3.2,
-      'sisa_makanan_pct': 32.5,
-      'penolakan_pct': 28.0,
-      'keputusan': 'DIBUANG',
-      'keputusanLabel': 'Perlu Dibuang / Diganti (Kurang Disukai)',
-      'badgeColor': AppColors.error,
-      'ulasan_singkat': 'Sisa makanan tinggi (32.5%) & tingkat penolakan tinggi.',
-    },
-  ];
+  late List<Map<String, dynamic>> _recommendationList;
+
+  @override
+  void initState() {
+    super.initState();
+    _recommendationList = List.from(MockData.topsisRecommendations);
+  }
+
 
   @override
   Widget build(BuildContext context) {
