@@ -6,9 +6,9 @@ import '../../features/distribution/presentation/distribution_tracker_screen.dar
 import '../../features/evaluation/presentation/menu_detail_screen.dart';
 import '../../features/evaluation/presentation/next_day_confirmation_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
-import '../../features/menu/presentation/create_schedule_screen.dart';
 import '../../features/menu/presentation/manage_ingredients_screen.dart';
 import '../../features/menu/presentation/manage_menu_screen.dart';
+import '../../features/menu/presentation/schedule_and_recommendations_screen.dart';
 import '../../features/production/presentation/estimation_screen.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -50,11 +50,22 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const ManageIngredientsScreen(),
     ),
     GoRoute(
+      path: '/schedule-and-recommendations',
+      builder: (context, state) {
+        final menus = state.extra as List<Map<String, dynamic>>?;
+        return ScheduleAndRecommendationsScreen(initialMenuList: menus);
+      },
+    ),
+    GoRoute(
       path: '/create-schedule',
       builder: (context, state) {
         final menus = state.extra as List<Map<String, dynamic>>?;
-        return CreateScheduleScreen(availableMenus: menus);
+        return ScheduleAndRecommendationsScreen(initialMenuList: menus);
       },
+    ),
+    GoRoute(
+      path: '/sppg/topsis-spk-engine',
+      builder: (context, state) => const ScheduleAndRecommendationsScreen(),
     ),
     GoRoute(
       path: '/estimation',

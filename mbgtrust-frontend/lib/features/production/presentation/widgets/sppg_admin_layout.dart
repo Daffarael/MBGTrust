@@ -47,14 +47,9 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
       'route': '/manage-menu',
     },
     {
-      'title': 'Jadwal Menu Harian',
-      'icon': Icons.edit_calendar_rounded,
-      'route': '/create-schedule',
-    },
-    {
-      'title': 'Rekomendasi Menu',
-      'icon': Icons.auto_awesome_rounded,
-      'route': '/sppg/topsis-spk-engine',
+      'title': 'Jadwal & Rekomendasi Menu',
+      'icon': Icons.calendar_month_rounded,
+      'route': '/schedule-and-recommendations',
     },
     {
       'title': 'Status Pengiriman',
