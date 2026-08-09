@@ -587,6 +587,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                       ? 3
                       : (constraints.maxWidth > 500 ? 2 : 1);
                   return GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 85),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
                       crossAxisSpacing: 14,

@@ -37,14 +37,14 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
       'route': '/estimation',
     },
     {
-      'title': 'Kelola Master Menu',
-      'icon': Icons.restaurant_menu_rounded,
-      'route': '/manage-menu',
-    },
-    {
       'title': 'Kelola Master Bahan',
       'icon': Icons.flatware_rounded,
       'route': '/manage-ingredients',
+    },
+    {
+      'title': 'Kelola Master Menu',
+      'icon': Icons.restaurant_menu_rounded,
+      'route': '/manage-menu',
     },
     {
       'title': 'Plotting Jadwal Menu',

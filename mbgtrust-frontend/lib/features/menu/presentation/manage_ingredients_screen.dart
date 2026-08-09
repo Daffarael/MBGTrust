@@ -300,12 +300,13 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
                             : (constraints.maxWidth > 500 ? 2 : 1);
 
                         return GridView.builder(
+                          padding: const EdgeInsets.only(bottom: 85),
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: crossAxisCount,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            mainAxisExtent: 170,
+                            mainAxisExtent: 138,
                           ),
                           itemCount: filtered.length,
                           itemBuilder: (context, index) {
@@ -327,7 +328,7 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
                                     [];
 
                             return Container(
-                              padding: const EdgeInsets.all(14),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
                                 borderRadius: BorderRadius.circular(16),
@@ -347,16 +348,16 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
                                   Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(8),
+                                        padding: const EdgeInsets.all(7),
                                         decoration: BoxDecoration(
                                           color: catColor.withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
                                         child: Icon(catIcon,
-                                            color: catColor, size: 20),
+                                            color: catColor, size: 18),
                                       ),
-                                      const SizedBox(width: 10),
+                                      const SizedBox(width: 8),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -366,17 +367,20 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
                                               title.toString(),
                                               softWrap: true,
                                               style: const TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.textPrimary,
+                                                height: 1.1,
                                               ),
                                             ),
+                                            const SizedBox(height: 2),
                                             Text(
                                               sub.toString(),
                                               softWrap: true,
                                               style: const TextStyle(
-                                                fontSize: 11,
+                                                fontSize: 10.5,
                                                 color: AppColors.textSecondary,
+                                                height: 1.1,
                                               ),
                                             ),
                                           ],
@@ -384,7 +388,7 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
                                       ),
                                     ],
                                   ),
-                                  const Spacer(),
+                                  const SizedBox(height: 8),
 
                                   // Badges Row: Portion & Calories
                                   Row(
