@@ -25,8 +25,9 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
   final TextEditingController _portionController =
       TextEditingController(text: '450');
 
-  // Filter State (By Date)
+  // Filter State (By Date & By Tab Status)
   DateTime? _filterDate;
+  String _historyTab = 'BELUM_BERJALAN'; // 'BELUM_BERJALAN' or 'SELESAI'
 
   late List<Map<String, dynamic>> _menuList;
   late List<Map<String, dynamic>> _scheduleHistory;
@@ -68,7 +69,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
         'kalori': '620 kcal',
         'target_porsi': 450,
         'batas_waktu': '17:00 WIB',
-        'status': 'SEDANG_BERJALAN', // Locked
+        'status': 'SEDANG_BERJALAN', // Active Today
         'kepuasan': '94.0%',
         'rasa': '4.7 / 5.0',
       },
@@ -80,7 +81,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
         'kalori': '580 kcal',
         'target_porsi': 440,
         'batas_waktu': '17:00 WIB',
-        'status': 'SELESAI', // Locked
+        'status': 'SELESAI', // Past Completed
         'kepuasan': '91.8%',
         'rasa': '4.6 / 5.0',
       },
@@ -92,7 +93,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
         'kalori': '510 kcal',
         'target_porsi': 445,
         'batas_waktu': '17:00 WIB',
-        'status': 'SELESAI', // Locked
+        'status': 'SELESAI', // Past Completed
         'kepuasan': '88.5%',
         'rasa': '4.4 / 5.0',
       },
@@ -104,7 +105,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
         'kalori': '560 kcal',
         'target_porsi': 450,
         'batas_waktu': '17:00 WIB',
-        'status': 'SELESAI', // Locked
+        'status': 'SELESAI', // Past Completed
         'kepuasan': '85.0%',
         'rasa': '4.3 / 5.0',
       },
@@ -288,10 +289,10 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
               contentPadding: const EdgeInsets.all(16),
               title: Row(
                 children: const [
-                  Icon(Icons.search_rounded,
+                  Icon(Icons.restaurant_menu_rounded,
                       color: AppColors.primary, size: 22),
                   SizedBox(width: 8),
-                  Text('Pilih Menu Makanan',
+                  Text('Katalog Menu Makanan',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold)),
                 ],
@@ -640,15 +641,31 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     final String selectedUlasan = selectedMenuObj['ulasan'] ??
         'Favorit utama siswa, bumbu meresap & porsi sangat pas.';
 
-    // Filter History by Selected Date (if filterDate is set)
-    final filteredHistory = _filterDate == null
-        ? _scheduleHistory
-        : _scheduleHistory.where((item) {
-            final DateTime dt = item['tanggal'];
-            return dt.year == _filterDate!.year &&
-                dt.month == _filterDate!.month &&
-                dt.day == _filterDate!.day;
-          }).toList();
+    // Active Today's Schedule Item (Sedang Berjalan)
+    final activeTodayItem = _scheduleHistory.firstWhere(
+      (item) => item['status'] == 'SEDANG_BERJALAN',
+      orElse: () => {},
+    );
+    final bool hasActiveToday = activeTodayItem.isNotEmpty;
+
+    // Filter History by Selected Date & Status Tab
+    final filteredHistory = _scheduleHistory.where((item) {
+      // Exclude SEDANG_BERJALAN from bottom tabs because it is displayed in top hero card
+      if (item['status'] == 'SEDANG_BERJALAN') return false;
+
+      // Filter by Status Tab (BELUM_BERJALAN vs SELESAI)
+      if (item['status'] != _historyTab) return false;
+
+      // Filter by Date (if filterDate is set)
+      if (_filterDate != null) {
+        final DateTime dt = item['tanggal'];
+        return dt.year == _filterDate!.year &&
+            dt.month == _filterDate!.month &&
+            dt.day == _filterDate!.day;
+      }
+
+      return true;
+    }).toList();
 
     return SppgAdminLayout(
       currentRoute: '/create-schedule',
@@ -814,45 +831,35 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // 2. Pilih Menu Makanan (Searchable Picker & Rich Card Detail)
+                      // 2. KARTU SELEKSI MENU MAKANAN (DESAIN BARU ELEGAN)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
+                        children: const [
+                          Text(
                             '2. Pilih Menu Makanan Seimbang',
                             style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textSecondary),
                           ),
-                          TextButton.icon(
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
-                            ),
-                            icon: const Icon(Icons.search_rounded,
-                                size: 16, color: AppColors.primary),
-                            label: const Text(
-                              'Cari Menu',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary),
-                            ),
-                            onPressed: _openMenuSearchModal,
-                          ),
                         ],
                       ),
                       const SizedBox(height: 6),
 
-                      // KARTU MENU TERPILIH (RICH DETAIL CARD)
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                               color: AppColors.primary.withValues(alpha: 0.4)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -860,18 +867,18 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: const BoxDecoration(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
                                     color: AppColors.primary,
-                                    shape: BoxShape.circle,
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Icon(
                                     Icons.restaurant_menu_rounded,
                                     color: Colors.white,
-                                    size: 18,
+                                    size: 20,
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -882,16 +889,17 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: const TextStyle(
-                                          fontSize: 13.5,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primaryDark,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
+                                      const SizedBox(height: 3),
                                       Text(
                                         '$selectedCategory • $selectedCal',
                                         style: const TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w500,
                                           color: AppColors.primaryDark,
                                         ),
                                       ),
@@ -900,15 +908,22 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 3),
+                                      horizontal: 9, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black
+                                            .withValues(alpha: 0.04),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
                                   ),
                                   child: Text(
                                     selectedKepuasan,
                                     style: const TextStyle(
-                                      fontSize: 10,
+                                      fontSize: 10.5,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryDark,
                                     ),
@@ -916,15 +931,41 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             Text(
                               '💬 "$selectedUlasan"',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                               style: const TextStyle(
-                                fontSize: 11,
+                                fontSize: 11.5,
                                 fontStyle: FontStyle.italic,
                                 color: AppColors.primaryDark,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: AppColors.primary,
+                                  side: const BorderSide(
+                                      color: AppColors.primary),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.search_rounded,
+                                    size: 16),
+                                label: const Text(
+                                  'Cari & Ganti Menu Makanan',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: _openMenuSearchModal,
                               ),
                             ),
                           ],
@@ -1099,79 +1140,259 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Header Riwayat Jadwal Menu (Singkat & Selaras)
+                // =============================================================
+                // RIWAYAT JADWAL MENU (STABIL, RAPI, & TERORGANISASI)
+                // =============================================================
+
+                // 1. HERO ACTIVE CARD: JADWAL SEDANG BERJALAN (HARI INI) ATAS
+                if (hasActiveToday) ...[
+                  const Text(
+                    'Jadwal Menu Hari Ini (Sedang Berjalan)',
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.amber.shade300),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.access_time_filled_rounded,
+                                  color: Colors.white, size: 18),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          _formatDate(
+                                              activeTodayItem['tanggal']),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.amber.shade900,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        child: const Text(
+                                          'SEDANG BERJALAN',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    activeTodayItem['nama_menu'],
+                                    softWrap: true,
+                                    style: const TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Divider(height: 1),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Sasaran: ${activeTodayItem['target_porsi']} Siswa • Batas Jam: ${activeTodayItem['batas_waktu']}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const Tooltip(
+                              message: 'Sedang dikonfirmasi siswa hari ini',
+                              child: Icon(Icons.lock_rounded,
+                                  color: Colors.orange, size: 16),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+
+                // 2. HEADER & SEGMENTED BUTTON 2 TAB FILTER (Belum Berjalan vs Selesai Disajikan)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Expanded(
+                  children: [
+                    const Expanded(
                       child: Text(
                         'Riwayat Jadwal Menu',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14.5,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
                       ),
                     ),
-                    Text(
-                      'Terurut Terbaru',
-                      style:
-                          TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                // BAR FITUR KALENDER FILTER TANGGAL (Bukan Input Ketik!)
-                Row(
-                  children: [
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
+                            horizontal: 8, vertical: 4),
                         side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       icon: const Icon(Icons.calendar_month_rounded,
-                          color: AppColors.primary, size: 18),
+                          color: AppColors.primary, size: 14),
                       label: Text(
                         _filterDate == null
-                            ? 'Pilih Filter Tanggal'
-                            : 'Tanggal: ${_formatDate(_filterDate!)}',
+                            ? 'Kalender Filter'
+                            : _formatDate(_filterDate!),
                         style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary),
                       ),
                       onPressed: _pickFilterDate,
                     ),
                     if (_filterDate != null) ...[
-                      const SizedBox(width: 8),
-                      TextButton.icon(
+                      IconButton(
                         icon: const Icon(Icons.close_rounded,
                             size: 16, color: AppColors.error),
-                        label: const Text(
-                          'Reset Filter',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.error),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _filterDate = null;
-                          });
-                        },
+                        onPressed: () => setState(() => _filterDate = null),
                       ),
                     ],
                   ],
                 ),
+                const SizedBox(height: 10),
+
+                // SEGMENTED BUTTON 2 TOMBOL (Kiri: Belum Berjalan, Kanan: Selesai Disajikan)
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      // Tombol Kiri: Belum Berjalan
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _historyTab = 'BELUM_BERJALAN';
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _historyTab == 'BELUM_BERJALAN'
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Belum Berjalan',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: _historyTab == 'BELUM_BERJALAN'
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+
+                      // Tombol Kanan: Selesai Disajikan
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _historyTab = 'SELESAI';
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _historyTab == 'SELESAI'
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Selesai Disajikan',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: _historyTab == 'SELESAI'
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 12),
 
-                // List Riwayat Jadwal
+                // List Riwayat Jadwal Filtered
                 filteredHistory.isEmpty
                     ? Container(
                         width: double.infinity,
@@ -1188,9 +1409,9 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                   color: AppColors.textLight, size: 32),
                               const SizedBox(height: 8),
                               Text(
-                                _filterDate != null
-                                    ? 'Tidak ada jadwal menu pada tanggal ${_formatDate(_filterDate!)}.'
-                                    : 'Belum ada riwayat jadwal menu.',
+                                _historyTab == 'BELUM_BERJALAN'
+                                    ? 'Belum ada jadwal menu mendatang (Belum Berjalan).'
+                                    : 'Belum ada riwayat jadwal yang selesai disajikan.',
                                 style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary),
@@ -1212,10 +1433,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
 
                           Color statusColor = AppColors.primary;
                           String statusLabel = 'BELUM BERJALAN';
-                          if (status == 'SEDANG_BERJALAN') {
-                            statusColor = Colors.orange;
-                            statusLabel = 'SEDANG BERJALAN (TERKUNCI)';
-                          } else if (status == 'SELESAI') {
+                          if (status == 'SELESAI') {
                             statusColor = Colors.grey;
                             statusLabel = 'SELESAI DISAJIKAN';
                           }
@@ -1334,8 +1552,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                       ),
                                     ] else ...[
                                       const Tooltip(
-                                        message:
-                                            'Status sedang berjalan / selesai terkunci',
+                                        message: 'Status selesai disajikan',
                                         child: Icon(Icons.lock_rounded,
                                             color: AppColors.textLight,
                                             size: 16),
