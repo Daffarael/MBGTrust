@@ -659,7 +659,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // PIE CHART RINGKAS (HEIGHT 160px)
           SizedBox(
@@ -688,14 +688,15 @@ class _EstimationScreenState extends State<EstimationScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
-          // 3 LEGENDA KATEGORI (WRAP BEBAS OVERFLOW)
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 12,
-            runSpacing: 8,
-            children: [
+          // 3 LEGENDA KATEGORI (CENTER + WRAP BEBAS OVERFLOW)
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 8,
+              children: [
               _ChartLegendTile(
                 color: AppColors.primary,
                 label: 'Konfirmasi Hadir ($confirmed)',
@@ -708,7 +709,8 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 color: Colors.amber.shade800,
                 label: 'Belum Konfirmasi ($pending)',
               ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 14),
 
@@ -806,7 +808,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // PIE CHART ULASAN (HEIGHT 160px)
           SizedBox(
@@ -834,13 +836,15 @@ class _EstimationScreenState extends State<EstimationScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
-          // LEGENDA ULASAN
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            children: const [
+          // LEGENDA ULASAN (CENTER)
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 16,
+              runSpacing: 8,
+              children: const [
               _ChartLegendTile(
                 color: AppColors.primary,
                 label: 'Suka (96.5%)',
@@ -849,7 +853,8 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 color: Colors.amber,
                 label: 'Evaluasi (3.5%)',
               ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 14),
 
