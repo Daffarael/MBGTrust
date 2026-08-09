@@ -161,10 +161,12 @@ class _EstimationScreenState extends State<EstimationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Banner (Target Presisi Dapur Hari Ini)
+                      // =======================================================
+                      // 1. BANNER UTAMA OPERASIONAL DAPUR HARI INI
+                      // =======================================================
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [AppColors.primary, AppColors.primaryDark],
@@ -180,54 +182,113 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             ),
                           ],
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.soup_kitchen_rounded,
-                                color: Colors.white,
-                                size: 32,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.restaurant_rounded,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Menu Makanan Hari Ini (${_formatTodayDate()})',
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      const Text(
+                                        'Nasi Daging Sapi Lada Hitam & Capcay',
+                                        softWrap: true,
+                                        maxLines: 2,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.25,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Target Presisi Dapur Hari Ini (${_formatTodayDate()})',
-                                    softWrap: true,
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
+                            const SizedBox(height: 14),
+                            const Divider(color: Colors.white24, height: 1),
+                            const SizedBox(height: 12),
+
+                            // Porsi Dimasak & Status Dapur
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Target Memasak Presisi Dapur:',
+                                      style: TextStyle(
+                                          fontSize: 11, color: Colors.white70),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '$precisionPortions Porsi Presisi',
-                                    softWrap: true,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.3,
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '$precisionPortions Porsi Wajib Dimasak',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                ],
-                              ),
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.outdoor_grill_rounded,
+                                          size: 14, color: AppColors.primaryDark),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        'SEDANG DIMASAK',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryDark,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      // 4 Stat Cards Analitik Utama
+                      // =======================================================
+                      // 2. 4 STAT CARDS ANALITIK UTAMA
+                      // =======================================================
                       const Text(
                         'Ringkasan Kinerja Dapur Hari Ini',
                         softWrap: true,
@@ -292,7 +353,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Section Diagram Presisi Porsi Memasak
+                      // =======================================================
+                      // 3. DIAGRAM PRESISI PORSI & ALASAN PENOLAKAN SISWA
+                      // =======================================================
                       const Text(
                         'Diagram Konfirmasi Presensi Siswa',
                         softWrap: true,
@@ -386,12 +449,12 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                     ),
                                   ),
                                   SizedBox(height: 6),
-                                  Text('• 30 Siswa: Alergi Makanan (Kacang / Udang)',
+                                  Text('• 30 Siswa: Sakit / Tidak Masuk Sekolah',
                                       softWrap: true,
                                       style: TextStyle(
                                           fontSize: 11,
                                           color: AppColors.secondaryDark)),
-                                  Text('• 10 Siswa: Sakit / Tidak Masuk Sekolah',
+                                  Text('• 10 Siswa: Alergi Makanan (Kacang / Udang)',
                                       softWrap: true,
                                       style: TextStyle(
                                           fontSize: 11,
@@ -409,7 +472,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // AKSI PINTAS NAVIGASI DAPUR SPPG
+                      // =======================================================
+                      // 4. AKSI PINTAS NAVIGASI OPERASIONAL SPPG
+                      // =======================================================
                       const Text(
                         'Aksi Pintas Pengelola SPPG',
                         softWrap: true,
