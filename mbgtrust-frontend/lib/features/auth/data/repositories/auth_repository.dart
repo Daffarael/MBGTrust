@@ -13,7 +13,7 @@ class AuthRepository {
   Future<ApiResponseEnvelope<UserModel>> registerBeneficiary({
     required String nikNisn,
     required String namaLengkap,
-    required String idSekolah,
+    required int idSekolah,
     required String tingkatKelas,
     required String kataSandi,
     List<String> riwayatAlergi = const [],
@@ -38,7 +38,7 @@ class AuthRepository {
         kodeStatus: 201,
         pesan: 'Pendaftaran akun penerima manfaat berhasil (Demo Mode).',
         data: UserModel(
-          idPengguna: 'usr_991823ab',
+          idPengguna: 1,
           nikNisn: nikNisn,
           namaLengkap: namaLengkap,
           peran: 'PENERIMA_MANFAAT',
@@ -82,11 +82,11 @@ class AuthRepository {
         jenisToken: 'Bearer',
         kadaluwarsaDalamDetik: 86400,
         pengguna: UserModel(
-          idPengguna: 'usr_991823ab',
+          idPengguna: 1,
           nikNisn: nikNisn.isNotEmpty ? nikNisn : '3171012345670001',
           namaLengkap: 'Faizullatif Fajran',
           peran: 'PENERIMA_MANFAAT',
-          idSekolah: 'sch_man2_padang',
+          idSekolah: 1,
           namaSekolah: 'MAN 2 Kota Padang',
           tingkatKelas: 'XII.FA-3',
           riwayatAlergi: ['Kacang Tanah', 'Udang'],
@@ -137,10 +137,10 @@ class AuthRepository {
         jenisToken: 'Bearer',
         kadaluwarsaDalamDetik: 86400,
         pengguna: UserModel(
-          idPengguna: 'usr_admin_001',
+          idPengguna: 2,
           namaLengkap: 'Pengelola SPPG Wilayah Jakarta',
           peran: 'SPPG_ADMIN',
-          idSekolah: 'sppg_unit_01',
+          idSekolah: 1,
           namaSekolah: 'SPPG Unit Jakarta Pusat 01',
         ),
       );
@@ -172,15 +172,15 @@ class AuthRepository {
     } catch (_) {
       // Fallback demo mode bila backend offline / CORS
       return UserModel(
-        idPengguna: 'usr_991823ab',
+        idPengguna: 1,
         nikNisn: '3171012345670001',
         namaLengkap: 'Faizullatif Fajran',
         peran: 'PENERIMA_MANFAAT',
-        idSekolah: 'sch_man2_padang',
+        idSekolah: 1,
         namaSekolah: 'MAN 2 Kota Padang',
         tingkatKelas: 'XII.FA-3',
         riwayatAlergi: ['Kacang Tanah', 'Udang'],
-        nomorTelepon: '081234567890',
+        nomorKontak: '081234567890',
       );
     }
     throw ApiErrorEnvelope(
@@ -195,7 +195,7 @@ class AuthRepository {
     String? namaLengkap,
     String? tingkatKelas,
     List<String>? riwayatAlergi,
-    String? nomorTelepon,
+    String? nomorKontak,
   }) async {
     try {
       final envelope = await _apiClient.patchEnvelope<UserModel>(
@@ -204,7 +204,7 @@ class AuthRepository {
           'nama_lengkap': ?namaLengkap,
           'tingkat_kelas': ?tingkatKelas,
           'riwayat_alergi': ?riwayatAlergi,
-          'nomor_telepon': ?nomorTelepon,
+          'nomor_kontak': ?nomorKontak,
         },
         fromJsonT: (json) => UserModel.fromJson(json as Map<String, dynamic>),
       );
@@ -215,12 +215,12 @@ class AuthRepository {
     } catch (_) {
       // Fallback demo mode
       return UserModel(
-        idPengguna: 'usr_991823ab',
+        idPengguna: 1,
         namaLengkap: namaLengkap ?? 'Budi Santoso',
         peran: 'PENERIMA_MANFAAT',
         tingkatKelas: tingkatKelas ?? '5-A',
         riwayatAlergi: riwayatAlergi ?? ['Kacang Tanah'],
-        nomorTelepon: nomorTelepon ?? '081234567890',
+        nomorKontak: nomorKontak ?? '081234567890',
       );
     }
     throw ApiErrorEnvelope(

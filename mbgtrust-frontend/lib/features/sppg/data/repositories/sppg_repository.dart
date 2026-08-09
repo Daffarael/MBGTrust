@@ -12,7 +12,7 @@ class SppgRepository {
   Future<TopsisExecutionModel> executeTopsis({
     required String tanggalMulai,
     required String tanggalSelesai,
-    required List<String> daftarIdMenu,
+    required List<int> daftarIdMenu,
   }) async {
     final envelope = await _apiClient.postEnvelope<TopsisExecutionModel>(
       '/spk/topsis/eksekusi',
@@ -51,8 +51,8 @@ class SppgRepository {
     final envelope = await _apiClient.getEnvelope<Map<String, dynamic>>(
       '/analitik/ringkasan-dasbor',
       queryParameters: {
-        'tanggalMulai': tanggalMulai,
-        'tanggalSelesai': tanggalSelesai,
+        'tanggal_mulai': tanggalMulai,
+        'tanggal_selesai': tanggalSelesai,
       },
       fromJsonT: (json) => json as Map<String, dynamic>,
     );

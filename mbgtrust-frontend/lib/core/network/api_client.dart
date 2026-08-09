@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../config/app_config.dart';
 import 'api_response.dart';
 
 /// HTTP Client terpusat menggunakan Dio untuk MBGTrust
 class ApiClient {
-  static const String defaultBaseUrl = 'https://api.mbgtrust.id/api/v1';
+  static const String defaultBaseUrl = AppConfig.baseUrl;
   static const Duration connectTimeoutDuration = Duration(seconds: 15);
   static const Duration receiveTimeoutDuration = Duration(seconds: 15);
 

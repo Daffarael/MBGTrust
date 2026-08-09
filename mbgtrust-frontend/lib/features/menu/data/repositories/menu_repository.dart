@@ -88,8 +88,8 @@ class MenuRepository {
 
   /// Endpoint 2.5: Plotting Jadwal Menu Harian
   Future<void> createSchedule({
-    required String idMenu,
-    required List<String> daftarIdSekolah,
+    required int idMenu,
+    required int idSekolah,
     required String tanggalJadwal,
     required int targetTotalPorsi,
   }) async {
@@ -97,7 +97,7 @@ class MenuRepository {
       '/jadwal',
       data: {
         'id_menu': idMenu,
-        'daftar_id_sekolah': daftarIdSekolah,
+        'id_sekolah': idSekolah,
         'tanggal_jadwal': tanggalJadwal,
         'target_total_porsi': targetTotalPorsi,
       },
@@ -105,11 +105,11 @@ class MenuRepository {
   }
 
   /// Endpoint 2.6: Ambil Menu Hari Ini
-  Future<ScheduleModel?> getTodaySchedule({String? idSekolah}) async {
+  Future<ScheduleModel?> getTodaySchedule({int? idSekolah}) async {
     final envelope = await _apiClient.getEnvelope<ScheduleModel>(
       '/jadwal/hari-ini',
       queryParameters: {
-        'idSekolah': ?idSekolah,
+        'id_sekolah': ?idSekolah,
       },
       fromJsonT: (json) => ScheduleModel.fromJson(json as Map<String, dynamic>),
     );
@@ -118,11 +118,11 @@ class MenuRepository {
   }
 
   /// Endpoint 2.7: Ambil Rencana Menu Besok (H+1)
-  Future<ScheduleModel?> getTomorrowSchedule({String? idSekolah}) async {
+  Future<ScheduleModel?> getTomorrowSchedule({int? idSekolah}) async {
     final envelope = await _apiClient.getEnvelope<ScheduleModel>(
       '/jadwal/besok',
       queryParameters: {
-        'idSekolah': ?idSekolah,
+        'id_sekolah': ?idSekolah,
       },
       fromJsonT: (json) => ScheduleModel.fromJson(json as Map<String, dynamic>),
     );
