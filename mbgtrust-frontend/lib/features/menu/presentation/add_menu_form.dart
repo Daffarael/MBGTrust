@@ -168,7 +168,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
   }
 
   void _removeIngredientField(int index) {
-    if (_ingredientFields.length > 1) {
+    if (index >= 0 && index < _ingredientFields.length) {
       final fieldName = _ingredientFields[index].name.text.trim();
       if (fieldName.isNotEmpty) {
         showDialog(
@@ -702,74 +702,97 @@ class _AddMenuFormState extends State<AddMenuForm> {
               ),
               const SizedBox(height: 6),
 
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  children: [
-                    for (int i = 0; i < _ingredientFields.length; i++) ...[
-                      if (i > 0) const Divider(height: 16, color: AppColors.border),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: CircleAvatar(
-                              radius: 12,
-                              backgroundColor: AppColors.primaryLight,
-                              child: Text(
-                                '${i + 1}',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryDark,
+              _ingredientFields.isEmpty
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Belum ada bahan baku dipilih. Tekan "Tambah Bahan" di atas.',
+                          style: TextStyle(
+                              fontSize: 12, color: AppColors.textSecondary),
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        for (int i = 0; i < _ingredientFields.length; i++) ...[
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: AppColors.primary.withValues(alpha: 0.2)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
                                 ),
-                              ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
+                            child: Row(
                               children: [
-                                CustomTextField(
-                                  label: 'Nama Bahan Baku',
-                                  hint: 'Dada Ayam Bakar Kecap',
-                                  controller: _ingredientFields[i].name,
-                                  validator: (v) => v == null || v.trim().isEmpty
-                                      ? 'Nama bahan wajib'
-                                      : null,
+                                CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: AppColors.primaryLight,
+                                  child: Text(
+                                    '${i + 1}',
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(height: 8),
-                                CustomTextField(
-                                  label: 'Subjudul Nutrisi / Manfaat',
-                                  hint: 'Sumber Utama Protein & Zat Besi',
-                                  controller: _ingredientFields[i].sub,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _ingredientFields[i].name.text.isNotEmpty
+                                            ? _ingredientFields[i].name.text
+                                            : 'Bahan Makanan Sehat',
+                                        softWrap: true,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${_ingredientFields[i].sub.text.isNotEmpty ? _ingredientFields[i].sub.text : 'Manfaat Nutrisi'} • ${_ingredientFields[i].portion.text.isNotEmpty ? _ingredientFields[i].portion.text : '50 gram'}',
+                                        softWrap: true,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(height: 8),
-                                CustomTextField(
-                                  label: 'Berat Gramasi Porsi',
-                                  hint: '80 gram',
-                                  controller: _ingredientFields[i].portion,
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline_rounded,
+                                      color: AppColors.error, size: 20),
+                                  onPressed: () => _removeIngredientField(i),
+                                  tooltip: 'Hapus dari Resep Menu',
                                 ),
                               ],
                             ),
                           ),
-                          if (_ingredientFields.length > 1)
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline_rounded,
-                                  color: AppColors.error, size: 20),
-                              onPressed: () => _removeIngredientField(i),
-                            ),
-                        ],
-                      ),
-                    ]
-                  ],
-                ),
-              ),
+                        ]
+                      ],
+                    ),
               const SizedBox(height: 14),
 
               // 9. Potensi Alergen

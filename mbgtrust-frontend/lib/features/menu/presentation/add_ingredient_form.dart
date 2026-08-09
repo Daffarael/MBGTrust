@@ -224,13 +224,13 @@ class _AddIngredientFormState extends State<AddIngredientForm> {
               ),
               const SizedBox(height: 14),
 
-              // 3. Subjudul Nutrisi / Manfaat Utama
+              // 3. Manfaat Nutrisi
               CustomTextField(
-                label: '3. Subjudul Nutrisi / Manfaat Utama',
+                label: '3. Manfaat Nutrisi',
                 hint: 'Contoh: Sumber Utama Protein & Zat Besi',
                 controller: _subController,
                 validator: (val) => val == null || val.trim().isEmpty
-                    ? 'Subjudul nutrisi wajib diisi'
+                    ? 'Manfaat nutrisi wajib diisi'
                     : null,
               ),
               const SizedBox(height: 14),
