@@ -124,6 +124,23 @@ eksekusi_topsis (berdiri sendiri — tidak berelasi langsung)
 
 ---
 
+### Tabel 4.B: `master_bahan` (Katalog Bahan Baku Sehat)
+
+| Kolom SQL | Field Prisma | Tipe | Wajib | Keterangan |
+|:---|:---|:---|:---:|:---|
+| `id` | `id` | `Int @id` | ✅ | Primary Key |
+| `nama_bahan` | `namaBahan` | `String` | ✅ | Contoh: `"Dada Ayam Bakar Kecap"` |
+| `kategori` | `kategori` | `Enum KategoriBahan` | ✅ | `LAUK_PAUK` / `SAYURAN` / `BUAH_DAN_SUSU` / `KARBOHIDRAT` |
+| `manfaat_nutrisi` | `manfaatNutrisi` | `String` | ✅ | Contoh: `"Sumber Utama Protein & Zat Besi"` |
+| `takaran_default` | `takaranDefault` | `String` | ✅ | Contoh: `"80 gram"` |
+| `stok_tersedia` | `stokTersedia` | `Int` | ❌ | Jumlah stok bahan baku |
+| `satuan_stok` | `satuanStok` | `String` | ❌ | Contoh: `"kg"`, `"gram"` |
+| `status_sehat` | `statusSehat` | `Boolean` | ✅ | Default: `true` |
+| `dibuat_pada` | `dibuatPada` | `DateTime` | ✅ | Auto timestamp |
+| `diubah_pada` | `diubahPada` | `DateTime @updatedAt` | ✅ | Auto update |
+
+---
+
 ### Tabel 5: `jadwal_menu`
 
 | Kolom SQL | Field Prisma | Tipe | Wajib | Keterangan |

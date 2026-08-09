@@ -96,7 +96,7 @@ body: Center(
 ---
 
 ### 🔵 PERAN 2: ADMIN SPPG (Pengelola Dapur SPPG & Support Engine) — [TARGET SELESAI 9 AGUSTUS 🚀]
-1. **Pengelolaan Master Menu & Plotting Jadwal (`/manage-menu`, `/create-schedule`)**: Tambah/edit menu, harga per porsi, nutrisi & tanggal jadwal sekolah.
+1. **Pengelolaan Bahan Baku Sehat, Katalog Menu & Jadwal Menu (`/manage-ingredients`, `/manage-menu`, `/create-schedule`)**: Katalog Bahan Baku Sehat dengan pencarian real-time, Form Menu dengan Kartu Bahan Baku Terkunci (Read-Only Chip Cards) untuk menjaga integritas data master, harga per porsi, manfaat nutrisi & jadwal pengiriman ke sekolah.
 2. **Rekap Estimasi Produksi Presisi H+1 Zero Waste (`/estimation`)**: Perhitungan Porsi Dasar vs Siswa Konfirmasi Hadir vs Siswa Menolak = Total Porsi Wajib Dimasak.
 3. **Engine SPK TOPSIS Evaluasi Menu (`/sppg/topsis-spk-engine`)**: Visualisasi skor preferensi matematika TOPSIS untuk menentukan menu rekomendasi vs menu revisi.
 4. **Pelacakan Logistik Distribusi (`/distribution-tracker`)**: Timeline status pengiriman dapur ke sekolah target.

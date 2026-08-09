@@ -3,7 +3,7 @@
 
 **Nama Proyek:** MBGTrust (Sistem Pendukung Keputusan Program Makan Bergizi Gratis)  
 **Target Kompetisi:** GEMASTIK — Bidang Pengembangan Perangkat Lunak  
-**Versi API:** 4.0.0 (Schema v5 Aligned — 26 Endpoints)  
+**Versi API:** 4.1.0 (Schema v6 Aligned — 30 Endpoints)  
 **URL Utama (Base URL):** `https://api.mbgtrust.id/api/v1`  
 **Standar Otentikasi:** Header Otorisasi HTTP (`Authorization: Bearer <TOKEN_JWT>`)  
 **Format Data:** JSON (`Content-Type: application/json`)  
@@ -404,6 +404,88 @@
       "status_kehadiran": "HADIR"
     }
   }
+}
+```
+
+#### 2.8 Ambil Katalog Bahan Baku Sehat (Daftar & Pencarian)
+* **Endpoint:** `GET /api/v1/ingredients`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Query Parameters:** `?cari=Ayam&kategori=LAUK_PAUK`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Katalog bahan baku sehat berhasil diambil.",
+  "data": [
+    {
+      "id_bahan": "ing_01",
+      "nama_bahan": "Dada Ayam Bakar Kecap",
+      "kategori": "LAUK_PAUK",
+      "manfaat_nutrisi": "Sumber Utama Protein & Zat Besi",
+      "takaran_default": "80 gram",
+      "status_sehat": true
+    }
+  ]
+}
+```
+
+#### 2.9 Tambah Bahan Baku Sehat ke Katalog
+* **Endpoint:** `POST /api/v1/ingredients`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Request Body:**
+```json
+{
+  "nama_bahan": "Tumis Buncis & Wortel",
+  "kategori": "SAYURAN",
+  "manfaat_nutrisi": "Kaya Serat, Vitamin A & C",
+  "takaran_default": "60 gram"
+}
+```
+* **Respon Berhasil (201 Created):**
+```json
+{
+  "sukses": true,
+  "kode_status": 201,
+  "pesan": "Bahan baku sehat berhasil ditambahkan ke katalog.",
+  "data": {
+    "id_bahan": "ing_08",
+    "nama_bahan": "Tumis Buncis & Wortel"
+  }
+}
+```
+
+#### 2.10 Perbarui Data Bahan Baku Sehat
+* **Endpoint:** `PATCH /api/v1/ingredients/:idBahan`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Request Body:**
+```json
+{
+  "manfaat_nutrisi": "Kaya Antioksidan & Serat Tinggi"
+}
+```
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Bahan baku berhasil diperbarui.",
+  "data": {
+    "id_bahan": "ing_08",
+    "manfaat_nutrisi": "Kaya Antioksidan & Serat Tinggi"
+  }
+}
+```
+
+#### 2.11 Hapus Bahan Baku dari Katalog
+* **Endpoint:** `DELETE /api/v1/ingredients/:idBahan`
+* **Hak Akses:** `[AUTH: SPPG_ADMIN]`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Bahan baku berhasil dihapus dari katalog."
 }
 ```
 
