@@ -632,10 +632,6 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     );
     final String selectedName =
         selectedMenuObj['nama_menu'] ?? selectedMenuObj['name'] ?? 'Pilih Menu';
-    final String selectedCal =
-        '${selectedMenuObj['kalori_kkal'] ?? selectedMenuObj['calories'] ?? 550} kcal';
-    final String selectedCategory =
-        selectedMenuObj['kategori'] ?? 'Makanan Berat';
     final String selectedKepuasan =
         selectedMenuObj['kepuasan'] ?? '96.5% Kepuasan Siswa';
 
@@ -885,24 +881,16 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                     children: [
                                       Text(
                                         selectedName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
+                                        softWrap: true,
+                                        maxLines: 2,
                                         style: const TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 13.5,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primaryDark,
+                                          height: 1.25,
                                         ),
                                       ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        '$selectedCategory • $selectedCal',
-                                        style: const TextStyle(
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryDark,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 6),
                                       Row(
                                         children: [
                                           Container(
