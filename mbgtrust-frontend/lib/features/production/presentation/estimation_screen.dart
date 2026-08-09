@@ -869,15 +869,25 @@ class _EstimationScreenState extends State<EstimationScreen> {
             ),
             child: Column(
               children: [
+                // Baris 1: Rasa, Kesukaan, Porsi
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildSubMetric('Rasa', '4.9 ⭐'),
+                    _buildSubMetric('Kesukaan', '4.7 ⭐'),
                     _buildSubMetric('Porsi', '4.8 ⭐'),
-                    _buildSubMetric('Kepuasan', '96.5%'),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
+                // Baris 2: Sisa Makanan, Penolakan
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildSubMetric('Sisa Makanan', '2.1%'),
+                    _buildSubMetric('Penolakan', '10.0%'),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 const Divider(height: 1),
                 const SizedBox(height: 8),
                 Row(
