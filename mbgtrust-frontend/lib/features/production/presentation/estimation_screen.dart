@@ -393,9 +393,11 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             ),
                             const SizedBox(height: 14),
 
-                            // 3 LEGENDA KATEGORI USER-FRIENDLY
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            // 3 LEGENDA KATEGORI USER-FRIENDLY (BEBAS OVERFLOW)
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 12,
+                              runSpacing: 8,
                               children: [
                                 _ChartLegendTile(
                                   color: AppColors.primary,
