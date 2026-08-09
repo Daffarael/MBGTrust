@@ -703,7 +703,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                '4. Target Porsi Masak',
+                                '4. Target Sasaran Siswa',
                                 style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -714,12 +714,12 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                 controller: _portionController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                  hintText: '450 porsi',
+                                  hintText: '450 siswa',
                                   contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 10),
                                   filled: true,
                                   fillColor: AppColors.background,
-                                  suffixText: 'porsi',
+                                  suffixText: 'siswa',
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide:
@@ -754,7 +754,31 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                           }
                         },
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.info_outline_rounded,
+                                color: AppColors.primary, size: 16),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Jumlah porsi memasak presisi dapur akan dihitung otomatis dari hasil konfirmasi presensi siswa sebelum jam batas.',
+                                style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: AppColors.textSecondary),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
 
                       SizedBox(
                         width: double.infinity,
@@ -997,7 +1021,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        'Porsi: ${item['target_porsi']} • Batas: ${item['batas_waktu']} • Kesukaan: ${item['kepuasan']}',
+                                        'Sasaran: ${item['target_porsi']} Siswa • Batas: ${item['batas_waktu']} • Kesukaan: ${item['kepuasan']}',
                                         softWrap: true,
                                         style: const TextStyle(
                                           fontSize: 10.5,
