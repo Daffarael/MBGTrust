@@ -1,31 +1,37 @@
 /// Item Peringkat SPK TOPSIS
 class TopsisRankItem {
   final int peringkat;
+  final int idMenu;
   final String namaMenu;
   final double skorPreferensiV;
   final String rekomendasi; // DIPERTAHANKAN, DIEVALUASI, DIGANTI
+  final String? analisisAi; // Narasi Gemini 2.0 Flash
 
   TopsisRankItem({
     required this.peringkat,
+    required this.idMenu,
     required this.namaMenu,
     required this.skorPreferensiV,
     required this.rekomendasi,
+    this.analisisAi,
   });
 
   factory TopsisRankItem.fromJson(Map<String, dynamic> json) {
     return TopsisRankItem(
       peringkat: json['peringkat'] as int? ?? 1,
+      idMenu: (json['id_menu'] as num?)?.toInt() ?? 0,
       namaMenu: json['nama_menu'] as String? ?? '',
       skorPreferensiV:
           (json['skor_preferensi_v'] as num?)?.toDouble() ?? 0.0,
       rekomendasi: json['rekomendasi'] as String? ?? 'DIPERTAHANKAN',
+      analisisAi: json['analisis_ai'] as String?,
     );
   }
 }
 
 /// Respon Hasil Kalkulasi TOPSIS (Modul 6 API Contract)
 class TopsisExecutionModel {
-  final String idEksekusi;
+  final int idEksekusi;
   final List<TopsisRankItem> peringkatMenu;
 
   TopsisExecutionModel({
@@ -37,7 +43,7 @@ class TopsisExecutionModel {
     var rawRank = json['peringkat_menu'] as List<dynamic>? ?? [];
 
     return TopsisExecutionModel(
-      idEksekusi: json['id_eksekusi'] as String? ?? '',
+      idEksekusi: (json['id_eksekusi'] as num?)?.toInt() ?? 0,
       peringkatMenu: rawRank.map((e) => TopsisRankItem.fromJson(e)).toList(),
     );
   }
