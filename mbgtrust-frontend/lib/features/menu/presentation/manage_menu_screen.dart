@@ -16,11 +16,30 @@ class ManageMenuScreen extends StatefulWidget {
 
 class _ManageMenuScreenState extends State<ManageMenuScreen> {
   late List<Map<String, dynamic>> _menuList;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _menuList = List<Map<String, dynamic>>.from(MockData.foodMenuList);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _filteredMenuList {
+    if (_searchQuery.trim().isEmpty) return _menuList;
+    final query = _searchQuery.trim().toLowerCase();
+    return _menuList.where((menu) {
+      final name = (menu['nama_menu'] ?? menu['name'] ?? '').toString().toLowerCase();
+      final category = (menu['kategori'] ?? menu['category'] ?? '').toString().toLowerCase();
+      final ingredients = (menu['komposisi_bahan'] ?? '').toString().toLowerCase();
+      return name.contains(query) || category.contains(query) || ingredients.contains(query);
+    }).toList();
   }
 
   void _handleAddMenu() {
@@ -551,248 +570,304 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      body: _menuList.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.restaurant_menu_rounded,
-                    size: 64,
-                    color: AppColors.textLight,
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Belum ada menu makanan.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    text: 'Tambah Menu Sekarang',
-                    width: 200,
-                    onPressed: _handleAddMenu,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Search Bar for Menu Search
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.border),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-            )
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final crossAxisCount = constraints.maxWidth > 800
-                      ? 3
-                      : (constraints.maxWidth > 500 ? 2 : 1);
-                  return GridView.builder(
-                    padding: const EdgeInsets.only(bottom: 85),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                      mainAxisExtent: 310,
-                    ),
-                    itemCount: _menuList.length,
-                    itemBuilder: (context, index) {
-                      final menu = _menuList[index];
-                      final title = menu['nama_menu'] ?? menu['name'] ?? '';
-                      final calories = menu['kalori_kkal']?.toString() ?? menu['calories']?.toString() ?? '500';
-                      final protein = menu['protein_gram'] != null ? '${menu['protein_gram']}g' : (menu['protein'] ?? '25g');
-                      final photoUrl = menu['foto_url'] ?? menu['photoUrl'] ?? '';
-                      final category = menu['kategori'] ?? menu['category'] ?? 'MAKANAN_BERAT';
-
-                      return InkWell(
-                        onTap: () => _showMenuDetailModal(context, index),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.border),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Card Image & Category Badge
-                              Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(16)),
-                                    child: Image.network(
-                                      ImageUtils.getDirectImageUrl(photoUrl),
-                                      height: 130,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              Container(
-                                        height: 130,
-                                        color: AppColors.primaryLight,
-                                        child: const Icon(
-                                          Icons.restaurant_menu_rounded,
-                                          color: AppColors.primary,
-                                          size: 36,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    left: 8,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        category,
-                                        softWrap: true,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              // Card Content (TEKS DIBACA UTUH 100%)
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        title,
-                                        softWrap: true,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textPrimary,
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.local_fire_department_rounded,
-                                            size: 14,
-                                            color: AppColors.secondary,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '$calories kcal',
-                                            softWrap: true,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.textSecondary,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            'Protein: $protein',
-                                            softWrap: true,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryDark,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const Divider(
-                                          height: 12, color: AppColors.border),
-
-                                      // Action Buttons (Edit & Delete)
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          InkWell(
-                                            onTap: () => _handleEditMenu(index),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Row(
-                                                children: const [
-                                                  Icon(Icons.edit_outlined,
-                                                      size: 16,
-                                                      color: AppColors.primary),
-                                                  SizedBox(width: 4),
-                                                  Text(
-                                                    'Edit',
-                                                    softWrap: true,
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppColors.primary,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 14,
-                                            width: 1,
-                                            color: AppColors.border,
-                                          ),
-                                          InkWell(
-                                            onTap: () => _handleDeleteMenu(index),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: Row(
-                                                children: const [
-                                                  Icon(
-                                                      Icons
-                                                          .delete_outline_rounded,
-                                                      size: 16,
-                                                      color: AppColors.error),
-                                                  SizedBox(width: 4),
-                                                  Text(
-                                                    'Hapus',
-                                                    softWrap: true,
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppColors.error,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  setState(() {
+                    _searchQuery = val;
+                  });
                 },
+                decoration: InputDecoration(
+                  hintText: 'Cari nama menu, bahan, atau kategori...',
+                  hintStyle: const TextStyle(fontSize: 13, color: AppColors.textLight),
+                  prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 18, color: AppColors.textSecondary),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                ),
               ),
             ),
+
+            // Menu List / Grid View
+            Expanded(
+              child: _filteredMenuList.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.search_off_rounded,
+                            size: 48,
+                            color: AppColors.textLight,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _searchQuery.isNotEmpty
+                                ? 'Menu "$_searchQuery" tidak ditemukan.'
+                                : 'Belum ada menu makanan.',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (_searchQuery.isEmpty) ...[
+                            const SizedBox(height: 16),
+                            CustomButton(
+                              text: 'Tambah Menu Sekarang',
+                              width: 200,
+                              onPressed: _handleAddMenu,
+                            ),
+                          ],
+                        ],
+                      ),
+                    )
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        final crossAxisCount = constraints.maxWidth > 800
+                            ? 3
+                            : (constraints.maxWidth > 500 ? 2 : 1);
+                        final filtered = _filteredMenuList;
+
+                        return GridView.builder(
+                          padding: const EdgeInsets.only(bottom: 85),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            mainAxisExtent: 242,
+                          ),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, index) {
+                            final menu = filtered[index];
+                            final title = menu['nama_menu'] ?? menu['name'] ?? '';
+                            final calories = menu['kalori_kkal']?.toString() ?? menu['calories']?.toString() ?? '500';
+                            final protein = menu['protein_gram'] != null ? '${menu['protein_gram']}g' : (menu['protein'] ?? '25g');
+                            final photoUrl = menu['foto_url'] ?? menu['photoUrl'] ?? '';
+                            final category = menu['kategori'] ?? menu['category'] ?? 'MAKANAN_BERAT';
+
+                            return InkWell(
+                              onTap: () => _showMenuDetailModal(context, index),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.border),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Card Image & Category Badge
+                                    Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: const BorderRadius.vertical(
+                                              top: Radius.circular(16)),
+                                          child: Image.network(
+                                            ImageUtils.getDirectImageUrl(photoUrl),
+                                            height: 110,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    Container(
+                                              height: 110,
+                                              color: AppColors.primaryLight,
+                                              child: const Icon(
+                                                Icons.restaurant_menu_rounded,
+                                                color: AppColors.primary,
+                                                size: 36,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 8,
+                                          left: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              category,
+                                              softWrap: true,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    // Card Content (Rapat & Tanpa Space Kosong)
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            title,
+                                            softWrap: true,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textPrimary,
+                                              height: 1.1,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.local_fire_department_rounded,
+                                                size: 14,
+                                                color: AppColors.secondary,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '$calories kcal',
+                                                softWrap: true,
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.textSecondary,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                'Protein: $protein',
+                                                softWrap: true,
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.primaryDark,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const Divider(
+                                              height: 10, color: AppColors.border),
+
+                                          // Action Buttons (Edit & Delete)
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              InkWell(
+                                                onTap: () => _handleEditMenu(index),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(2.0),
+                                                  child: Row(
+                                                    children: const [
+                                                      Icon(Icons.edit_outlined,
+                                                          size: 15,
+                                                          color: AppColors.primary),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        'Edit',
+                                                        softWrap: true,
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: AppColors.primary,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                height: 12,
+                                                width: 1,
+                                                color: AppColors.border,
+                                              ),
+                                              InkWell(
+                                                onTap: () => _handleDeleteMenu(index),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(2.0),
+                                                  child: Row(
+                                                    children: const [
+                                                      Icon(
+                                                          Icons
+                                                              .delete_outline_rounded,
+                                                          size: 15,
+                                                          color: AppColors.error),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        'Hapus',
+                                                        softWrap: true,
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: AppColors.error,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
