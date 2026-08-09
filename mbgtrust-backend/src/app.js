@@ -17,7 +17,19 @@ import { analitikRouter, laporanRouter } from './modules/analitik/analitik.route
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Izinkan: APK mobile (tanpa Origin header), localhost dev, Netlify, Railway
+    if (!origin) return callback(null, true); // mobile APK & server-to-server
+    if (
+      origin.startsWith('http://localhost') ||
+      /\.netlify\.app$/.test(origin) ||
+      /\.railway\.app$/.test(origin)
+    ) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
