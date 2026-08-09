@@ -187,8 +187,8 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
   Widget build(BuildContext context) {
     return SppgAdminLayout(
       currentRoute: '/create-schedule',
-      title: 'Plotting Jadwal Menu',
-      subtitle: 'Pengaturan Menu Harian SPPG',
+      title: 'Jadwal Menu Harian',
+      subtitle: 'Pengaturan Jadwal Menu Makanan ke Sekolah',
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 720),
@@ -206,7 +206,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Pilihlah menu terbaik untuk setiap hari kerja (Senin - Jumat) dari Master Menu SPPG.',
+                        'Pilihlah menu terbaik untuk setiap hari kerja (Senin - Jumat) dari Katalog Menu.',
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 12,

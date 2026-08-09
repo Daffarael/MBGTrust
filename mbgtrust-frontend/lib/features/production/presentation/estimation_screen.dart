@@ -198,8 +198,8 @@ class _EstimationScreenState extends State<EstimationScreen> {
 
     return SppgAdminLayout(
       currentRoute: '/estimation',
-      title: 'Halaman Dasbor',
-      subtitle: 'SPPG Unit Dapur Kota Padang 01',
+      title: 'Dasbor Utama',
+      subtitle: 'Ringkasan Target Porsi Memasak & Presisi Dapur',
       onTopsisTap: () => _showTopsisDetailModal(context),
       actions: [
         IconButton(

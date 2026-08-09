@@ -549,8 +549,8 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
   Widget build(BuildContext context) {
     return SppgAdminLayout(
       currentRoute: '/manage-menu',
-      title: 'Kelola Katalog Menu',
-      subtitle: 'Katalog Menu Seimbang SPPG',
+      title: 'Katalog Menu Makanan',
+      subtitle: 'Daftar Resep & Kandungan Nutrisi Menu Seimbang',
       actions: [
         IconButton(
           icon: const Icon(Icons.calendar_month_rounded,

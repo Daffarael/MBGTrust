@@ -32,32 +32,32 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
 
   final List<Map<String, dynamic>> _menuItems = [
     {
-      'title': 'Halaman Dasbor',
+      'title': 'Dasbor Utama',
       'icon': Icons.dashboard_rounded,
       'route': '/estimation',
     },
     {
-      'title': 'Kelola Bahan Baku',
+      'title': 'Bahan Baku Sehat',
       'icon': Icons.flatware_rounded,
       'route': '/manage-ingredients',
     },
     {
-      'title': 'Kelola Katalog Menu',
+      'title': 'Katalog Menu Makanan',
       'icon': Icons.restaurant_menu_rounded,
       'route': '/manage-menu',
     },
     {
-      'title': 'Plotting Jadwal Menu',
+      'title': 'Jadwal Menu Harian',
       'icon': Icons.edit_calendar_rounded,
       'route': '/create-schedule',
     },
     {
-      'title': 'Analisis Rekomendasi Menu',
-      'icon': Icons.calculate_rounded,
+      'title': 'Rekomendasi Menu',
+      'icon': Icons.auto_awesome_rounded,
       'route': '/sppg/topsis-spk-engine',
     },
     {
-      'title': 'Pelacak Logistik',
+      'title': 'Status Pengiriman',
       'icon': Icons.local_shipping_rounded,
       'route': '/distribution-tracker',
     },
