@@ -37,12 +37,12 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
       'route': '/estimation',
     },
     {
-      'title': 'Kelola Master Bahan',
+      'title': 'Kelola Bahan Baku',
       'icon': Icons.flatware_rounded,
       'route': '/manage-ingredients',
     },
     {
-      'title': 'Kelola Master Menu',
+      'title': 'Kelola Katalog Menu',
       'icon': Icons.restaurant_menu_rounded,
       'route': '/manage-menu',
     },
@@ -52,7 +52,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
       'route': '/create-schedule',
     },
     {
-      'title': 'Engine SPK TOPSIS',
+      'title': 'Analisis Rekomendasi Menu',
       'icon': Icons.calculate_rounded,
       'route': '/sppg/topsis-spk-engine',
     },

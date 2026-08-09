@@ -89,9 +89,9 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Hapus Master Bahan'),
+          title: const Text('Hapus Bahan Makanan'),
           content: Text(
-              'Apakah Anda yakin ingin menghapus bahan "${item['nama_bahan'] ?? item['nama']}" dari Master Bank?'),
+              'Apakah Anda yakin ingin menghapus bahan "${item['nama_bahan'] ?? item['nama']}" dari katalog bahan baku?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
@@ -168,8 +168,8 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
 
     return SppgAdminLayout(
       currentRoute: '/manage-ingredients',
-      title: 'Kelola Master Bahan',
-      subtitle: 'Bank Data Bahan Baku Makanan Sehat SPPG',
+      title: 'Kelola Bahan Baku',
+      subtitle: 'Katalog Bahan Baku Makanan Sehat SPPG',
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _handleAddIngredient,
         backgroundColor: AppColors.primary,
@@ -219,7 +219,7 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Bank Master Bahan Baku Sehat SPPG',
+                          'Katalog Bahan Baku Makanan Sehat',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

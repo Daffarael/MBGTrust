@@ -192,7 +192,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    '🍱 Pilih dari Bank Master Bahan Sehat',
+                    '🍱 Pilih dari Katalog Bahan Sehat',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -477,7 +477,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
                     icon: const Icon(Icons.playlist_add_rounded,
                         color: AppColors.primaryDark, size: 22),
                     onPressed: _showMasterPresetsModal,
-                    tooltip: 'Pilih dari Bank Master Bahan',
+                    tooltip: 'Pilih dari Katalog Bahan Sehat',
                   ),
                   IconButton(
                     icon: const Icon(Icons.add_circle_rounded,
@@ -576,7 +576,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
               const SizedBox(height: 24),
 
               CustomButton(
-                text: isEditing ? 'Simpan Perubahan Menu' : 'Tambah Menu ke Master API',
+                text: isEditing ? 'Simpan Perubahan Menu' : 'Simpan Menu Makanan Baru',
                 prefixIcon: Icon(
                   isEditing ? Icons.save_rounded : Icons.add_rounded,
                   color: Colors.white,

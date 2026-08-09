@@ -530,7 +530,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
   Widget build(BuildContext context) {
     return SppgAdminLayout(
       currentRoute: '/manage-menu',
-      title: 'Kelola Master Menu',
+      title: 'Kelola Katalog Menu',
       subtitle: 'Katalog Menu Seimbang SPPG',
       actions: [
         IconButton(

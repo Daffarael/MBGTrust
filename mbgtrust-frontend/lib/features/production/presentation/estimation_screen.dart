@@ -103,7 +103,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 children: [
                   const Expanded(
                     child: Text(
-                      '🧮 Detail Matriks SPK TOPSIS',
+                      '🧮 Rincian Analisis Rekomendasi Menu',
                       softWrap: true,
                       style: TextStyle(
                         fontSize: 18,
@@ -143,7 +143,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
               _buildTopsisRow('3. Nasi Ikan Goreng Tepung', 'V = 0.312', 'D+ = 0.088', 'D- = 0.021', AppColors.error),
               const SizedBox(height: 20),
               CustomButton(
-                text: 'Tutup Detail TOPSIS',
+                text: 'Tutup Rincian Analisis',
                 onPressed: () => Navigator.pop(ctx),
               ),
             ],
@@ -479,7 +479,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                         children: [
                           const Expanded(
                             child: Text(
-                              '🧮 Engine SPK TOPSIS Evaluasi Menu',
+                              '🧮 Analisis & Rekomendasi Menu (SPK)',
                               softWrap: true,
                               style: TextStyle(
                                 fontSize: 16,

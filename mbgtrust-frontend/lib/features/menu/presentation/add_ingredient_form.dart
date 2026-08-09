@@ -268,7 +268,7 @@ class _AddIngredientFormState extends State<AddIngredientForm> {
               CustomButton(
                 text: isEditing
                     ? 'Simpan Perubahan Bahan'
-                    : 'Tambah Bahan ke Master API',
+                    : 'Simpan Bahan Makanan Baru',
                 prefixIcon: Icon(
                   isEditing ? Icons.save_rounded : Icons.add_rounded,
                   color: Colors.white,
