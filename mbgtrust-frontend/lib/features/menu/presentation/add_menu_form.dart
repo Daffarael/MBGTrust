@@ -168,10 +168,48 @@ class _AddMenuFormState extends State<AddMenuForm> {
 
   void _removeIngredientField(int index) {
     if (_ingredientFields.length > 1) {
-      setState(() {
-        _ingredientFields[index].dispose();
-        _ingredientFields.removeAt(index);
-      });
+      final fieldName = _ingredientFields[index].name.text.trim();
+      if (fieldName.isNotEmpty) {
+        showDialog(
+          context: context,
+          builder: (dialogCtx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
+            title: const Text('Hapus Rincian Bahan',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            content: Text(
+                'Apakah Anda yakin ingin menghapus rincian bahan "$fieldName" dari resep menu ini?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: const Text('Batal',
+                    style: TextStyle(color: AppColors.textSecondary)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  Navigator.pop(dialogCtx);
+                  setState(() {
+                    _ingredientFields[index].dispose();
+                    _ingredientFields.removeAt(index);
+                  });
+                },
+                child: const Text('Hapus'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        setState(() {
+          _ingredientFields[index].dispose();
+          _ingredientFields.removeAt(index);
+        });
+      }
     }
   }
 

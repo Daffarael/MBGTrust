@@ -89,9 +89,10 @@ class _ManageIngredientsScreenState extends State<ManageIngredientsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Hapus Bahan Makanan'),
+          title: const Text('Hapus Bahan Makanan',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           content: Text(
-              'Apakah Anda yakin ingin menghapus bahan "${item['nama_bahan'] ?? item['nama']}" dari katalog bahan baku?'),
+              'Apakah Anda yakin ingin menghapus bahan baku "${item['nama_bahan'] ?? item['nama']}" dari katalog? Tindakan ini tidak dapat dibatalkan.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),

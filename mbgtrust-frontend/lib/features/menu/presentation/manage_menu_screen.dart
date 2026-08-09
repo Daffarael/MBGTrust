@@ -87,9 +87,10 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Hapus Menu'),
+          title: const Text('Hapus Menu Makanan',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           content: Text(
-              'Apakah Anda yakin ingin menghapus menu "${itemToDelete['nama_menu'] ?? itemToDelete['name']}"?'),
+              'Apakah Anda yakin ingin menghapus menu "${itemToDelete['nama_menu'] ?? itemToDelete['name']}" dari katalog? Tindakan ini tidak dapat dibatalkan.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
@@ -664,7 +665,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                             crossAxisCount: crossAxisCount,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            mainAxisExtent: 242,
+                            mainAxisExtent: 218,
                           ),
                           itemCount: filtered.length,
                           itemBuilder: (context, index) {
