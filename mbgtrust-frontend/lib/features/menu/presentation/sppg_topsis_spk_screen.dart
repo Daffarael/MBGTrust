@@ -342,29 +342,6 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
       currentRoute: '/sppg/topsis-spk-engine',
       title: 'Rekomendasi Menu',
       subtitle: 'Analisis Rekomendasi Menu Terfavorit Siswa',
-      actions: [
-        OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            side: const BorderSide(color: AppColors.primary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          icon:
-              const Icon(Icons.tune_rounded, color: AppColors.primary, size: 16),
-          label: const Text(
-            'Atur Bobot',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-          ),
-          onPressed: _openWeightModal,
-        ),
-        const SizedBox(width: 8),
-      ],
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 720),
