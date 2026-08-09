@@ -558,7 +558,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
               color: AppColors.primary),
           tooltip: 'Buat Jadwal Menu',
           onPressed: () {
-            context.push('/schedule-and-recommendations', extra: _menuList);
+            context.push('/create-schedule', extra: _menuList);
           },
         ),
       ],
