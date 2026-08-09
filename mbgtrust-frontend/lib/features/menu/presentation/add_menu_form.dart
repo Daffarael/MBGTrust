@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/widgets.dart';
+import 'add_ingredient_form.dart';
 
 class AddMenuForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -216,75 +217,231 @@ class _AddMenuFormState extends State<AddMenuForm> {
   void _showMasterPresetsModal() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(maxHeight: 500),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        String searchQuery = '';
+        return StatefulBuilder(
+          builder: (modalContext, setModalState) {
+            final allIngredients = MockData.masterHealthyIngredients;
+            final filtered = searchQuery.isEmpty
+                ? allIngredients
+                : allIngredients.where((item) {
+                    final name = item['nama']!.toLowerCase();
+                    final sub = item['sub']!.toLowerCase();
+                    final q = searchQuery.toLowerCase();
+                    return name.contains(q) || sub.contains(q);
+                  }).toList();
+
+            return Container(
+              padding: const EdgeInsets.all(18),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.75,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '🍱 Pilih dari Katalog Bahan Sehat',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                  // Title & Close Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          '🥗 Pilih Bahan Baku dari Katalog',
+                          softWrap: true,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Realtime Search Bar Input Field
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: TextField(
+                      onChanged: (val) {
+                        setModalState(() {
+                          searchQuery = val.trim();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText:
+                            'Cari bahan baku (misal: Ayam, Sayur Buncis)...',
+                        hintStyle: const TextStyle(
+                            fontSize: 12.5, color: AppColors.textLight),
+                        prefixIcon: const Icon(Icons.search_rounded,
+                            color: AppColors.primary, size: 20),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                      ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(ctx),
+                  const SizedBox(height: 10),
+                  const Divider(height: 1),
+
+                  // List of Ingredients
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      children: [
+                        // Option A: Manual Blank Row Add
+                        ListTile(
+                          dense: true,
+                          leading: const CircleAvatar(
+                            radius: 14,
+                            backgroundColor: AppColors.primaryLight,
+                            child: Icon(Icons.edit_note_rounded,
+                                color: AppColors.primary, size: 18),
+                          ),
+                          title: const Text(
+                            '✍️ Ketik Bahan Baku Manual / Kustom',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: AppColors.primaryDark),
+                          ),
+                          subtitle: const Text(
+                            'Tambah baris kosong untuk diketik sendiri',
+                            style: TextStyle(
+                                fontSize: 11, color: AppColors.textSecondary),
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded,
+                              color: AppColors.primary),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            _addIngredientField();
+                          },
+                        ),
+                        const Divider(height: 12, color: AppColors.border),
+
+                        if (filtered.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  const Icon(Icons.search_off_rounded,
+                                      size: 40, color: AppColors.textLight),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Bahan "$searchQuery" belum ada di katalog.',
+                                    style: const TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.textSecondary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          ...filtered.map((item) {
+                            return ListTile(
+                              dense: true,
+                              leading: const Icon(
+                                  Icons.check_circle_outline_rounded,
+                                  color: AppColors.primary,
+                                  size: 20),
+                              title: Text(
+                                item['nama']!,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              subtitle: Text(
+                                '${item['sub']} • ${item['berat']}',
+                                style: const TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textSecondary),
+                              ),
+                              trailing: const Icon(
+                                  Icons.add_circle_outline_rounded,
+                                  color: AppColors.primary,
+                                  size: 20),
+                              onTap: () {
+                                Navigator.pop(ctx);
+                                _addIngredientField(
+                                  name: item['nama'],
+                                  sub: item['sub'],
+                                  portion: item['berat'],
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        'Bahan "${item['nama']}" berhasil ditambahkan!'),
+                                    duration: const Duration(seconds: 1),
+                                    backgroundColor: AppColors.primary,
+                                  ),
+                                );
+                              },
+                            );
+                          }),
+                      ],
+                    ),
+                  ),
+
+                  // Option B: Shortcut Button to Add New Ingredient to Catalog
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add_rounded,
+                          color: AppColors.primary, size: 18),
+                      label: const Text(
+                        '+ Buat Bahan Baru di Katalog Bahan Baku',
+                        style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.5),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        AddIngredientForm.show(
+                          context,
+                          onSave: (newIngredient) {
+                            _addIngredientField(
+                              name: newIngredient['nama_bahan'],
+                              sub: newIngredient['subjudul_nutrisi'],
+                              portion: newIngredient['takaran_default'],
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Bahan "${newIngredient['nama_bahan']}" ditambahkan ke katalog & resep menu!'),
+                                backgroundColor: AppColors.success,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
-              const Divider(),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: MockData.masterHealthyIngredients.length,
-                  separatorBuilder: (ctx, i) => const Divider(height: 1, color: AppColors.border),
-                  itemBuilder: (ctx, i) {
-                    final item = MockData.masterHealthyIngredients[i];
-                    return ListTile(
-                      dense: true,
-                      leading: const Icon(Icons.check_circle_outline_rounded,
-                          color: AppColors.primary, size: 20),
-                      title: Text(
-                        item['nama']!,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                      subtitle: Text(
-                        '${item['sub']} • ${item['berat']}',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                      ),
-                      trailing: const Icon(Icons.add_rounded, color: AppColors.primary),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _addIngredientField(
-                          name: item['nama'],
-                          sub: item['sub'],
-                          portion: item['berat'],
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Bahan "${item['nama']}" ditambahkan!'),
-                            duration: const Duration(seconds: 1),
-                            backgroundColor: AppColors.primary,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -511,17 +668,35 @@ class _AddMenuFormState extends State<AddMenuForm> {
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.playlist_add_rounded,
-                        color: AppColors.primaryDark, size: 22),
-                    onPressed: _showMasterPresetsModal,
-                    tooltip: 'Pilih dari Katalog Bahan Sehat',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_rounded,
-                        color: AppColors.primary, size: 22),
-                    onPressed: () => _addIngredientField(),
-                    tooltip: 'Tambah Baris Bahan Kosong',
+                  InkWell(
+                    onTap: _showMasterPresetsModal,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.playlist_add_rounded,
+                              color: AppColors.primaryDark, size: 18),
+                          SizedBox(width: 4),
+                          Text(
+                            '+ Tambah Bahan',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
