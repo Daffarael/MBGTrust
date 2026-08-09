@@ -8,7 +8,7 @@
     "dev": "nodemon src/server.js",
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
-    "db:seed": "node src/database/seeders/demo.seeder.js"
+    "db:seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.9.1",
