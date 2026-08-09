@@ -12,15 +12,15 @@ class SppgTopsisSpkScreen extends StatefulWidget {
 }
 
 class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
-  // Simulator Bobot Penilaian
-  double _weightRasa = 20.0;
-  double _weightKesukaan = 15.0;
-  double _weightPorsi = 10.0;
-  double _weightWaste = 30.0;
-  double _weightPenolakan = 25.0;
+  // Simulator Bobot Penilaian (Default 100%)
+  double _weightRasa = 25.0;
+  double _weightKesukaan = 20.0;
+  double _weightPorsi = 15.0;
+  double _weightWaste = 25.0;
+  double _weightPenolakan = 15.0;
 
   bool _isWeightExpanded = false;
-  String _selectedCategoryTab = 'TOP_FAVORIT'; // 'TOP_FAVORIT' or 'EVALUASI_DIGANTI'
+  String _selectedCategoryTab = 'FAVORIT'; // 'FAVORIT' or 'EVALUASI'
 
   late List<Map<String, dynamic>> _recommendationList;
 
@@ -30,35 +30,151 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
     _recommendationList = List.from(MockData.topsisRecommendations);
   }
 
-  Color _getBadgeColor(String status) {
-    if (status == 'DIPERTAHANKAN') {
+  Color _getBadgeColor(double kepuasanNum) {
+    if (kepuasanNum >= 85.0) {
       return AppColors.primary;
-    } else if (status == 'MODIFIKASI_RESEP' || status == 'DIPERBAIKI') {
-      return Colors.amber.shade800;
-    } else if (status == 'DIHAPUS_GANTI_MENU' || status == 'DIBUANG') {
+    } else if (kepuasanNum >= 50.0) {
+      return Colors.blue.shade700;
+    } else {
       return AppColors.error;
     }
-    return AppColors.primary;
+  }
+
+  /// Calculates normalized weights so the sum always equals 100%
+  Map<String, double> _getNormalizedWeights() {
+    final double total = _weightRasa +
+        _weightKesukaan +
+        _weightPorsi +
+        _weightWaste +
+        _weightPenolakan;
+    if (total == 0) {
+      return {
+        'rasa': 20.0,
+        'kesukaan': 20.0,
+        'porsi': 20.0,
+        'waste': 20.0,
+        'penolakan': 20.0,
+      };
+    }
+    return {
+      'rasa': (_weightRasa / total) * 100,
+      'kesukaan': (_weightKesukaan / total) * 100,
+      'porsi': (_weightPorsi / total) * 100,
+      'waste': (_weightWaste / total) * 100,
+      'penolakan': (_weightPenolakan / total) * 100,
+    };
+  }
+
+  void _confirmApplyWeights() {
+    final norm = _getNormalizedWeights();
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
+            SizedBox(width: 8),
+            Text('Konfirmasi Ubah Bobot',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Apakah Anda yakin ingin memperbarui bobot kriteria SPK? Bobot baru akan dinormalisasi (Total 100%) sebagai berikut:',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                children: [
+                  _buildNormRow('1. Penilaian Rasa', '${norm['rasa']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('2. Tingkat Kesukaan', '${norm['kesukaan']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('3. Kecukupan Porsi', '${norm['porsi']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('4. Makanan Dipertahankan / Sisa', '${norm['waste']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('5. Penolakan Presensi', '${norm['penolakan']!.toStringAsFixed(1)}%'),
+                  const Divider(height: 12),
+                  _buildNormRow('Total Bobot Ter-Normalisasi', '100.0%', isBold: true),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              setState(() {
+                _isWeightExpanded = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Bobot kriteria berhasil diperbarui & dinormalisasi (100%)!'),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            },
+            child: const Text('Ya, Terapkan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNormRow(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                  color: AppColors.textPrimary)),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: isBold ? AppColors.primary : AppColors.primaryDark)),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Separate Top Favorites vs Needs Evaluation
+    // Categorize: Menu Favorit (Kepuasan >= 50%) vs Perlu Evaluasi (Kepuasan < 50%)
     final topFavorites = _recommendationList.where((rec) {
-      final status = (rec['keputusan'] ?? '').toString();
-      return status == 'DIPERTAHANKAN';
+      final double kepuasan = (rec['kepuasan_num'] ?? 0.0) as double;
+      return kepuasan >= 50.0;
     }).toList();
 
     final needsEvaluation = _recommendationList.where((rec) {
-      final status = (rec['keputusan'] ?? '').toString();
-      return status == 'MODIFIKASI_RESEP' ||
-          status == 'DIPERBAIKI' ||
-          status == 'DIHAPUS_GANTI_MENU' ||
-          status == 'DIBUANG';
+      final double kepuasan = (rec['kepuasan_num'] ?? 0.0) as double;
+      return kepuasan < 50.0;
     }).toList();
 
     final displayedList =
-        _selectedCategoryTab == 'TOP_FAVORIT' ? topFavorites : needsEvaluation;
+        _selectedCategoryTab == 'FAVORIT' ? topFavorites : needsEvaluation;
 
     return SppgAdminLayout(
       currentRoute: '/sppg/topsis-spk-engine',
@@ -73,9 +189,10 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // =============================================================
-                // 1. KARTU PROGRES SURVEI & KEPUASAN SISWA HARI INI (PALING ATAS)
+                // 1. KARTU PROGRES SURVEI SISWA HARI INI (PALING ATAS - NO OVERFLOW)
                 // =============================================================
                 Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
@@ -96,6 +213,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
                             padding: const EdgeInsets.all(10),
@@ -104,9 +222,9 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(Icons.analytics_rounded,
-                                color: Colors.white, size: 24),
+                                color: Colors.white, size: 22),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +232,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                 Text(
                                   'Survei Kepuasan Siswa Hari Ini',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11.5,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white70,
                                   ),
@@ -122,28 +240,30 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                 SizedBox(height: 2),
                                 Text(
                                   'Nasi Daging Sapi Lada Hitam & Capcay',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                                  softWrap: true,
+                                  maxLines: 2,
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
+                                    height: 1.2,
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
+                                horizontal: 9, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
                               '94.0% Kepuasan',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10.5,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryDark,
                               ),
@@ -151,36 +271,40 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
-                      const Divider(color: Colors.white24, height: 1),
                       const SizedBox(height: 12),
+                      const Divider(color: Colors.white24, height: 1),
+                      const SizedBox(height: 10),
 
-                      // Indicators Progres Survei
+                      // Indicators Progres Survei (Responsive Flexible)
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Progres Survei Ulasan Siswa:',
-                                style: TextStyle(
-                                    fontSize: 11, color: Colors.white70),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                '425 / 450 Siswa (94.4% Selesai)',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'Progres Survei Ulasan Siswa:',
+                                  style: TextStyle(
+                                      fontSize: 11, color: Colors.white70),
                                 ),
-                              ),
-                            ],
+                                SizedBox(height: 2),
+                                Text(
+                                  '425 / 450 Siswa (94.4% Selesai)',
+                                  softWrap: true,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: AppColors.success,
                               borderRadius: BorderRadius.circular(6),
@@ -212,7 +336,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                             SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Survei berjalan berkelanjutan secara otomatis setiap hari. Persentase kepuasan dan rekomendasi menu diperbarui secara real-time berdasarkan masukan siswa.',
+                                'Survei berjalan berkelanjutan secara otomatis setiap hari. Persentase kepuasan diperbarui secara real-time berdasarkan masukan siswa.',
                                 style: TextStyle(
                                     fontSize: 10.5, color: Colors.white),
                               ),
@@ -226,7 +350,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                 const SizedBox(height: 16),
 
                 // =============================================================
-                // 2. SIMULATOR BOBOT PENILAIAN MENU (COLLAPSIBLE)
+                // 2. ATUR BOBOT PENILAIAN (3 KATA & KONFIRMASI NORMALISASI 100%)
                 // =============================================================
                 Card(
                   elevation: 0,
@@ -241,7 +365,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                     leading: const Icon(Icons.tune_rounded,
                         color: AppColors.primary, size: 22),
                     title: const Text(
-                      'Atur Bobot Prioritas Penilaian',
+                      'Atur Bobot Penilaian',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -281,6 +405,31 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                 _weightPenolakan, (val) {
                               setState(() => _weightPenolakan = val);
                             }),
+                            const SizedBox(height: 10),
+
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.check_circle_rounded,
+                                    size: 16),
+                                label: const Text(
+                                  'Simpan & Terapkan Bobot',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: _confirmApplyWeights,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -290,7 +439,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                 const SizedBox(height: 20),
 
                 // =============================================================
-                // 3. SEGMENTED BUTTON FILTER: TOP 5 FAVORIT VS PERLU EVALUASI
+                // 3. SEGMENTED BUTTON 2 KATA (Menu Favorit vs Perlu Evaluasi)
                 // =============================================================
                 const Text(
                   'Kategori Analisis Rekomendasi Menu',
@@ -311,19 +460,19 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                   ),
                   child: Row(
                     children: [
-                      // Tombol Kiri: Top 5 Favorit
+                      // Tombol Kiri: Menu Favorit (2 Kata)
                       Expanded(
                         child: InkWell(
                           onTap: () {
                             setState(() {
-                              _selectedCategoryTab = 'TOP_FAVORIT';
+                              _selectedCategoryTab = 'FAVORIT';
                             });
                           },
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: _selectedCategoryTab == 'TOP_FAVORIT'
+                              color: _selectedCategoryTab == 'FAVORIT'
                                   ? AppColors.primary
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(10),
@@ -334,17 +483,17 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                 Icon(
                                   Icons.star_rounded,
                                   size: 16,
-                                  color: _selectedCategoryTab == 'TOP_FAVORIT'
+                                  color: _selectedCategoryTab == 'FAVORIT'
                                       ? Colors.white
                                       : AppColors.textSecondary,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Top Menu Terfavorit (${topFavorites.length})',
+                                  'Menu Favorit (${topFavorites.length})',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: _selectedCategoryTab == 'TOP_FAVORIT'
+                                    color: _selectedCategoryTab == 'FAVORIT'
                                         ? Colors.white
                                         : AppColors.textSecondary,
                                   ),
@@ -356,19 +505,19 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Tombol Kanan: Perlu Evaluasi / Diganti
+                      // Tombol Kanan: Perlu Evaluasi (2 Kata)
                       Expanded(
                         child: InkWell(
                           onTap: () {
                             setState(() {
-                              _selectedCategoryTab = 'EVALUASI_DIGANTI';
+                              _selectedCategoryTab = 'EVALUASI';
                             });
                           },
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: _selectedCategoryTab == 'EVALUASI_DIGANTI'
+                              color: _selectedCategoryTab == 'EVALUASI'
                                   ? AppColors.primary
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(10),
@@ -379,10 +528,9 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                 Icon(
                                   Icons.warning_amber_rounded,
                                   size: 16,
-                                  color:
-                                      _selectedCategoryTab == 'EVALUASI_DIGANTI'
-                                          ? Colors.white
-                                          : AppColors.textSecondary,
+                                  color: _selectedCategoryTab == 'EVALUASI'
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
@@ -390,10 +538,9 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color:
-                                        _selectedCategoryTab == 'EVALUASI_DIGANTI'
-                                            ? Colors.white
-                                            : AppColors.textSecondary,
+                                    color: _selectedCategoryTab == 'EVALUASI'
+                                        ? Colors.white
+                                        : AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -407,7 +554,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                 const SizedBox(height: 14),
 
                 // =============================================================
-                // 4. DAFTAR KARTU REKOMENDASI MENU
+                // 4. DAFTAR KARTU REKOMENDASI MENU (DETIL IDSS AI & NO ELLIPSIS)
                 // =============================================================
                 displayedList.isEmpty
                     ? Container(
@@ -432,9 +579,9 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                         itemCount: displayedList.length,
                         itemBuilder: (context, index) {
                           final rec = displayedList[index];
-                          final String status =
-                              (rec['keputusan'] ?? '').toString();
-                          final Color badgeColor = _getBadgeColor(status);
+                          final double kepuasanNum =
+                              (rec['kepuasan_num'] ?? 0.0) as double;
+                          final Color badgeColor = _getBadgeColor(kepuasanNum);
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -457,6 +604,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                               children: [
                                 // Header Row (Rank + Name + Satisfaction)
                                 Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 32,
@@ -497,9 +645,10 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                               fontSize: 13.5,
                                               fontWeight: FontWeight.bold,
                                               color: AppColors.textPrimary,
+                                              height: 1.25,
                                             ),
                                           ),
-                                          const SizedBox(height: 2),
+                                          const SizedBox(height: 3),
                                           Text(
                                             '${rec['kategori']} • ${rec['kalori']}',
                                             style: const TextStyle(
@@ -510,7 +659,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
+                                    const SizedBox(width: 8),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
@@ -542,7 +691,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                 ),
                                 const SizedBox(height: 10),
 
-                                // Real Survey Numbers Row
+                                // Metric Numbers Row
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -564,84 +713,91 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-
-                                // Qualitative Comment
-                                Text(
-                                  '💬 "${rec['ulasan_singkat']}"',
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontStyle: FontStyle.italic,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
                                 const SizedBox(height: 10),
 
-                                // Card Footer (Decision Badge & Schedule Button anchored to right)
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color:
-                                              badgeColor.withValues(alpha: 0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          rec['keputusanLabel'],
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: badgeColor,
+                                // PENJELASAN KECERDASAN IDSS AI
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: badgeColor.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                        color: badgeColor.withValues(alpha: 0.25)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.psychology_rounded,
+                                              size: 16, color: badgeColor),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              rec['keputusanLabel'],
+                                              softWrap: true,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: badgeColor,
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    OutlinedButton.icon(
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 6),
-                                        side: const BorderSide(
-                                            color: AppColors.primary),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      icon: const Icon(
-                                          Icons.event_available_rounded,
-                                          color: AppColors.primary,
-                                          size: 15),
-                                      label: const Text(
-                                        'Jadwalkan Menu Ini',
-                                        style: TextStyle(
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        rec['idss_insight'] ??
+                                            'Analisis IDSS: Menu ini memiliki tingkat penerimaan yang stabil.',
+                                        softWrap: true,
+                                        style: const TextStyle(
                                           fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primary,
+                                          color: AppColors.textPrimary,
+                                          height: 1.3,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        context.push('/create-schedule',
-                                            extra: rec);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                'Menu "${rec['nama_menu']}" terpilih! Mengalihkan ke form jadwal.'),
-                                            backgroundColor: AppColors.primary,
-                                          ),
-                                        );
-                                      },
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+
+                                // TOMBOL PENUH "JADWALKAN MENU INI"
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  ],
+                                    icon: const Icon(
+                                        Icons.event_available_rounded,
+                                        size: 16),
+                                    label: const Text(
+                                      'Jadwalkan Menu Ini',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      context.push('/create-schedule',
+                                          extra: rec);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Menu "${rec['nama_menu']}" terpilih! Mengalihkan ke form jadwal.'),
+                                          backgroundColor: AppColors.primary,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ],
                             ),
