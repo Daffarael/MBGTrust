@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,10 +21,30 @@ class _EstimationScreenState extends State<EstimationScreen> {
   bool _isLoading = true;
   int _touchedIndex = -1;
 
+  Timer? _clockTimer;
+  DateTime _now = DateTime.now();
+
   @override
   void initState() {
     super.initState();
     _fetchEstimate();
+    _startClockTimer();
+  }
+
+  void _startClockTimer() {
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _now = DateTime.now();
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchEstimate() async {
@@ -97,8 +118,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
     });
   }
 
-  String _formatTodayDate() {
-    final date = DateTime.now();
+  String _formatLiveDateTime() {
     const days = [
       'Minggu',
       'Senin',
@@ -122,7 +142,15 @@ class _EstimationScreenState extends State<EstimationScreen> {
       'November',
       'Desember'
     ];
-    return '${days[date.weekday % 7]}, ${date.day} ${months[date.month - 1]} ${date.year}';
+    final dayName = days[_now.weekday % 7];
+    final dayNum = _now.day;
+    final monthName = months[_now.month - 1];
+    final year = _now.year;
+    final hour = _now.hour.toString().padLeft(2, '0');
+    final minute = _now.minute.toString().padLeft(2, '0');
+    final second = _now.second.toString().padLeft(2, '0');
+
+    return '$dayName, $dayNum $monthName $year • $hour:$minute:$second WIB';
   }
 
   @override
@@ -162,7 +190,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // =======================================================
-                      // 1. BANNER UTAMA OPERASIONAL DAPUR HARI INI
+                      // 1. BANNER UTAMA OPERASIONAL DAPUR HARI INI (LIVE CLOCK)
                       // =======================================================
                       Container(
                         width: double.infinity,
@@ -185,6 +213,37 @@ class _EstimationScreenState extends State<EstimationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // LIVE REAL-TIME CLOCK (HARI, TANGGAL, & JAM BERGERAK)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.access_time_filled_rounded,
+                                      color: Colors.white, size: 14),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      _formatLiveDateTime(),
+                                      softWrap: true,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+
                             Row(
                               children: [
                                 Container(
@@ -203,17 +262,17 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                                    children: const [
                                       Text(
-                                        'Menu Makanan Hari Ini (${_formatTodayDate()})',
-                                        style: const TextStyle(
+                                        'Menu Makanan Hari Ini',
+                                        style: TextStyle(
                                           color: Colors.white70,
                                           fontSize: 11.5,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      const Text(
+                                      SizedBox(height: 2),
+                                      Text(
                                         'Nasi Daging Sapi Lada Hitam & Capcay',
                                         softWrap: true,
                                         maxLines: 2,
