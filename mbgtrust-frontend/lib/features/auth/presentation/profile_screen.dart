@@ -28,7 +28,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final gradeEditController =
         TextEditingController(text: user?.tingkatKelas ?? '');
     final phoneEditController =
-        TextEditingController(text: user?.nomorTelepon ?? '');
+        TextEditingController(text: user?.nomorKontak ?? '');
     final allergyEditController =
         TextEditingController(text: user?.riwayatAlergi.join(', ') ?? '');
 
@@ -112,7 +112,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       namaLengkap: nameEditController.text.trim(),
                       tingkatKelas: gradeEditController.text.trim(),
                       riwayatAlergi: allergies,
-                      nomorTelepon: phoneEditController.text.trim(),
+                      nomorKontak: phoneEditController.text.trim(),
                     );
                     await ref.read(authProvider.notifier).checkCurrentUser();
                     if (mounted) {

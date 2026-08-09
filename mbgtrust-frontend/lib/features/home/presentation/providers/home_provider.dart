@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/models/schedule_model.dart';
+import '../../../menu/data/models/schedule_model.dart';
 import '../../data/repositories/home_repository.dart';
 
 /// Provider instansi HomeRepository

@@ -8,9 +8,9 @@
 **Stack Teknologi Resmi (Fixed):**  
 * 📱 **Frontend Client:** Flutter 3.19 (Dart 3.3) — State Management: Provider — *Fuadi Dhiyaulhaq*  
 * ⚙️ **Backend Server:** Node.js v20 LTS + Express.js v4.19 — *Daffarael Anaqi Ali*  
-* 🗄️ **Database Engine:** MySQL 8.0 + **Prisma ORM v5.14**  
+* 🗄️ **Database Engine:** MySQL 8.0 + **Prisma ORM v7.9.1**  
 * 🔐 **Keamanan & Logger:** JWT, Bcrypt (12 rounds), Zod Validation, Winston Enterprise Logger, RESTful API (100% Bahasa Indonesia)  
-**Versi Dokumen:** 5.0.0 (Perfect 27-Feature Mapping Edition)  
+**Versi Dokumen:** 5.0.0 (Schema v5 Final — 12 Tabel)  
 **Status:** Ditetapkan & Mengikat  
 
 ---
@@ -64,7 +64,7 @@ Berikut adalah pembuktian bahwa **seluruh 27 Fitur Fungsional** dari Google Shee
 ### 3.1 Stack Teknologi Utama
 * **Frontend Client Framework:** Flutter 3.19 (Dart 3.3) — State Management: Provider v6.1 — Client API: Dio v5.4.
 * **Backend Server Framework:** Node.js v20 LTS dengan Express.js v4.19 (Modular Monolith / Layered Architecture).
-* **Database Engine & ORM:** MySQL 8.0 Engine + **Prisma ORM v5.14** (Data Modeling, Migrasi DDL, & Type-Safe Queries).
+* **Database Engine & ORM:** MySQL 8.0 Engine + **Prisma ORM v7.9.1** (Data Modeling, Migrasi DDL, & Type-Safe Queries).
 * **Otentikasi & Otorisasi:** JSON Web Token (JWT Access & Refresh Token) dengan Role-Based Access Control (RBAC).
 * **Validasi & Keamanan:** Zod Schema Validation v3.23, Helmet, CORS, Bcrypt Hashing (12 rounds), Express Rate-Limit.
 * **Logging & Monitoring:** Winston Enterprise Logger (Structured JSON Logs) + Morgan.
@@ -76,7 +76,7 @@ Untuk menjaga agar repositori kode backend tetap bersih, profesional, dan mudah 
 2. **Dilarang Komentar Berlebihan (No Noise Comments)**: Dilarang keras menulis komentar redundan yang hanya mengulang fungsi kode (contoh buruk: `// Ambil user dari database` tepat di atas query Prisma).
 3. **Komentar Hanya untuk Logika Kompleks (*Why, Not What*)**: Komentar HANYA diperbolehkan untuk menjelaskan tahapan matematika rumit (seperti rumus TOPSIS $r_{ij}, v_{ij}, A^+/A^-$) atau latar belakang keputusan teknis khusus.
 
-### 3.3 Struktur Arsitektur Monorepo Tunggal (Root Repository MBGTrust)
+### 3.2 Struktur Arsitektur Monorepo Tunggal (Root Repository MBGTrust)
 ```text
 MBGTrust/                           # Root Repositori Git Utama (https://github.com/accfd/MBGTrust.git)
 ├── .github/                        # Workflows CI/CD & Template Pull Request

@@ -1,0 +1,512 @@
+{
+  "info": {
+    "_postman_id": "mbgtrust-api-v3-gemastik-2026",
+    "name": "MBGTrust API v3.0.0 — Gemastik",
+    "description": "Koleksi lengkap 26 endpoint REST API sistem MBGTrust.\n\n**Cara pakai:**\n1. Import koleksi ini ke Postman\n2. Import file `MBGTrust_ENV.postman_environment.json`\n3. Aktifkan environment MBGTrust Local\n4. Jalankan `[1.2] Login Penerima Manfaat` atau `[1.3] Login Admin SPPG` — access_token otomatis tersimpan\n5. Semua endpoint lain langsung bisa dipakai\n\n**Stack:** Node.js + Express.js + Prisma ORM + MySQL 8.0\n**Author:** Backend Lead — Daffarael Anaqi Ali",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",      "value": "http://localhost:3000", "type": "string" },
+    { "key": "access_token",  "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" },
+    { "key": "id_jadwal",     "value": "1", "type": "string" },
+    { "key": "id_menu",       "value": "1", "type": "string" },
+    { "key": "id_produksi",   "value": "1", "type": "string" },
+    { "key": "id_distribusi", "value": "1", "type": "string" },
+    { "key": "id_eksekusi",   "value": "1", "type": "string" },
+    { "key": "id_sekolah",    "value": "1", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "🔐 Modul 1 — Otentikasi & Pengguna",
+      "description": "Registrasi, login (siswa & admin SPPG), refresh token, dan pengelolaan profil.",
+      "item": [
+        {
+          "name": "[1.1] Pendaftaran Penerima Manfaat",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/otentikasi/pendaftaran", "host": ["{{base_url}}"], "path": ["api","v1","otentikasi","pendaftaran"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nisn\": \"3171012345670001\",\n  \"nama_lengkap\": \"Budi Santoso\",\n  \"kata_sandi\": \"Password123!\",\n  \"id_sekolah\": 1,\n  \"tingkat_kelas\": \"5-A\",\n  \"tanggal_lahir\": \"2015-03-15\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[1.2] Login Penerima Manfaat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sukses && res.data) {",
+                  "  pm.collectionVariables.set('access_token', res.data.access_token);",
+                  "  pm.collectionVariables.set('refresh_token', res.data.refresh_token);",
+                  "  console.log('✅ Token tersimpan: access_token dan refresh_token');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/otentikasi/masuk", "host": ["{{base_url}}"], "path": ["api","v1","otentikasi","masuk"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nisn\": \"3171012345670001\",\n  \"kata_sandi\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[1.3] Login Admin SPPG",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sukses && res.data) {",
+                  "  pm.collectionVariables.set('access_token', res.data.access_token);",
+                  "  pm.collectionVariables.set('refresh_token', res.data.refresh_token);",
+                  "  console.log('✅ Token Admin SPPG tersimpan');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/otentikasi/sppg/masuk", "host": ["{{base_url}}"], "path": ["api","v1","otentikasi","sppg","masuk"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sppg-jakarta.id\",\n  \"kata_sandi\": \"AdminSPPG123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[1.4] Perbarui Token (Refresh)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sukses && res.data) {",
+                  "  pm.collectionVariables.set('access_token', res.data.access_token);",
+                  "  console.log('✅ access_token diperbarui');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/otentikasi/perbarui-token", "host": ["{{base_url}}"], "path": ["api","v1","otentikasi","perbarui-token"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[1.5] Lihat Profil Saya",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/v1/pengguna/profil-saya", "host": ["{{base_url}}"], "path": ["api","v1","pengguna","profil-saya"] }
+          }
+        },
+        {
+          "name": "[1.6] Perbarui Profil Saya",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/pengguna/profil-saya", "host": ["{{base_url}}"], "path": ["api","v1","pengguna","profil-saya"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_lengkap\": \"Budi Santoso Baru\",\n  \"kata_sandi_baru\": \"NewPassword123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🍱 Modul 2 — Menu & Jadwal",
+      "description": "CRUD master data menu MBG dan penjadwalan harian per sekolah.",
+      "item": [
+        {
+          "name": "[2.1] Tambah Menu Baru",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sukses && res.data) {",
+                  "  pm.collectionVariables.set('id_menu', String(res.data.id_menu));",
+                  "  console.log('✅ id_menu tersimpan:', res.data.id_menu);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/menu", "host": ["{{base_url}}"], "path": ["api","v1","menu"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_menu\": \"Nasi Ayam Bakar Kecap\",\n  \"kategori\": \"MAKANAN_BERAT\",\n  \"deskripsi\": \"Nasi putih dengan ayam bakar kecap, lalapan, dan sambal\",\n  \"kalori_kkal\": 620,\n  \"protein_gram\": 35.5,\n  \"karbohidrat_gram\": 72.0,\n  \"lemak_gram\": 18.0,\n  \"estimasi_biaya_per_porsi\": 15000,\n  \"daftar_alergen\": [\"KEDELAI\"],\n  \"url_foto\": \"https://example.com/nasi-ayam-bakar.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[2.2] Daftar Semua Menu",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/menu?halaman=1&per_halaman=10",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","menu"],
+              "query": [
+                { "key": "halaman",    "value": "1" },
+                { "key": "per_halaman","value": "10" },
+                { "key": "kategori",   "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[2.3] Perbarui Menu",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/menu/{{id_menu}}", "host": ["{{base_url}}"], "path": ["api","v1","menu","{{id_menu}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kalori_kkal\": 640,\n  \"estimasi_biaya_per_porsi\": 16000\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[2.4] Buat Jadwal Menu Harian",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sukses && res.data) {",
+                  "  pm.collectionVariables.set('id_jadwal', String(res.data.id_jadwal));",
+                  "  console.log('✅ id_jadwal tersimpan:', res.data.id_jadwal);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/jadwal", "host": ["{{base_url}}"], "path": ["api","v1","jadwal"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_menu\": {{id_menu}},\n  \"id_sekolah\": {{id_sekolah}},\n  \"tanggal_jadwal\": \"2026-08-10\",\n  \"target_total_porsi\": 500\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[2.5] Ambil Jadwal Hari Ini",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/jadwal/hari-ini?id_sekolah={{id_sekolah}}",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","jadwal","hari-ini"],
+              "query": [{ "key": "id_sekolah", "value": "{{id_sekolah}}" }]
+            }
+          }
+        },
+        {
+          "name": "[2.6] Ambil Jadwal Besok (H+1)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/jadwal/besok?id_sekolah={{id_sekolah}}",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","jadwal","besok"],
+              "query": [{ "key": "id_sekolah", "value": "{{id_sekolah}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Modul 3 — Evaluasi & Konfirmasi",
+      "description": "Umpan balik evaluasi menu (sumber TOPSIS C1-C4) dan konfirmasi kehadiran H+1 (sumber TOPSIS C5).",
+      "item": [
+        {
+          "name": "[3.1] Kirim Evaluasi Menu (Siswa)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/jadwal/{{id_jadwal}}/evaluasi", "host": ["{{base_url}}"], "path": ["api","v1","jadwal","{{id_jadwal}}","evaluasi"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"menerima_porsi\": true,\n  \"penilaian_rasa\": 5,\n  \"tingkat_kesukaan\": 4,\n  \"kesesuaian_porsi\": 4,\n  \"persentase_sisa_makanan\": 10.0,\n  \"masukan_kualitatif\": \"Daging ayamnya empuk dan bumbunya pas.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[3.2] Kirim Evaluasi Kolektif (Petugas)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/jadwal/{{id_jadwal}}/evaluasi-kolektif", "host": ["{{base_url}}"], "path": ["api","v1","jadwal","{{id_jadwal}}","evaluasi-kolektif"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_sekolah\": 1,\n  \"tingkat_kelas\": \"5-A\",\n  \"daftar_evaluasi\": [\n    {\n      \"nisn_siswa\": \"3171012345670001\",\n      \"menerima_porsi\": true,\n      \"penilaian_rasa\": 5,\n      \"tingkat_kesukaan\": 4,\n      \"kesesuaian_porsi\": 4,\n      \"persentase_sisa_makanan\": 10.0\n    },\n    {\n      \"nisn_siswa\": \"3171012345670002\",\n      \"menerima_porsi\": true,\n      \"penilaian_rasa\": 3,\n      \"tingkat_kesukaan\": 3,\n      \"kesesuaian_porsi\": 3,\n      \"persentase_sisa_makanan\": 25.0\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[3.3] Konfirmasi Kehadiran H+1 (Hadir)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/jadwal/{{id_jadwal}}/konfirmasi", "host": ["{{base_url}}"], "path": ["api","v1","jadwal","{{id_jadwal}}","konfirmasi"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status_kehadiran\": \"HADIR\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[3.3b] Konfirmasi Kehadiran H+1 (Tidak Hadir)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/jadwal/{{id_jadwal}}/konfirmasi", "host": ["{{base_url}}"], "path": ["api","v1","jadwal","{{id_jadwal}}","konfirmasi"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status_kehadiran\": \"TIDAK_HADIR\",\n  \"kode_alasan_penolakan\": \"ALERGI\",\n  \"catatan_khusus\": \"Alergi udang berat\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[3.4] Daftar Alasan Penolakan",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/v1/alasan-penolakan", "host": ["{{base_url}}"], "path": ["api","v1","alasan-penolakan"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🍳 Modul 4 & 5 — Produksi & Logistik",
+      "description": "Perencanaan presisi porsi H+1, tracking siklus memasak, dan pengiriman armada distribusi.",
+      "item": [
+        {
+          "name": "[4.1] Rekapitulasi Porsi Produksi Harian",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/rencana-produksi/harian?tanggal=2026-08-10",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","rencana-produksi","harian"],
+              "query": [{ "key": "tanggal", "value": "2026-08-10" }]
+            }
+          }
+        },
+        {
+          "name": "[4.2] Hitung Ulang Estimasi Produksi",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/rencana-produksi/harian/hitung", "host": ["{{base_url}}"], "path": ["api","v1","rencana-produksi","harian","hitung"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tanggal_target\": \"2026-08-10\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[5.1] Daftar Siklus Produksi Aktif Hari Ini",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/v1/produksi/aktif", "host": ["{{base_url}}"], "path": ["api","v1","produksi","aktif"] }
+          }
+        },
+        {
+          "name": "[5.2] Update Status Produksi",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/produksi/{{id_produksi}}/status", "host": ["{{base_url}}"], "path": ["api","v1","produksi","{{id_produksi}}","status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status_produksi\": \"MEMASAK\",\n  \"jumlah_dimasak\": 450,\n  \"catatan_dapur\": \"Bumbu sudah disesuaikan, perkiraan selesai pukul 10.30\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[5.3] Update Status Distribusi",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/distribusi/{{id_distribusi}}/status", "host": ["{{base_url}}"], "path": ["api","v1","distribusi","{{id_distribusi}}","status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status_distribusi\": \"TIBA_DI_SEKOLAH\",\n  \"catatan_kurir\": \"Makanan tiba dalam kondisi baik dan masih hangat\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧮 Modul 6 — SPK TOPSIS Engine",
+      "description": "Eksekusi kalkulasi TOPSIS (C1-C5), detail matriks, dan rekomendasi kebijakan menu otomatis.",
+      "item": [
+        {
+          "name": "[6.1] Eksekusi Kalkulasi TOPSIS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.sukses && res.data) {",
+                  "  pm.collectionVariables.set('id_eksekusi', String(res.data.id_eksekusi));",
+                  "  console.log('✅ id_eksekusi tersimpan:', res.data.id_eksekusi);",
+                  "  console.log('📊 Peringkat menu:', JSON.stringify(res.data.peringkat_menu));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/v1/spk/topsis/eksekusi", "host": ["{{base_url}}"], "path": ["api","v1","spk","topsis","eksekusi"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tanggal_mulai\": \"2026-08-01\",\n  \"tanggal_selesai\": \"2026-08-07\",\n  \"daftar_id_menu\": [1, 2, 3]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "[6.2] Detail Matriks Eksekusi TOPSIS",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/v1/spk/topsis/eksekusi/{{id_eksekusi}}", "host": ["{{base_url}}"], "path": ["api","v1","spk","topsis","eksekusi","{{id_eksekusi}}"] }
+          }
+        },
+        {
+          "name": "[6.3] Rekomendasi Kebijakan Menu (Terbaru)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/v1/spk/topsis/rekomendasi", "host": ["{{base_url}}"], "path": ["api","v1","spk","topsis","rekomendasi"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Modul 7 — Analitik & Laporan",
+      "description": "Metrik ringkasan dasbor 4 KPI dan unduh laporan audit (PDF / Excel).",
+      "item": [
+        {
+          "name": "[7.1] Ringkasan Dasbor",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/analitik/ringkasan-dasbor?tanggal_mulai=2026-08-01&tanggal_selesai=2026-08-07",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","analitik","ringkasan-dasbor"],
+              "query": [
+                { "key": "tanggal_mulai",   "value": "2026-08-01" },
+                { "key": "tanggal_selesai", "value": "2026-08-07" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[7.2a] Unduh Laporan PDF",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/laporan/unduh?format=pdf&tanggal_mulai=2026-08-01&tanggal_selesai=2026-08-07",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","laporan","unduh"],
+              "query": [
+                { "key": "format",          "value": "pdf" },
+                { "key": "tanggal_mulai",   "value": "2026-08-01" },
+                { "key": "tanggal_selesai", "value": "2026-08-07" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[7.2b] Unduh Laporan Excel",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/laporan/unduh?format=excel&tanggal_mulai=2026-08-01&tanggal_selesai=2026-08-07",
+              "host": ["{{base_url}}"],
+              "path": ["api","v1","laporan","unduh"],
+              "query": [
+                { "key": "format",          "value": "excel" },
+                { "key": "tanggal_mulai",   "value": "2026-08-01" },
+                { "key": "tanggal_selesai", "value": "2026-08-07" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -46,7 +46,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     bool success = await authNotifier.registerBeneficiary(
       nikNisn: _nikNisnController.text.trim(),
       namaLengkap: _nameController.text.trim(),
-      idSekolah: _schoolIdController.text.trim(),
+      idSekolah: int.tryParse(_schoolIdController.text.trim()) ?? 0,
       tingkatKelas: _gradeController.text.trim(),
       kataSandi: _passwordController.text.trim(),
       riwayatAlergi: allergies,
