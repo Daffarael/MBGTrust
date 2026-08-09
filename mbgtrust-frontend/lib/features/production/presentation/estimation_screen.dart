@@ -62,9 +62,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
         _plan = ProductionPlanModel(
           tanggalTarget: '2026-08-08',
           totalPorsiDasar: 500,
-          totalSiswaKonfirmasiHadir: 450,
+          totalSiswaKonfirmasiHadir: 420,
           totalSiswaMenolak: 50,
-          totalPorsiPresisiWajibDimasak: 450,
+          totalPorsiPresisiWajibDimasak: 420,
         );
         _isLoading = false;
       });
@@ -81,11 +81,12 @@ class _EstimationScreenState extends State<EstimationScreen> {
     );
   }
 
-  List<PieChartSectionData> _showingSections(int confirmed, int rejected) {
-    return List.generate(2, (i) {
+  List<PieChartSectionData> _showingSections(
+      int confirmed, int rejected, int pending) {
+    return List.generate(3, (i) {
       final isTouched = i == _touchedIndex;
-      final fontSize = isTouched ? 15.0 : 12.0;
-      final radius = isTouched ? 48.0 : 40.0;
+      final fontSize = isTouched ? 16.0 : 13.0;
+      final radius = isTouched ? 65.0 : 56.0;
 
       switch (i) {
         case 0:
@@ -105,6 +106,18 @@ class _EstimationScreenState extends State<EstimationScreen> {
             color: AppColors.error,
             value: rejected.toDouble(),
             title: '$rejected',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          );
+        case 2:
+          return PieChartSectionData(
+            color: Colors.amber.shade800,
+            value: pending.toDouble(),
+            title: '$pending',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -159,13 +172,14 @@ class _EstimationScreenState extends State<EstimationScreen> {
         ProductionPlanModel(
           tanggalTarget: '2026-08-08',
           totalPorsiDasar: 500,
-          totalSiswaKonfirmasiHadir: 450,
+          totalSiswaKonfirmasiHadir: 420,
           totalSiswaMenolak: 50,
-          totalPorsiPresisiWajibDimasak: 450,
+          totalPorsiPresisiWajibDimasak: 420,
         );
 
-    final confirmed = plan.totalSiswaKonfirmasiHadir;
-    final rejected = plan.totalSiswaMenolak;
+    final confirmed = plan.totalSiswaKonfirmasiHadir; // 420 Mau/Hadir
+    final rejected = plan.totalSiswaMenolak; // 50 Membatalkan
+    const pending = 30; // 30 Belum Konfirmasi (Total 500 Sasaran)
     final precisionPortions = plan.totalPorsiPresisiWajibDimasak;
 
     return SppgAdminLayout(
@@ -319,7 +333,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       const SizedBox(height: 16),
 
                       // =======================================================
-                      // 2. DIAGRAM KONFIRMASI PRESENSI SISWA (LANGSUNG TAMPIL ATAS)
+                      // 2. DIAGRAM KONFIRMASI 3 KATEGORI & RATING PASCA PENGIRIMAN
                       // =======================================================
                       const Text(
                         'Diagram Konfirmasi Presensi Siswa',
@@ -333,7 +347,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       const SizedBox(height: 10),
 
                       Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(18),
@@ -348,8 +362,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                         ),
                         child: Column(
                           children: [
+                            // DIERBESARKAN 2 CM (Height 200px)
                             SizedBox(
-                              height: 140,
+                              height: 200,
                               child: PieChart(
                                 PieChartData(
                                   pieTouchData: PieTouchData(
@@ -369,28 +384,89 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                     },
                                   ),
                                   borderData: FlBorderData(show: false),
-                                  sectionsSpace: 3,
-                                  centerSpaceRadius: 38,
-                                  sections:
-                                      _showingSections(confirmed, rejected),
+                                  sectionsSpace: 4,
+                                  centerSpaceRadius: 46,
+                                  sections: _showingSections(
+                                      confirmed, rejected, pending),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
+
+                            // 3 LEGENDA KATEGORI USER-FRIENDLY
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 _ChartLegendTile(
                                   color: AppColors.primary,
-                                  label: 'Dimasak ($confirmed Porsi)',
+                                  label: 'Konfirmasi Hadir ($confirmed)',
                                 ),
                                 _ChartLegendTile(
                                   color: AppColors.error,
-                                  label: 'Dibatalkan ($rejected Porsi)',
+                                  label: 'Membatalkan ($rejected)',
+                                ),
+                                _ChartLegendTile(
+                                  color: Colors.amber.shade800,
+                                  label: 'Belum Konfirmasi ($pending)',
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
+
+                            // STATUS RATING & SURVEI SISWA PASCA PENGIRIMAN
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                    color: AppColors.primary.withValues(alpha: 0.3)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: const [
+                                      Icon(Icons.stars_rounded,
+                                          color: AppColors.primaryDark, size: 18),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Rating Kepuasan Siswa Hari Ini (Pasca Diantarkan)',
+                                        style: TextStyle(
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryDark,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: const [
+                                      Text(
+                                        '⭐ 4.9 / 5.0 (Kepuasan 96.5%)',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      Text(
+                                        '410 / 420 Siswa Sudah Mengulas',
+                                        style: TextStyle(
+                                          fontSize: 10.5,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
 
                             // Rincian Alasan Penolakan Siswa
                             Container(
@@ -405,7 +481,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: const [
                                   Text(
-                                    'Rincian Alasan Penolakan Siswa (50 Porsi):',
+                                    'Rincian Alasan Membatalkan Porsi (50 Siswa):',
                                     softWrap: true,
                                     style: TextStyle(
                                       fontSize: 11.5,
@@ -456,8 +532,8 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: _buildStatCard(
                               title: 'Kepuasan Siswa',
-                              valueText: '4.8 ⭐',
-                              subtitle: '1.240 Ulasan',
+                              valueText: '4.9 ⭐',
+                              subtitle: '410 Ulasan Siswa',
                               icon: Icons.star_rounded,
                               color: AppColors.secondaryDark,
                               bgColor: AppColors.secondaryLight,
@@ -467,7 +543,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: _buildStatCard(
                               title: 'Penerimaan Presisi',
-                              valueText: '95.2%',
+                              valueText: '84.0%',
                               subtitle: '$confirmed Konfirmasi Hadir',
                               icon: Icons.check_circle_rounded,
                               color: AppColors.success,
