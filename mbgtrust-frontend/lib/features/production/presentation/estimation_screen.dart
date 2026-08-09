@@ -233,56 +233,23 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             const Divider(color: Colors.white24, height: 1),
                             const SizedBox(height: 12),
 
-                            // Porsi Dimasak & Status Dapur
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            // Target Memasak Presisi Dapur
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Target Memasak Presisi Dapur:',
-                                        style: TextStyle(
-                                            fontSize: 11, color: Colors.white70),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        '$precisionPortions Porsi Wajib Dimasak',
-                                        softWrap: true,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                const Text(
+                                  'Target Memasak Presisi Dapur:',
+                                  style: TextStyle(
+                                      fontSize: 11.5, color: Colors.white70),
                                 ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 9, vertical: 5),
-                                  decoration: BoxDecoration(
+                                const SizedBox(height: 2),
+                                Text(
+                                  '$precisionPortions Porsi Wajib Dimasak',
+                                  softWrap: true,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(Icons.outdoor_grill_rounded,
-                                          size: 14, color: AppColors.primaryDark),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'SEDANG DIMASAK',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryDark,
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ],
