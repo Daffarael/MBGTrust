@@ -427,11 +427,11 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  context.push('/create-schedule');
+                                  context.push('/create-schedule', extra: rec);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                          'Mengalihkan ke Jadwal Menu untuk "${rec['nama_menu']}".'),
+                                          'Menu "${rec['nama_menu']}" terpilih! Mengalihkan ke form jadwal.'),
                                       backgroundColor: AppColors.primary,
                                     ),
                                   );

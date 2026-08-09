@@ -5,10 +5,12 @@ import '../../production/presentation/widgets/sppg_admin_layout.dart';
 
 class CreateScheduleScreen extends StatefulWidget {
   final List<Map<String, dynamic>>? availableMenus;
+  final Map<String, dynamic>? initialSelectedMenu;
 
   const CreateScheduleScreen({
     super.key,
     this.availableMenus,
+    this.initialSelectedMenu,
   });
 
   @override
@@ -43,10 +45,6 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
   void initState() {
     super.initState();
     _menuList = widget.availableMenus ?? List.from(MockData.foodMenuList);
-
-    if (_menuList.isNotEmpty) {
-      _selectedMenuId = _menuList.first['id'] ?? _menuList.first['id_menu'];
-    }
 
     // Initial Schedule History Data
     _scheduleHistory = [
@@ -114,6 +112,44 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
 
     // Smart Auto-Default Date: 1 day after the latest scheduled date
     _selectedDate = _getSuggestedNextDate();
+
+    // Check if initial selected menu passed from Recommendation Screen
+    if (widget.initialSelectedMenu != null) {
+      final recMenuName = widget.initialSelectedMenu!['nama_menu'] ??
+          widget.initialSelectedMenu!['name'];
+      final matched = _menuList.firstWhere(
+        (m) => (m['nama_menu'] ?? m['name']) == recMenuName,
+        orElse: () => {
+          'id': 'menu_rec_${DateTime.now().millisecondsSinceEpoch}',
+          'nama_menu': recMenuName,
+          'kalori_kkal': 550,
+          'kategori': 'Makanan Berat',
+          'kepuasan': widget.initialSelectedMenu!['skor_kepuasan'] ?? '96.5%',
+          'protein': '28g',
+          'karbo': '65g',
+          'ulasan': widget.initialSelectedMenu!['ulasan_singkat'] ??
+              'Sangat disukai siswa',
+        },
+      );
+
+      if (!_menuList.contains(matched)) {
+        _menuList.insert(0, matched);
+      }
+      _selectedMenuId = matched['id'] ?? matched['id_menu'];
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Menu "$recMenuName" terpilih otomatis dari rekomendasi siswa!'),
+            backgroundColor: AppColors.primary,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      });
+    } else if (_menuList.isNotEmpty) {
+      _selectedMenuId = _menuList.first['id'] ?? _menuList.first['id_menu'];
+    }
   }
 
   @override
@@ -230,6 +266,172 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     }
   }
 
+  /// Open Searchable Menu Selector Modal Dialog
+  void _openMenuSearchModal() {
+    String searchQuery = '';
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final filtered = _menuList.where((m) {
+              final name = (m['nama_menu'] ?? m['name'] ?? '').toLowerCase();
+              final category = (m['kategori'] ?? '').toLowerCase();
+              final q = searchQuery.toLowerCase();
+              return name.contains(q) || category.contains(q);
+            }).toList();
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              contentPadding: const EdgeInsets.all(16),
+              title: Row(
+                children: const [
+                  Icon(Icons.search_rounded,
+                      color: AppColors.primary, size: 22),
+                  SizedBox(width: 8),
+                  Text('Pilih Menu Makanan',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: SizedBox(
+                width: 480,
+                height: 480,
+                child: Column(
+                  children: [
+                    // Search Bar Field
+                    TextField(
+                      onChanged: (val) {
+                        setModalState(() {
+                          searchQuery = val.trim();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Cari nama menu, kalori, atau kategori...',
+                        hintStyle: const TextStyle(
+                            fontSize: 12, color: AppColors.textLight),
+                        prefixIcon: const Icon(Icons.search_rounded,
+                            color: AppColors.primary, size: 20),
+                        filled: true,
+                        fillColor: AppColors.background,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                              color: AppColors.primary, width: 1.5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // List of Searchable Menus
+                    Expanded(
+                      child: filtered.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'Tidak ada menu yang sesuai pencarian.',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: filtered.length,
+                              itemBuilder: (context, index) {
+                                final menu = filtered[index];
+                                final id = menu['id'] ?? menu['id_menu'];
+                                final name =
+                                    menu['nama_menu'] ?? menu['name'] ?? '';
+                                final cal = menu['kalori_kkal'] ??
+                                    menu['calories'] ??
+                                    500;
+                                final kepuasan =
+                                    menu['kepuasan'] ?? '95.0% Kepuasan';
+                                final isSelected = id == _selectedMenuId;
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.primaryLight
+                                        : AppColors.surface,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? AppColors.primary
+                                          : AppColors.border,
+                                      width: isSelected ? 1.5 : 1.0,
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedMenuId = id;
+                                      });
+                                      Navigator.pop(dialogCtx);
+                                    },
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? AppColors.primary
+                                            : AppColors.background,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.restaurant_menu_rounded,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : AppColors.primary,
+                                        size: 18,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? AppColors.primaryDark
+                                            : AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      '$cal kcal • $kepuasan',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                    trailing: isSelected
+                                        ? const Icon(Icons.check_circle_rounded,
+                                            color: AppColors.primary, size: 20)
+                                        : const Icon(
+                                            Icons.chevron_right_rounded,
+                                            color: AppColors.textLight),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _submitSchedule() {
     if (_selectedMenuId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -241,7 +443,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
       return;
     }
 
-    // 1-DATE 1-MENU VALIDATION (1 tanggal hanya boleh 1 menu)
+    // 1-DATE 1-MENU VALIDATION
     final bool isDuplicateDate = _scheduleHistory.asMap().entries.any((entry) {
       final idx = entry.key;
       final item = entry.value;
@@ -283,6 +485,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     final kalori =
         '${selectedMenuObj['kalori_kkal'] ?? selectedMenuObj['calories'] ?? 500} kcal';
     final targetPorsi = int.tryParse(_portionController.text.trim()) ?? 450;
+    final kepuasanStr = selectedMenuObj['kepuasan'] ?? '95.0%';
 
     setState(() {
       if (_editingIndex != null && _editingIndex! < _scheduleHistory.length) {
@@ -312,7 +515,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
           'target_porsi': targetPorsi,
           'batas_waktu': _selectedDeadlineTime,
           'status': 'BELUM_BERJALAN',
-          'kepuasan': 'Belum Ada Ulasan',
+          'kepuasan': kepuasanStr,
           'rasa': '4.8 / 5.0',
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -420,6 +623,22 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
   Widget build(BuildContext context) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     final bool tomorrowIsScheduled = _isTomorrowScheduled();
+
+    // Currently Selected Menu Details
+    final selectedMenuObj = _menuList.firstWhere(
+      (m) => (m['id'] ?? m['id_menu']) == _selectedMenuId,
+      orElse: () => _menuList.first,
+    );
+    final String selectedName =
+        selectedMenuObj['nama_menu'] ?? selectedMenuObj['name'] ?? 'Pilih Menu';
+    final String selectedCal =
+        '${selectedMenuObj['kalori_kkal'] ?? selectedMenuObj['calories'] ?? 550} kcal';
+    final String selectedCategory =
+        selectedMenuObj['kategori'] ?? 'Makanan Berat';
+    final String selectedKepuasan =
+        selectedMenuObj['kepuasan'] ?? '96.5% Kepuasan Siswa';
+    final String selectedUlasan = selectedMenuObj['ulasan'] ??
+        'Favorit utama siswa, bumbu meresap & porsi sangat pas.';
 
     // Filter History by Selected Date (if filterDate is set)
     final filteredHistory = _filterDate == null
@@ -595,52 +814,121 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // 2. Pilih Menu Makanan
-                      const Text(
-                        '2. Pilih Menu Makanan Seimbang',
-                        style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textSecondary),
+                      // 2. Pilih Menu Makanan (Searchable Picker & Rich Card Detail)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            '2. Pilih Menu Makanan Seimbang',
+                            style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textSecondary),
+                          ),
+                          TextButton.icon(
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                            ),
+                            icon: const Icon(Icons.search_rounded,
+                                size: 16, color: AppColors.primary),
+                            label: const Text(
+                              'Cari Menu',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary),
+                            ),
+                            onPressed: _openMenuSearchModal,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 6),
-                      DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        initialValue: _selectedMenuId,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 12),
-                          filled: true,
-                          fillColor: AppColors.background,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.border),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                                color: AppColors.primary, width: 1.5),
-                          ),
+
+                      // KARTU MENU TERPILIH (RICH DETAIL CARD)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.4)),
                         ),
-                        items: _menuList.map((m) {
-                          final id = m['id'] ?? m['id_menu'];
-                          final name = m['nama_menu'] ?? m['name'] ?? '';
-                          final cal = m['kalori_kkal'] ?? m['calories'] ?? 500;
-                          return DropdownMenuItem<String>(
-                            value: id,
-                            child: Text(
-                              '$name ($cal kcal)',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: const TextStyle(fontSize: 12.5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.restaurant_menu_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        selectedName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryDark,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '$selectedCategory • $selectedCal',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.primaryDark,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    selectedKepuasan,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() => _selectedMenuId = val);
-                          }
-                        },
+                            const SizedBox(height: 8),
+                            Text(
+                              '💬 "$selectedUlasan"',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontStyle: FontStyle.italic,
+                                color: AppColors.primaryDark,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 14),
 

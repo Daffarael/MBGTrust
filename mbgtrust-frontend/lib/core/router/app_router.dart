@@ -53,8 +53,27 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/create-schedule',
       builder: (context, state) {
-        final menus = state.extra as List<Map<String, dynamic>>?;
-        return CreateScheduleScreen(availableMenus: menus);
+        List<Map<String, dynamic>>? menus;
+        Map<String, dynamic>? initialSelectedMenu;
+
+        if (state.extra is List<Map<String, dynamic>>) {
+          menus = state.extra as List<Map<String, dynamic>>?;
+        } else if (state.extra is Map<String, dynamic>) {
+          final extraMap = state.extra as Map<String, dynamic>;
+          if (extraMap.containsKey('availableMenus')) {
+            menus = extraMap['availableMenus'] as List<Map<String, dynamic>>?;
+          }
+          if (extraMap.containsKey('selectedMenu')) {
+            initialSelectedMenu = extraMap['selectedMenu'] as Map<String, dynamic>?;
+          } else {
+            initialSelectedMenu = extraMap;
+          }
+        }
+
+        return CreateScheduleScreen(
+          availableMenus: menus,
+          initialSelectedMenu: initialSelectedMenu,
+        );
       },
     ),
     GoRoute(
