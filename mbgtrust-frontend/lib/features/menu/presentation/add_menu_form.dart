@@ -310,7 +310,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
                                 color: AppColors.primary, size: 18),
                           ),
                           title: const Text(
-                            '✍️ Ketik Bahan Baku Manual / Kustom',
+                            'Ketik Bahan Manual',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
@@ -410,11 +410,11 @@ class _AddMenuFormState extends State<AddMenuForm> {
                       icon: const Icon(Icons.add_rounded,
                           color: AppColors.primary, size: 18),
                       label: const Text(
-                        '+ Buat Bahan Baru di Katalog Bahan Baku',
+                        'Tambah Bahan Baru',
                         style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12.5),
+                            fontSize: 13),
                       ),
                       onPressed: () {
                         Navigator.pop(ctx);
@@ -687,7 +687,7 @@ class _AddMenuFormState extends State<AddMenuForm> {
                               color: AppColors.primaryDark, size: 18),
                           SizedBox(width: 4),
                           Text(
-                            '+ Tambah Bahan',
+                            'Tambah Bahan',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
