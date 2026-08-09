@@ -21,6 +21,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
   bool _isLoading = true;
   int _touchedIndex = -1;
 
+  // Active Tab: 'KONFIRMASI' (Pra-Distribusi Pagi) or 'ULASAN' (Pasca-Distribusi Siang)
+  String _activeDashboardTab = 'KONFIRMASI';
+
   Timer? _clockTimer;
   DateTime _now = DateTime.now();
 
@@ -81,12 +84,12 @@ class _EstimationScreenState extends State<EstimationScreen> {
     );
   }
 
-  List<PieChartSectionData> _showingSections(
+  List<PieChartSectionData> _showingConfirmationSections(
       int confirmed, int rejected, int pending) {
     return List.generate(3, (i) {
       final isTouched = i == _touchedIndex;
-      final fontSize = isTouched ? 16.0 : 13.0;
-      final radius = isTouched ? 65.0 : 56.0;
+      final fontSize = isTouched ? 15.0 : 12.0;
+      final radius = isTouched ? 54.0 : 46.0;
 
       switch (i) {
         case 0:
@@ -118,6 +121,43 @@ class _EstimationScreenState extends State<EstimationScreen> {
             color: Colors.amber.shade800,
             value: pending.toDouble(),
             title: '$pending',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          );
+        default:
+          throw Error();
+      }
+    });
+  }
+
+  List<PieChartSectionData> _showingSatisfactionSections() {
+    return List.generate(2, (i) {
+      final isTouched = i == _touchedIndex;
+      final fontSize = isTouched ? 15.0 : 12.0;
+      final radius = isTouched ? 54.0 : 46.0;
+
+      switch (i) {
+        case 0:
+          return PieChartSectionData(
+            color: AppColors.primary,
+            value: 96.5,
+            title: '96.5%',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          );
+        case 1:
+          return PieChartSectionData(
+            color: Colors.amber.shade700,
+            value: 3.5,
+            title: '3.5%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -330,193 +370,129 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // =======================================================
-                      // 2. DIAGRAM KONFIRMASI 3 KATEGORI & RATING PASCA PENGIRIMAN
+                      // 2. DUA TOMBOL SAKELAR SEGMENTED (STATUS VS ULASAN)
                       // =======================================================
-                      const Text(
-                        'Diagram Konfirmasi Presensi Siswa',
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(18),
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.border),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
                         ),
-                        child: Column(
+                        child: Row(
                           children: [
-                            // DIERBESARKAN 2 CM (Height 200px)
-                            SizedBox(
-                              height: 200,
-                              child: PieChart(
-                                PieChartData(
-                                  pieTouchData: PieTouchData(
-                                    touchCallback: (FlTouchEvent event,
-                                        pieTouchResponse) {
-                                      setState(() {
-                                        if (!event.isInterestedForInteractions ||
-                                            pieTouchResponse == null ||
-                                            pieTouchResponse.touchedSection ==
-                                                null) {
-                                          _touchedIndex = -1;
-                                          return;
-                                        }
-                                        _touchedIndex = pieTouchResponse
-                                            .touchedSection!.touchedSectionIndex;
-                                      });
-                                    },
+                            // Tombol Kiri: Status Konfirmasi
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _activeDashboardTab = 'KONFIRMASI';
+                                  });
+                                },
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 9),
+                                  decoration: BoxDecoration(
+                                    color: _activeDashboardTab == 'KONFIRMASI'
+                                        ? AppColors.primary
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  borderData: FlBorderData(show: false),
-                                  sectionsSpace: 4,
-                                  centerSpaceRadius: 46,
-                                  sections: _showingSections(
-                                      confirmed, rejected, pending),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-
-                            // 3 LEGENDA KATEGORI USER-FRIENDLY (BEBAS OVERFLOW)
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 12,
-                              runSpacing: 8,
-                              children: [
-                                _ChartLegendTile(
-                                  color: AppColors.primary,
-                                  label: 'Konfirmasi Hadir ($confirmed)',
-                                ),
-                                _ChartLegendTile(
-                                  color: AppColors.error,
-                                  label: 'Membatalkan ($rejected)',
-                                ),
-                                _ChartLegendTile(
-                                  color: Colors.amber.shade800,
-                                  label: 'Belum Konfirmasi ($pending)',
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14),
-
-                            // STATUS RATING & SURVEI SISWA PASCA PENGIRIMAN
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: AppColors.primary.withValues(alpha: 0.3)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: const [
-                                      Icon(Icons.stars_rounded,
-                                          color: AppColors.primaryDark, size: 18),
-                                      SizedBox(width: 6),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.how_to_reg_rounded,
+                                        size: 16,
+                                        color:
+                                            _activeDashboardTab == 'KONFIRMASI'
+                                                ? Colors.white
+                                                : AppColors.textSecondary,
+                                      ),
+                                      const SizedBox(width: 6),
                                       Text(
-                                        'Rating Kepuasan Siswa Hari Ini (Pasca Diantarkan)',
+                                        'Status Konfirmasi',
                                         style: TextStyle(
                                           fontSize: 11.5,
                                           fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryDark,
+                                          color: _activeDashboardTab ==
+                                                  'KONFIRMASI'
+                                              ? Colors.white
+                                              : AppColors.textSecondary,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: const [
-                                      Text(
-                                        '⭐ 4.9 / 5.0 (Kepuasan 96.5%)',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textPrimary,
-                                        ),
-                                      ),
-                                      Text(
-                                        '410 / 420 Siswa Sudah Mengulas',
-                                        style: TextStyle(
-                                          fontSize: 10.5,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(width: 4),
 
-                            // Rincian Alasan Penolakan Siswa
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppColors.background,
+                            // Tombol Kanan: Ulasan & Kepuasan
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _activeDashboardTab = 'ULASAN';
+                                  });
+                                },
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppColors.border),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    'Rincian Alasan Membatalkan Porsi (50 Siswa):',
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
-                                    ),
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 9),
+                                  decoration: BoxDecoration(
+                                    color: _activeDashboardTab == 'ULASAN'
+                                        ? AppColors.primary
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  SizedBox(height: 4),
-                                  Text('• 30 Siswa: Sakit / Tidak Masuk Sekolah',
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 10.5,
-                                          color: AppColors.secondaryDark)),
-                                  Text('• 10 Siswa: Alergi Makanan (Kacang / Udang)',
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 10.5,
-                                          color: AppColors.textSecondary)),
-                                  Text('• 10 Siswa: Izin / Kegiatan Luar Sekolah',
-                                      softWrap: true,
-                                      style: TextStyle(
-                                          fontSize: 10.5,
-                                          color: AppColors.textSecondary)),
-                                ],
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.star_rounded,
+                                        size: 16,
+                                        color: _activeDashboardTab == 'ULASAN'
+                                            ? Colors.white
+                                            : AppColors.textSecondary,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Ulasan & Kepuasan',
+                                        style: TextStyle(
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: _activeDashboardTab == 'ULASAN'
+                                              ? Colors.white
+                                              : AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 14),
+
+                      // =======================================================
+                      // 3. KARTU DIAGRAM DINAMIS BERBASIS TAB SAKELAR
+                      // =======================================================
+                      _activeDashboardTab == 'KONFIRMASI'
+                          ? _buildConfirmationDiagramCard(
+                              confirmed, rejected, pending)
+                          : _buildSatisfactionDiagramCard(),
+
                       const SizedBox(height: 18),
 
                       // =======================================================
-                      // 3. 4 STAT CARDS ANALITIK UTAMA
+                      // 4. 4 STAT CARDS ANALITIK UTAMA
                       // =======================================================
                       const Text(
                         'Ringkasan Kinerja Dapur Hari Ini',
@@ -583,7 +559,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       const SizedBox(height: 20),
 
                       // =======================================================
-                      // 4. AKSI PINTAS NAVIGASI OPERASIONAL SPPG
+                      // 5. AKSI PINTAS NAVIGASI OPERASIONAL SPPG
                       // =======================================================
                       const Text(
                         'Aksi Pintas Pengelola SPPG',
@@ -637,6 +613,307 @@ class _EstimationScreenState extends State<EstimationScreen> {
                 ),
         ),
       ),
+    );
+  }
+
+  /// Widget Tampilan Card Mode 1: Status Konfirmasi Presensi Siswa
+  Widget _buildConfirmationDiagramCard(
+      int confirmed, int rejected, int pending) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.pie_chart_rounded,
+                  color: AppColors.primary, size: 18),
+              SizedBox(width: 6),
+              Text(
+                'Diagram Konfirmasi Presensi Siswa (Pra-Distribusi)',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // PIE CHART RINGKAS (HEIGHT 160px)
+          SizedBox(
+            height: 160,
+            child: PieChart(
+              PieChartData(
+                pieTouchData: PieTouchData(
+                  touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                    setState(() {
+                      if (!event.isInterestedForInteractions ||
+                          pieTouchResponse == null ||
+                          pieTouchResponse.touchedSection == null) {
+                        _touchedIndex = -1;
+                        return;
+                      }
+                      _touchedIndex =
+                          pieTouchResponse.touchedSection!.touchedSectionIndex;
+                    });
+                  },
+                ),
+                borderData: FlBorderData(show: false),
+                sectionsSpace: 4,
+                centerSpaceRadius: 40,
+                sections: _showingConfirmationSections(
+                    confirmed, rejected, pending),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // 3 LEGENDA KATEGORI (WRAP BEBAS OVERFLOW)
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              _ChartLegendTile(
+                color: AppColors.primary,
+                label: 'Konfirmasi Hadir ($confirmed)',
+              ),
+              _ChartLegendTile(
+                color: AppColors.error,
+                label: 'Membatalkan ($rejected)',
+              ),
+              _ChartLegendTile(
+                color: Colors.amber.shade800,
+                label: 'Belum Konfirmasi ($pending)',
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Rincian Alasan Membatalkan Porsi
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Rincian Alasan Membatalkan Porsi (50 Siswa):',
+                  softWrap: true,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text('• 30 Siswa: Sakit / Tidak Masuk Sekolah',
+                    softWrap: true,
+                    style: TextStyle(
+                        fontSize: 10.5, color: AppColors.secondaryDark)),
+                Text('• 10 Siswa: Alergi Makanan (Kacang / Udang)',
+                    softWrap: true,
+                    style: TextStyle(
+                        fontSize: 10.5, color: AppColors.textSecondary)),
+                Text('• 10 Siswa: Izin / Kegiatan Luar Sekolah',
+                    softWrap: true,
+                    style: TextStyle(
+                        fontSize: 10.5, color: AppColors.textSecondary)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Widget Tampilan Card Mode 2: Ulasan & Kepuasan Siswa (Pasca Pengiriman)
+  Widget _buildSatisfactionDiagramCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.stars_rounded,
+                      color: AppColors.secondaryDark, size: 18),
+                  SizedBox(width: 6),
+                  Text(
+                    'Tingkat Kepuasan Siswa Hari Ini',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'PASCA DISTRIBUSI',
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // PIE CHART ULASAN (HEIGHT 160px)
+          SizedBox(
+            height: 160,
+            child: PieChart(
+              PieChartData(
+                pieTouchData: PieTouchData(
+                  touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                    setState(() {
+                      if (!event.isInterestedForInteractions ||
+                          pieTouchResponse == null ||
+                          pieTouchResponse.touchedSection == null) {
+                        _touchedIndex = -1;
+                        return;
+                      }
+                      _touchedIndex =
+                          pieTouchResponse.touchedSection!.touchedSectionIndex;
+                    });
+                  },
+                ),
+                borderData: FlBorderData(show: false),
+                sectionsSpace: 4,
+                centerSpaceRadius: 40,
+                sections: _showingSatisfactionSections(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // LEGENDA ULASAN
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            children: const [
+              _ChartLegendTile(
+                color: AppColors.primary,
+                label: 'Sangat Suka (96.5%)',
+              ),
+              _ChartLegendTile(
+                color: Colors.amber,
+                label: 'Cukup Suka / Evaluasi (3.5%)',
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // DETIL STATISTIK SURVEI PASCA DISTRIBUSI (FLEXIBLE BEBAS OVERFLOW)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildSubMetric('Rating Rasa', '4.9 ⭐'),
+                    _buildSubMetric('Porsi', '4.8 ⭐'),
+                    _buildSubMetric('Kepuasan', '96.5%'),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Divider(height: 1),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.assignment_turned_in_rounded,
+                        size: 14, color: AppColors.primary),
+                    SizedBox(width: 6),
+                    Text(
+                      'Progres Survei: 410 / 420 Siswa Sudah Mengulas',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubMetric(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 
