@@ -17,17 +17,17 @@ class CreateScheduleScreen extends StatefulWidget {
 
 class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
   // Form State
-  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1)); // Default H+1 (Besok)
+  late DateTime _selectedDate;
   String? _selectedMenuId;
   String _selectedDeadlineTime = '17:00 WIB (Standar SPPG)';
   final TextEditingController _portionController =
       TextEditingController(text: '450');
-  final TextEditingController _searchHistoryController =
-      TextEditingController();
+
+  // Filter State (By Date)
+  DateTime? _filterDate;
 
   late List<Map<String, dynamic>> _menuList;
   late List<Map<String, dynamic>> _scheduleHistory;
-  String _historyQuery = '';
 
   int? _editingIndex; // Null if adding new, or index if editing
 
@@ -48,7 +48,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
       _selectedMenuId = _menuList.first['id'] ?? _menuList.first['id_menu'];
     }
 
-    // Full Schedule History Data
+    // Initial Schedule History Data
     _scheduleHistory = [
       {
         'id': 'sch_01',
@@ -111,13 +111,30 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
         'rasa': '4.3 / 5.0',
       },
     ];
+
+    // Smart Auto-Default Date: 1 day after the latest scheduled date
+    _selectedDate = _getSuggestedNextDate();
   }
 
   @override
   void dispose() {
     _portionController.dispose();
-    _searchHistoryController.dispose();
     super.dispose();
+  }
+
+  /// Calculates the next consecutive date (Latest Scheduled Date + 1 Day)
+  DateTime _getSuggestedNextDate() {
+    if (_scheduleHistory.isEmpty) {
+      return DateTime.now().add(const Duration(days: 1));
+    }
+    DateTime maxDate = _scheduleHistory.first['tanggal'];
+    for (var item in _scheduleHistory) {
+      final DateTime dt = item['tanggal'];
+      if (dt.isAfter(maxDate)) {
+        maxDate = dt;
+      }
+    }
+    return maxDate.add(const Duration(days: 1));
   }
 
   String _formatDate(DateTime date) {
@@ -186,12 +203,71 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     }
   }
 
+  Future<void> _pickFilterDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _filterDate ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 60)),
+      lastDate: DateTime.now().add(const Duration(days: 60)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              onSurface: AppColors.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _filterDate = picked;
+      });
+    }
+  }
+
   void _submitSchedule() {
     if (_selectedMenuId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Silakan pilih menu makanan terlebih dahulu.'),
           backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    // 1-DATE 1-MENU VALIDATION (1 tanggal hanya boleh 1 menu)
+    final bool isDuplicateDate = _scheduleHistory.asMap().entries.any((entry) {
+      final idx = entry.key;
+      final item = entry.value;
+      if (_editingIndex != null && _editingIndex == idx) {
+        return false; // Skip checking self when editing
+      }
+      final DateTime dt = item['tanggal'];
+      return dt.year == _selectedDate.year &&
+          dt.month == _selectedDate.month &&
+          dt.day == _selectedDate.day;
+    });
+
+    if (isDuplicateDate) {
+      final existingItem = _scheduleHistory.firstWhere((item) {
+        final DateTime dt = item['tanggal'];
+        return dt.year == _selectedDate.year &&
+            dt.month == _selectedDate.month &&
+            dt.day == _selectedDate.day;
+      });
+      final existingName = existingItem['nama_menu'];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              '⚠️ Tanggal ${_formatDate(_selectedDate)} sudah memiliki jadwal menu ("$existingName"). 1 tanggal hanya dapat berisi 1 menu penyajian.'),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 4),
         ),
       );
       return;
@@ -247,6 +323,9 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
           ),
         );
       }
+
+      // Auto set next form date to (Latest Date + 1 Day)
+      _selectedDate = _getSuggestedNextDate();
     });
   }
 
@@ -277,7 +356,8 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Mengedit jadwal "${item['nama_menu']}". Silakan ubah data pada form.'),
+        content: Text(
+            'Mengedit jadwal "${item['nama_menu']}". Silakan ubah data pada form.'),
         backgroundColor: AppColors.primary,
       ),
     );
@@ -320,6 +400,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
               Navigator.pop(dialogCtx);
               setState(() {
                 _scheduleHistory.removeAt(index);
+                _selectedDate = _getSuggestedNextDate();
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -340,13 +421,14 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     final bool tomorrowIsScheduled = _isTomorrowScheduled();
 
-    final filteredHistory = _historyQuery.isEmpty
+    // Filter History by Selected Date (if filterDate is set)
+    final filteredHistory = _filterDate == null
         ? _scheduleHistory
         : _scheduleHistory.where((item) {
-            final name = item['nama_menu'].toString().toLowerCase();
-            final dateStr = _formatDate(item['tanggal']).toLowerCase();
-            final q = _historyQuery.toLowerCase();
-            return name.contains(q) || dateStr.contains(q);
+            final DateTime dt = item['tanggal'];
+            return dt.year == _filterDate!.year &&
+                dt.month == _filterDate!.month &&
+                dt.day == _filterDate!.day;
           }).toList();
 
     return SppgAdminLayout(
@@ -361,7 +443,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ⚠️ BANNER PERINGATAN H-1 (Hanya muncul jika menu besok belum diisi)
+                // ⚠️ BANNER PERINGATAN H-1 (Ramah pengguna tanpa jam kaku)
                 if (!tomorrowIsScheduled)
                   Container(
                     margin: const EdgeInsets.only(bottom: 16),
@@ -451,6 +533,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                               onPressed: () {
                                 setState(() {
                                   _editingIndex = null;
+                                  _selectedDate = _getSuggestedNextDate();
                                 });
                               },
                               child: const Text('Batal Edit',
@@ -512,7 +595,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // 2. Pilih Menu Makanan (isExpanded: true to prevent overflow)
+                      // 2. Pilih Menu Makanan
                       const Text(
                         '2. Pilih Menu Makanan Seimbang',
                         style: TextStyle(
@@ -704,15 +787,15 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Header Riwayat Jadwal & Search Bar Input
+                // Header Riwayat Jadwal Menu (Singkat & Selaras)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
                     Expanded(
                       child: Text(
-                        'Riwayat Lengkap Jadwal Menu per Tanggal',
+                        'Riwayat Jadwal Menu',
                         style: TextStyle(
-                          fontSize: 14.5,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
@@ -725,33 +808,54 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
 
-                // Filter Search Input
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: TextField(
-                    controller: _searchHistoryController,
-                    onChanged: (val) {
-                      setState(() {
-                        _historyQuery = val.trim();
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      hintText: 'Cari riwayat berdasarkan tanggal atau nama menu...',
-                      hintStyle:
-                          TextStyle(fontSize: 12, color: AppColors.textLight),
-                      prefixIcon: Icon(Icons.search_rounded,
-                          color: AppColors.primary, size: 20),
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                // BAR FITUR KALENDER FILTER TANGGAL (Bukan Input Ketik!)
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      icon: const Icon(Icons.calendar_month_rounded,
+                          color: AppColors.primary, size: 18),
+                      label: Text(
+                        _filterDate == null
+                            ? 'Pilih Filter Tanggal'
+                            : 'Tanggal: ${_formatDate(_filterDate!)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      onPressed: _pickFilterDate,
                     ),
-                  ),
+                    if (_filterDate != null) ...[
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        icon: const Icon(Icons.close_rounded,
+                            size: 16, color: AppColors.error),
+                        label: const Text(
+                          'Reset Filter',
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.error),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _filterDate = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 12),
 
@@ -765,11 +869,21 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: AppColors.border),
                         ),
-                        child: const Center(
-                          child: Text(
-                            'Tidak ada riwayat jadwal yang sesuai pencarian.',
-                            style: TextStyle(
-                                fontSize: 12, color: AppColors.textSecondary),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Icon(Icons.event_busy_rounded,
+                                  color: AppColors.textLight, size: 32),
+                              const SizedBox(height: 8),
+                              Text(
+                                _filterDate != null
+                                    ? 'Tidak ada jadwal menu pada tanggal ${_formatDate(_filterDate!)}.'
+                                    : 'Belum ada riwayat jadwal menu.',
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary),
+                              ),
+                            ],
                           ),
                         ),
                       )
