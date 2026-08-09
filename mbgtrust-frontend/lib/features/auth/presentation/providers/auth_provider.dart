@@ -112,7 +112,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> registerBeneficiary({
     required String nikNisn,
     required String namaLengkap,
-    required String idSekolah,
+    required int idSekolah,
     required String tingkatKelas,
     required String kataSandi,
     List<String> riwayatAlergi = const [],
