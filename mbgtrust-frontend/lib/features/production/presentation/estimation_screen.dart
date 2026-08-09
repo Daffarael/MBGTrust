@@ -236,34 +236,40 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             // Porsi Dimasak & Status Dapur
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Target Memasak Presisi Dapur:',
-                                      style: TextStyle(
-                                          fontSize: 11, color: Colors.white70),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '$precisionPortions Porsi Wajib Dimasak',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Target Memasak Presisi Dapur:',
+                                        style: TextStyle(
+                                            fontSize: 11, color: Colors.white70),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '$precisionPortions Porsi Wajib Dimasak',
+                                        softWrap: true,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
+                                const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
+                                      horizontal: 9, vertical: 5),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: const [
                                       Icon(Icons.outdoor_grill_rounded,
                                           size: 14, color: AppColors.primaryDark),
@@ -610,6 +616,7 @@ class _ChartLegendTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 12,
@@ -620,13 +627,15 @@ class _ChartLegendTile extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 6),
-        Text(
-          label,
-          softWrap: true,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+        Flexible(
+          child: Text(
+            label,
+            softWrap: true,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
         ),
       ],
