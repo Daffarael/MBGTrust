@@ -7,6 +7,7 @@ import '../../features/evaluation/presentation/menu_detail_screen.dart';
 import '../../features/evaluation/presentation/next_day_confirmation_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/menu/presentation/create_schedule_screen.dart';
+import '../../features/menu/presentation/manage_ingredients_screen.dart';
 import '../../features/menu/presentation/manage_menu_screen.dart';
 import '../../features/production/presentation/estimation_screen.dart';
 
@@ -43,6 +44,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/manage-menu',
       builder: (context, state) => const ManageMenuScreen(),
+    ),
+    GoRoute(
+      path: '/manage-ingredients',
+      builder: (context, state) => const ManageIngredientsScreen(),
     ),
     GoRoute(
       path: '/create-schedule',

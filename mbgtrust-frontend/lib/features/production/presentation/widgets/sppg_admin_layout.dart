@@ -42,6 +42,11 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
       'route': '/manage-menu',
     },
     {
+      'title': 'Kelola Master Bahan',
+      'icon': Icons.flatware_rounded,
+      'route': '/manage-ingredients',
+    },
+    {
       'title': 'Plotting Jadwal Menu',
       'icon': Icons.edit_calendar_rounded,
       'route': '/create-schedule',
