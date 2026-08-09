@@ -19,7 +19,6 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
   double _weightWaste = 25.0;
   double _weightPenolakan = 15.0;
 
-  bool _isWeightExpanded = false;
   String _selectedCategoryTab = 'FAVORIT'; // 'FAVORIT' or 'EVALUASI'
 
   late List<Map<String, dynamic>> _recommendationList;
@@ -97,13 +96,19 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
               ),
               child: Column(
                 children: [
-                  _buildNormRow('1. Penilaian Rasa', '${norm['rasa']!.toStringAsFixed(1)}%'),
-                  _buildNormRow('2. Tingkat Kesukaan', '${norm['kesukaan']!.toStringAsFixed(1)}%'),
-                  _buildNormRow('3. Kecukupan Porsi', '${norm['porsi']!.toStringAsFixed(1)}%'),
-                  _buildNormRow('4. Makanan Dipertahankan / Sisa', '${norm['waste']!.toStringAsFixed(1)}%'),
-                  _buildNormRow('5. Penolakan Presensi', '${norm['penolakan']!.toStringAsFixed(1)}%'),
+                  _buildNormRow(
+                      '1. Penilaian Rasa', '${norm['rasa']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('2. Tingkat Kesukaan',
+                      '${norm['kesukaan']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('3. Kecukupan Porsi',
+                      '${norm['porsi']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('4. Makanan Sisa',
+                      '${norm['waste']!.toStringAsFixed(1)}%'),
+                  _buildNormRow('5. Penolakan Presensi',
+                      '${norm['penolakan']!.toStringAsFixed(1)}%'),
                   const Divider(height: 12),
-                  _buildNormRow('Total Bobot Ter-Normalisasi', '100.0%', isBold: true),
+                  _buildNormRow('Total Bobot Ter-Normalisasi', '100.0%',
+                      isBold: true),
                 ],
               ),
             ),
@@ -112,22 +117,23 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
+            child: const Text('Batal',
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () {
               Navigator.pop(dialogCtx);
-              setState(() {
-                _isWeightExpanded = false;
-              });
+              setState(() {});
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Bobot kriteria berhasil diperbarui & dinormalisasi (100%)!'),
+                  content: Text(
+                      'Bobot kriteria berhasil diperbarui & dinormalisasi (100%)!'),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -136,6 +142,122 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Opens Modal BottomSheet for Weight Slider Adjustment with Criteria Sub-Explanations
+  void _openWeightModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.tune_rounded,
+                            color: AppColors.primary, size: 24),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Atur Bobot Penilaian',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded,
+                              color: AppColors.textSecondary),
+                          onPressed: () => Navigator.pop(sheetCtx),
+                        ),
+                      ],
+                    ),
+                    const Text(
+                      'Sesuaikan bobot prioritas kriteria penilaian SPK. Setiap kriteria memiliki penjelasan definisi di bawah ini.',
+                      style: TextStyle(
+                          fontSize: 11.5, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(height: 1),
+                    const SizedBox(height: 12),
+
+                    _buildWeightSliderWithDesc(
+                      '1. Penilaian Rasa (⭐)',
+                      'Tingkat kelezatan bumbu & cita rasa makanan menurut ulasan siswa.',
+                      _weightRasa,
+                      (val) => setModalState(() => _weightRasa = val),
+                    ),
+                    _buildWeightSliderWithDesc(
+                      '2. Tingkat Kesukaan (⭐)',
+                      'Tingkat kepuasan & preferensi penerimaan siswa terhadap variasi menu.',
+                      _weightKesukaan,
+                      (val) => setModalState(() => _weightKesukaan = val),
+                    ),
+                    _buildWeightSliderWithDesc(
+                      '3. Kecukupan Porsi (⭐)',
+                      'Kesesuaian volume porsi makanan dengan kebutuhan gizi & kenyang siswa.',
+                      _weightPorsi,
+                      (val) => setModalState(() => _weightPorsi = val),
+                    ),
+                    _buildWeightSliderWithDesc(
+                      '4. Makanan Sisa (🗑️)',
+                      'Persentase volume makanan tidak terhabiskan yang berpotensi menjadi sisa food waste.',
+                      _weightWaste,
+                      (val) => setModalState(() => _weightWaste = val),
+                    ),
+                    _buildWeightSliderWithDesc(
+                      '5. Penolakan Presensi (❌)',
+                      'Persentase siswa yang menolak / membatalkan porsi sebelum jam batas konfirmasi.',
+                      _weightPenolakan,
+                      (val) => setModalState(() => _weightPenolakan = val),
+                    ),
+                    const SizedBox(height: 16),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        icon: const Icon(Icons.check_circle_rounded, size: 18),
+                        label: const Text(
+                          'Simpan & Terapkan Bobot',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(sheetCtx);
+                          _confirmApplyWeights();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -155,6 +277,46 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: isBold ? AppColors.primary : AppColors.primaryDark)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeightSliderWithDesc(String title, String description,
+      double value, ValueChanged<double> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary)),
+              Text('${value.toInt()}%',
+                  style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary)),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            description,
+            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          ),
+          Slider(
+            value: value,
+            min: 0,
+            max: 50,
+            divisions: 10,
+            activeColor: AppColors.primary,
+            onChanged: onChanged,
+          ),
         ],
       ),
     );
@@ -180,6 +342,29 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
       currentRoute: '/sppg/topsis-spk-engine',
       title: 'Rekomendasi Menu',
       subtitle: 'Analisis Rekomendasi Menu Terfavorit Siswa',
+      actions: [
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            side: const BorderSide(color: AppColors.primary),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          icon:
+              const Icon(Icons.tune_rounded, color: AppColors.primary, size: 16),
+          label: const Text(
+            'Atur Bobot',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+          onPressed: _openWeightModal,
+        ),
+        const SizedBox(width: 8),
+      ],
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 720),
@@ -350,107 +535,47 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                 const SizedBox(height: 16),
 
                 // =============================================================
-                // 2. ATUR BOBOT PENILAIAN (3 KATA & KONFIRMASI NORMALISASI 100%)
+                // 2. HEADER KATEGORI & BUTTON ATUR BOBOT POJOK KANAN ATAS
                 // =============================================================
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: AppColors.border),
-                  ),
-                  child: ExpansionTile(
-                    initiallyExpanded: _isWeightExpanded,
-                    onExpansionChanged: (val) =>
-                        setState(() => _isWeightExpanded = val),
-                    leading: const Icon(Icons.tune_rounded,
-                        color: AppColors.primary, size: 22),
-                    title: const Text(
-                      'Atur Bobot Penilaian',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    subtitle: const Text(
-                      'Sesuaikan bobot pertimbangan rasa, porsi, dan penolakan siswa',
-                      style: TextStyle(
-                          fontSize: 11, color: AppColors.textSecondary),
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Column(
-                          children: [
-                            _buildWeightSlider(
-                                '1. Penilaian Rasa (⭐)', _weightRasa, (val) {
-                              setState(() => _weightRasa = val);
-                            }),
-                            _buildWeightSlider(
-                                '2. Tingkat Kesukaan (⭐)', _weightKesukaan,
-                                (val) {
-                              setState(() => _weightKesukaan = val);
-                            }),
-                            _buildWeightSlider(
-                                '3. Kecukupan Porsi (⭐)', _weightPorsi, (val) {
-                              setState(() => _weightPorsi = val);
-                            }),
-                            _buildWeightSlider(
-                                '4. Makanan Dipertahankan / Sisa (🗑️)',
-                                _weightWaste, (val) {
-                              setState(() => _weightWaste = val);
-                            }),
-                            _buildWeightSlider(
-                                '5. Tingkat Penolakan Presensi (❌)',
-                                _weightPenolakan, (val) {
-                              setState(() => _weightPenolakan = val);
-                            }),
-                            const SizedBox(height: 10),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.check_circle_rounded,
-                                    size: 16),
-                                label: const Text(
-                                  'Simpan & Terapkan Bobot',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                onPressed: _confirmApplyWeights,
-                              ),
-                            ),
-                          ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Kategori Rekomendasi Menu',
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // =============================================================
-                // 3. SEGMENTED BUTTON 2 KATA (Menu Favorit vs Perlu Evaluasi)
-                // =============================================================
-                const Text(
-                  'Kategori Analisis Rekomendasi Menu',
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                    ),
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: const Icon(Icons.tune_rounded,
+                          color: AppColors.primary, size: 15),
+                      label: const Text(
+                        'Atur Bobot',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      onPressed: _openWeightModal,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
 
+                // SEGMENTED BUTTON 2 KATA (Menu Favorit vs Perlu Evaluasi)
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -554,7 +679,7 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
                 const SizedBox(height: 14),
 
                 // =============================================================
-                // 4. DAFTAR KARTU REKOMENDASI MENU (DETIL IDSS AI & NO ELLIPSIS)
+                // 3. DAFTAR KARTU REKOMENDASI MENU (DETIL IDSS AI & NO ELLIPSIS)
                 // =============================================================
                 displayedList.isEmpty
                     ? Container(
@@ -832,39 +957,6 @@ class _SppgTopsisSpkScreenState extends State<SppgTopsisSpkScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildWeightSlider(
-      String label, double value, ValueChanged<double> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label,
-                  style: const TextStyle(
-                      fontSize: 12, color: AppColors.textPrimary)),
-              Text('${value.toInt()}%',
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary)),
-            ],
-          ),
-          Slider(
-            value: value,
-            min: 0,
-            max: 50,
-            divisions: 10,
-            activeColor: AppColors.primary,
-            onChanged: onChanged,
-          ),
-        ],
-      ),
     );
   }
 }
