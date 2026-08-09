@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/widgets.dart';
+import '../../../core/widgets/custom_button.dart';
 import '../data/models/production_plan_model.dart';
 import '../data/repositories/production_repository.dart';
 import 'widgets/sppg_admin_layout.dart';
@@ -15,170 +15,114 @@ class EstimationScreen extends StatefulWidget {
 }
 
 class _EstimationScreenState extends State<EstimationScreen> {
-  late ProductionRepository _repository;
-  bool _isLoading = true;
+  final ProductionRepository _productionRepository = ProductionRepository();
   ProductionPlanModel? _plan;
+  bool _isLoading = true;
   int _touchedIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    _repository = ProductionRepository();
-    _fetchProductionPlan();
+    _fetchEstimate();
   }
 
-  Future<void> _fetchProductionPlan() async {
+  Future<void> _fetchEstimate() async {
     setState(() => _isLoading = true);
     try {
-      final plan = await _repository.getDailyProductionPlan('2026-08-08');
-      if (mounted) {
-        setState(() {
-          _plan = plan;
-          _isLoading = false;
-        });
-      }
+      final plan = await _productionRepository.getDailyProductionPlan(
+          '2026-08-08');
+      setState(() {
+        _plan = plan;
+        _isLoading = false;
+      });
     } catch (_) {
-      if (mounted) {
-        setState(() {
-          _plan = ProductionPlanModel(
-            tanggalTarget: '2026-08-08',
-            totalPorsiDasar: 500,
-            totalSiswaKonfirmasiHadir: 450,
-            totalSiswaMenolak: 50,
-            totalPorsiPresisiWajibDimasak: 450,
-          );
-          _isLoading = false;
-        });
-      }
+      // Fallback mock model if API error
+      setState(() {
+        _plan = ProductionPlanModel(
+          tanggalTarget: '2026-08-08',
+          totalPorsiDasar: 500,
+          totalSiswaKonfirmasiHadir: 450,
+          totalSiswaMenolak: 50,
+          totalPorsiPresisiWajibDimasak: 450,
+        );
+        _isLoading = false;
+      });
     }
   }
 
-  Future<void> _recalculateEstimate() async {
-    setState(() => _isLoading = true);
-    try {
-      final newEstimate =
-          await _repository.recalculateProductionEstimate('2026-08-08');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Hitung ulang estimasi presisi selesai! Porsi presisi: $newEstimate'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        _fetchProductionPlan();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Hitung ulang gagal: ${e.toString()}'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-      }
-    }
-  }
-
-  void _showTopsisDetailModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        constraints: const BoxConstraints(maxWidth: 640),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Expanded(
-                    child: Text(
-                      '🧮 Rincian Analisis Rekomendasi Menu',
-                      softWrap: true,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ],
-              ),
-              const Divider(),
-              const SizedBox(height: 10),
-              const Text(
-                'Bobot Kriteria Penilaian (Wj):',
-                softWrap: true,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                '• C1 Rasa (30%) • C2 Kesukaan (25%) • C3 Porsi (20%) • C4 Sisa Makanan (25%)',
-                softWrap: true,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Matriks Terbobot & Jarak Solusi Ideal (D+, D-):',
-                softWrap: true,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              const SizedBox(height: 8),
-              _buildTopsisRow('1. Nasi Ayam Bakar Kecap', 'V = 0.892', 'D+ = 0.012', 'D- = 0.098', AppColors.primary),
-              _buildTopsisRow('2. Nasi Semur Daging Sapi', 'V = 0.765', 'D+ = 0.024', 'D- = 0.078', AppColors.primary),
-              _buildTopsisRow('3. Nasi Ikan Goreng Tepung', 'V = 0.312', 'D+ = 0.088', 'D- = 0.021', AppColors.error),
-              const SizedBox(height: 20),
-              CustomButton(
-                text: 'Tutup Rincian Analisis',
-                onPressed: () => Navigator.pop(ctx),
-              ),
-            ],
-          ),
-        ),
+  void _recalculateEstimate() {
+    _fetchEstimate();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Presisi porsi harian berhasil diperbarui!'),
+        backgroundColor: AppColors.success,
       ),
     );
   }
 
-  static Widget _buildTopsisRow(String menuName, String vScore, String dPlus, String dMinus, Color statusColor) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: statusColor.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(menuName, softWrap: true, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                Text('$dPlus | $dMinus', softWrap: true, style: const TextStyle(fontSize: 10, color: AppColors.textLight)),
-              ],
+  List<PieChartSectionData> _showingSections(int confirmed, int rejected) {
+    return List.generate(2, (i) {
+      final isTouched = i == _touchedIndex;
+      final fontSize = isTouched ? 16.0 : 13.0;
+      final radius = isTouched ? 55.0 : 45.0;
+
+      switch (i) {
+        case 0:
+          return PieChartSectionData(
+            color: AppColors.primary,
+            value: confirmed.toDouble(),
+            title: '$confirmed',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(vScore, softWrap: true, style: TextStyle(fontWeight: FontWeight.bold, color: statusColor, fontSize: 13)),
-        ],
-      ),
-    );
+          );
+        case 1:
+          return PieChartSectionData(
+            color: AppColors.error,
+            value: rejected.toDouble(),
+            title: '$rejected',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          );
+        default:
+          throw Error();
+      }
+    });
+  }
+
+  String _formatTodayDate() {
+    final date = DateTime.now();
+    const days = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu'
+    ];
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember'
+    ];
+    return '${days[date.weekday % 7]}, ${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   @override
@@ -200,7 +144,6 @@ class _EstimationScreenState extends State<EstimationScreen> {
       currentRoute: '/estimation',
       title: 'Dasbor Utama',
       subtitle: 'Ringkasan Target Porsi & Dapur',
-      onTopsisTap: () => _showTopsisDetailModal(context),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
@@ -218,7 +161,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Banner (Target Porsi Memasak Besok - 2 Baris Besar)
+                      // Header Banner (Target Presisi Dapur Hari Ini)
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
@@ -256,12 +199,12 @@ class _EstimationScreenState extends State<EstimationScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Target Porsi Memasak Besok',
+                                  Text(
+                                    'Target Presisi Dapur Hari Ini (${_formatTodayDate()})',
                                     softWrap: true,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white70,
-                                      fontSize: 14,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -284,9 +227,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // 4 Stat Cards Analitik Utama (Format Bersambung Tanpa Terpisah Baris)
+                      // 4 Stat Cards Analitik Utama
                       const Text(
-                        'Ringkasan Analitik Eksekutif',
+                        'Ringkasan Kinerja Dapur Hari Ini',
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 16,
@@ -311,9 +254,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildStatCard(
-                              title: 'Penerimaan Porsi',
+                              title: 'Penerimaan Presisi',
                               valueText: '95.2%',
-                              subtitle: 'Presisi Tinggi',
+                              subtitle: '$confirmed Konfirmasi Hadir',
                               icon: Icons.check_circle_rounded,
                               color: AppColors.success,
                               bgColor: AppColors.primaryLight,
@@ -328,7 +271,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             child: _buildStatCard(
                               title: 'Sisa Makanan',
                               valueText: '0%',
-                              subtitle: '50 Porsi Tercegah',
+                              subtitle: '$rejected Porsi Tercegah',
                               icon: Icons.cleaning_services_rounded,
                               color: AppColors.primary,
                               bgColor: AppColors.primaryLight,
@@ -337,9 +280,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildStatCard(
-                              title: 'Hemat Anggaran',
+                              title: 'Efisiensi Anggaran',
                               valueText: 'Rp 750k',
-                              subtitle: 'Efisiensi / Hari',
+                              subtitle: 'Penghematan Harian',
                               icon: Icons.savings_rounded,
                               color: Colors.blue,
                               bgColor: Colors.blueAccent.withValues(alpha: 0.1),
@@ -347,23 +290,17 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 24),
 
-                      // Section Presisi Porsi Memasak Besok
-                      Row(
-                        children: const [
-                          Expanded(
-                            child: Text(
-                              'Presisi Porsi Memasak Besok',
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                        ],
+                      // Section Diagram Presisi Porsi Memasak
+                      const Text(
+                        'Diagram Konfirmasi Presensi Siswa',
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       const SizedBox(height: 12),
 
@@ -427,7 +364,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                             ),
                             const SizedBox(height: 16),
 
-                            // Rincian Alasan Penolakan
+                            // Rincian Alasan Penolakan Siswa
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
@@ -470,98 +407,9 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 24),
 
-                      // ==========================================
-                      // ENGINE SPK TOPSIS EVALUASI MENU
-                      // ==========================================
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              '🧮 Analisis & Rekomendasi Menu (SPK)',
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _showTopsisDetailModal(context),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppColors.primary),
-                              ),
-                              child: const Text(
-                                'Detail Matriks',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryDark,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Hasil Ranking Preferensi Menu (Vi):',
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            _buildTopsisRankCard(
-                              rank: '🥇 Rank 1',
-                              menuName: 'Nasi Ayam Bakar Kecap & Tumis Buncis',
-                              score: 'V = 0.892',
-                              badgeText: 'SANGAT DIREKOMENDASIKAN',
-                              badgeColor: AppColors.primary,
-                            ),
-                            const SizedBox(height: 8),
-                            _buildTopsisRankCard(
-                              rank: '🥈 Rank 2',
-                              menuName: 'Nasi Semur Daging Sapi & Sup Sayur',
-                              score: 'V = 0.765',
-                              badgeText: 'DIREKOMENDASIKAN',
-                              badgeColor: AppColors.primaryDark,
-                            ),
-                            const SizedBox(height: 8),
-                            _buildTopsisRankCard(
-                              rank: '🥉 Rank 3',
-                              menuName: 'Nasi Ikan Goreng Tepung & Sayur Lodeh',
-                              score: 'V = 0.312',
-                              badgeText: 'PERLU REVISI / GANTI MENU',
-                              badgeColor: AppColors.error,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-
-                      // NAVIGASI AKSI UTAMA SPPG
+                      // AKSI PINTAS NAVIGASI DAPUR SPPG
                       const Text(
                         'Aksi Pintas Pengelola SPPG',
                         softWrap: true,
@@ -574,29 +422,39 @@ class _EstimationScreenState extends State<EstimationScreen> {
                       const SizedBox(height: 12),
 
                       CustomButton(
-                        text: '🍱 Kelola Master Menu MBG',
-                        prefixIcon: const Icon(Icons.restaurant_menu_rounded,
-                            color: Colors.white, size: 20),
-                        onPressed: () => context.push('/manage-menu'),
-                      ),
-                      const SizedBox(height: 10),
-
-                      CustomButton(
-                        text: '📅 Plotting Jadwal Menu Harian',
-                        isOutlined: true,
-                        borderColor: AppColors.secondaryDark,
+                        text: '📅 Jadwal Menu Harian',
                         prefixIcon: const Icon(Icons.edit_calendar_rounded,
-                            color: AppColors.secondaryDark, size: 20),
+                            color: Colors.white, size: 20),
                         onPressed: () => context.push('/create-schedule'),
                       ),
                       const SizedBox(height: 10),
 
                       CustomButton(
-                        text: '🚚 Pelacak Logistik Distribusi',
+                        text: '⭐ Rekomendasi Menu Terfavorit',
                         isOutlined: true,
                         borderColor: AppColors.primary,
-                        prefixIcon: const Icon(Icons.local_shipping_rounded,
+                        prefixIcon: const Icon(Icons.auto_awesome_rounded,
                             color: AppColors.primary, size: 20),
+                        onPressed: () => context.push('/sppg/topsis-spk-engine'),
+                      ),
+                      const SizedBox(height: 10),
+
+                      CustomButton(
+                        text: '🍱 Katalog Menu Makanan',
+                        isOutlined: true,
+                        borderColor: AppColors.secondaryDark,
+                        prefixIcon: const Icon(Icons.restaurant_menu_rounded,
+                            color: AppColors.secondaryDark, size: 20),
+                        onPressed: () => context.push('/manage-menu'),
+                      ),
+                      const SizedBox(height: 10),
+
+                      CustomButton(
+                        text: '🚚 Status Pengiriman Makanan',
+                        isOutlined: true,
+                        borderColor: AppColors.primaryDark,
+                        prefixIcon: const Icon(Icons.local_shipping_rounded,
+                            color: AppColors.primaryDark, size: 20),
                         onPressed: () => context.push('/distribution-tracker'),
                       ),
                     ],
@@ -607,123 +465,6 @@ class _EstimationScreenState extends State<EstimationScreen> {
     );
   }
 
-  Widget _buildTopsisRankCard({
-    required String rank,
-    required String menuName,
-    required String score,
-    required String badgeText,
-    required Color badgeColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                rank,
-                softWrap: true,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
-                ),
-                child: Text(
-                  badgeText,
-                  softWrap: true,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: badgeColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  menuName,
-                  softWrap: true,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                score,
-                softWrap: true,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: badgeColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<PieChartSectionData> _showingSections(int confirmed, int rejected) {
-    return List.generate(2, (i) {
-      final isTouched = i == _touchedIndex;
-      final fontSize = isTouched ? 16.0 : 12.0;
-      final radius = isTouched ? 55.0 : 45.0;
-
-      switch (i) {
-        case 0:
-          return PieChartSectionData(
-            color: AppColors.primary,
-            value: confirmed.toDouble(),
-            title: '$confirmed',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          );
-        case 1:
-          return PieChartSectionData(
-            color: AppColors.error,
-            value: rejected.toDouble(),
-            title: '$rejected',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          );
-        default:
-          throw Error();
-      }
-    });
-  }
-
-  // REDESIGNED STAT CARD: NILAI & ANGKANYA SELALU BERSAMBUNG HIZONTALLY TANPA TERPOTONG
   Widget _buildStatCard({
     required String title,
     required String valueText,
@@ -733,7 +474,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
     required Color bgColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -743,39 +484,36 @@ class _EstimationScreenState extends State<EstimationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: bgColor,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, size: 18, color: color),
+                child: Icon(icon, color: color, size: 20),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    valueText,
-                    softWrap: false,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
+              Flexible(
+                child: Text(
+                  valueText,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: color,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             title,
             softWrap: true,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 12.5,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
@@ -785,8 +523,8 @@ class _EstimationScreenState extends State<EstimationScreen> {
             subtitle,
             softWrap: true,
             style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.textLight,
+              fontSize: 10.5,
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -823,7 +561,7 @@ class _ChartLegendTile extends StatelessWidget {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: AppColors.textSecondary,
+            color: AppColors.textPrimary,
           ),
         ),
       ],

@@ -105,10 +105,6 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
     if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
       Navigator.pop(context);
     }
-    if (route == '/sppg/topsis-spk-engine' && widget.onTopsisTap != null) {
-      widget.onTopsisTap!();
-      return;
-    }
     if (widget.currentRoute != route) {
       context.go(route);
     }
