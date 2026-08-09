@@ -638,8 +638,7 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
         selectedMenuObj['kategori'] ?? 'Makanan Berat';
     final String selectedKepuasan =
         selectedMenuObj['kepuasan'] ?? '96.5% Kepuasan Siswa';
-    final String selectedUlasan = selectedMenuObj['ulasan'] ??
-        'Favorit utama siswa, bumbu meresap & porsi sangat pas.';
+
 
     // Active Today's Schedule Item (Sedang Berjalan)
     final activeTodayItem = _scheduleHistory.firstWhere(
@@ -903,44 +902,35 @@ class _CreateScheduleScreenState extends State<CreateScheduleScreen> {
                                           color: AppColors.primaryDark,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 9, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black
-                                            .withValues(alpha: 0.04),
-                                        blurRadius: 4,
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                              border: Border.all(
+                                                  color: AppColors.primary
+                                                      .withValues(alpha: 0.3)),
+                                            ),
+                                            child: Text(
+                                              '⭐ $selectedKepuasan',
+                                              style: const TextStyle(
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primaryDark,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  child: Text(
-                                    selectedKepuasan,
-                                    style: const TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryDark,
-                                    ),
-                                  ),
                                 ),
                               ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              '💬 "$selectedUlasan"',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                fontStyle: FontStyle.italic,
-                                color: AppColors.primaryDark,
-                              ),
                             ),
                             const SizedBox(height: 12),
                             SizedBox(
