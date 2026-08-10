@@ -415,8 +415,6 @@ class _GamificationScreenState extends State<GamificationScreen>
                     Text(
                       badge['desc'],
                       textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10,
                         color: isUnlocked ? AppColors.textSecondary : AppColors.textLight,

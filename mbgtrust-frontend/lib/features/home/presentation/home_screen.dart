@@ -567,8 +567,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const Expanded(
                             child: Text(
                               'Apakah kamu mengonsumsi MBG hari ini?',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -576,22 +574,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                             ),
                           ),
-                          if (_hasEvaluatedToday)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                '✓ Terjawab',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryDark,
-                                ),
-                              ),
-                            ),
                         ],
                       ),
                       const SizedBox(height: 14),
@@ -612,8 +594,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               SizedBox(width: 8),
                               Flexible(
                                 child: Text(
-                                  '✓ Evaluasi & Presensi Hari Ini Telah Dikirim',
-                                  overflow: TextOverflow.ellipsis,
+                                  'Evaluasi & Presensi Hari Ini Telah Dikirim',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
