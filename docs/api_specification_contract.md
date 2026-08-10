@@ -1,14 +1,20 @@
 # Kontrak Spesifikasi API RESTful Enterprise (100% Lengkap)
 ## MBGTrust — Dokumentasi Eksklusif Seluruh Endpoint API
 
-**Nama Proyek:** MBGTrust (Sistem Pendukung Keputusan Program Makan Bergizi Gratis)  
+**Nama Proyek:** MBGTrust — Platform Digital Berbasis AI untuk Mitigasi Food Waste pada Program Makan Bergizi Gratis  
 **Target Kompetisi:** GEMASTIK — Bidang Pengembangan Perangkat Lunak  
-**Versi API:** 4.1.0 (Schema v6 Aligned — 30 Endpoints)  
+**Versi API:** 5.0.0 (Disesuaikan Gagasan Awal — 3 Peran, NLP + TOPSIS All-Benefit)  
 **URL Utama (Base URL):** `https://api.mbgtrust.id/api/v1`  
 **Standar Otentikasi:** Header Otorisasi HTTP (`Authorization: Bearer <TOKEN_JWT>`)  
 **Format Data:** JSON (`Content-Type: application/json`)  
+**3 Peran RBAC:** `SUPER_ADMIN` | `SPPG_ADMIN` | `PENERIMA_MANFAAT`  
 
----
+> **Catatan Perubahan v5.0.0:**
+> - Ditambahkan endpoint grup **Modul 0: Super Admin** (manajemen sekolah, Admin SPPG, Penerima Manfaat)
+> - Ditambahkan endpoint **NLP Sentiment Analysis** (`GET /analitik/hasil-nlp`, `GET /analitik/tren-food-waste`)
+> - Kriteria TOPSIS C4 dan C5 diubah dari **Cost** menjadi **Benefit** (sesuai Gagasan Awal):
+>   - C4: Tingkat Konsumsi Makanan (**Benefit** 30%) — bukan lagi Potensi Food Waste (Cost)
+>   - C5: Tingkat Penerimaan MBG (**Benefit** 25%) — bukan lagi Tingkat Penolakan (Cost)
 
 ## 1. Standar Global API & Format Amplop Response
 
@@ -56,7 +62,25 @@
 
 ---
 
-## 2. Rincian Eksklusif Seluruh 26 Endpoint per Modul
+## 2. Rincian Endpoint per Modul
+
+### Modul 0: Super Admin (Manajemen Entitas Sistem)
+
+| Method | Endpoint | Deskripsi | Akses |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/admin/masuk` | Login Super Admin | PUBLIC |
+| `GET` | `/admin/profil-saya` | Profil Super Admin | SUPER_ADMIN |
+| `PATCH` | `/admin/profil-saya` | Update profil Super Admin | SUPER_ADMIN |
+| `GET` | `/admin/sekolah` | Daftar semua sekolah | SUPER_ADMIN |
+| `POST` | `/admin/sekolah` | Tambah sekolah baru | SUPER_ADMIN |
+| `PATCH` | `/admin/sekolah/:id` | Edit data sekolah | SUPER_ADMIN |
+| `DELETE` | `/admin/sekolah/:id` | Hapus sekolah | SUPER_ADMIN |
+| `GET` | `/admin/sppg-admin` | Daftar semua Admin SPPG | SUPER_ADMIN |
+| `POST` | `/admin/sppg-admin` | Buat akun Admin SPPG baru | SUPER_ADMIN |
+| `PATCH` | `/admin/sppg-admin/:id` | Edit data Admin SPPG | SUPER_ADMIN |
+| `GET` | `/admin/penerima-manfaat` | Daftar semua siswa | SUPER_ADMIN |
+| `POST` | `/admin/penerima-manfaat` | Buat akun siswa baru | SUPER_ADMIN |
+| `PATCH` | `/admin/penerima-manfaat/:id` | Edit data siswa | SUPER_ADMIN |
 
 ### 🔵 Modul 1: Otentikasi & Manajemen Pengguna (IAM)
 

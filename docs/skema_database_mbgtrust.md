@@ -1,30 +1,32 @@
 # Skema Database MBGTrust — Versi Final
 
-**Nama Proyek:** MBGTrust  
+**Nama Proyek:** MBGTrust — Platform Digital Berbasis AI untuk Mitigasi Food Waste pada Program Makan Bergizi Gratis  
 **Database Engine:** MySQL 8.0 (via Prisma ORM v7)  
-**Versi Dokumen:** 5.0.0 (Final — Sinkron dengan `schema.prisma` aktual)  
+**Versi Dokumen:** 6.0.0 (Disesuaikan Gagasan Awal — 3 Peran, NLP, Kriteria TOPSIS All-Benefit)  
 **Status:** ✅ **FINAL** — Source of truth adalah `mbgtrust-backend/prisma/schema.prisma`
 
-> ⚠️ Dokumen ini diperbarui dari v2.0.0 (8 tabel) → v5.0.0 (12 tabel + 5 enum). Versi lama sudah tidak berlaku.
+> ⚠️ Diperbarui ke v6.0.0: Menambahkan peran Super Admin, tabel `hasil_nlp`, dan mengubah C4/C5 TOPSIS menjadi Benefit (sesuai Gagasan Awal).
 
 ---
 
-## 1. Ringkasan Tabel (12 Tabel)
+## 1. Ringkasan Tabel (13 Tabel)
 
 | # | Nama Tabel SQL | Model Prisma | Fungsi Utama |
 |:---|:---|:---|:---|
-| 1 | `pengguna` | `Pengguna` | Semua akun pengguna + sistem poin XP gamifikasi |
+| 1 | `pengguna` | `Pengguna` | Semua akun pengguna 3 peran + poin XP gamifikasi |
 | 2 | `token_penyegar` | `TokenPenyegar` | JWT Refresh Token (rotasi otomatis) |
-| 3 | `sekolah` | `Sekolah` | Data master sekolah penerima MBG |
-| 4 | `menu` | `Menu` | Data master menu + info gizi lengkap + alergen |
-| 5 | `jadwal_menu` | `JadwalMenu` | Penjadwalan menu harian per sekolah |
-| 6 | `evaluasi_menu` | `EvaluasiMenu` | Umpan balik siswa — sumber C1/C2/C3/C4 TOPSIS |
-| 7 | `konfirmasi` | `Konfirmasi` | Konfirmasi kehadiran H+1 — sumber C5 TOPSIS |
-| 8 | `alasan_penolakan` | `AlasanPenolakan` | Master alasan penolakan (4 kode standar) |
-| 9 | `rencana_produksi` | `RencanaProduksi` | Estimasi porsi presisi H+1 + buffer 5% |
-| 10 | `produksi` | `Produksi` | Tracking siklus memasak dapur SPPG |
-| 11 | `distribusi` | `Distribusi` | Tracking pengiriman logistik ke sekolah |
-| 12 | `eksekusi_topsis` | `EksekusiTopsis` | Hasil audit SPK TOPSIS disimpan permanen |
+| 3 | `sekolah` | `Sekolah` | Data master sekolah penerima MBG (dikelola Super Admin) |
+| 4 | `bahan_baku` | `BahanBaku` | Data master bahan baku makanan (dikelola Admin SPPG) |
+| 5 | `menu` | `Menu` | Data master menu + info gizi + alergen + referensi bahan baku |
+| 6 | `jadwal_menu` | `JadwalMenu` | Penjadwalan menu harian per sekolah |
+| 7 | `evaluasi_menu` | `EvaluasiMenu` | Umpan balik siswa — sumber C1/C2/C3/C4 TOPSIS (Benefit) |
+| 8 | `konfirmasi` | `Konfirmasi` | Konfirmasi kehadiran — sumber C5 TOPSIS (Benefit) |
+| 9 | `alasan_penolakan` | `AlasanPenolakan` | Master alasan penolakan (4 kode standar) |
+| 10 | `rencana_produksi` | `RencanaProduksi` | Estimasi porsi presisi H+1 + buffer 5% |
+| 11 | `produksi` | `Produksi` | Tracking siklus memasak dapur SPPG |
+| 12 | `distribusi` | `Distribusi` | Tracking pengiriman logistik ke sekolah |
+| 13 | `eksekusi_topsis` | `EksekusiTopsis` | Hasil audit SPK TOPSIS disimpan permanen |
+| 14 | `hasil_nlp` | `HasilNlp` | Hasil NLP Sentiment Analysis per ulasan teks siswa |
 
 ---
 
@@ -67,13 +69,14 @@ eksekusi_topsis (berdiri sendiri — tidak berelasi langsung)
 | `id` | `id` | `Int @id` | ✅ | Primary Key |
 | `nik_nisn` | `nikNisn` | `String? @unique` | ❌ | Login siswa via NISN 16 digit |
 | `nama_lengkap` | `namaLengkap` | `String` | ✅ | Nama lengkap |
-| `email` | `email` | `String? @unique` | ❌ | Login `SPPG_ADMIN` & `PETUGAS` |
+| `email` | `email` | `String? @unique` | ❌ | Login `SPPG_ADMIN` & `SUPER_ADMIN` |
 | `katasandi` | `katasandi` | `String` | ✅ | Hash bcrypt 12 rounds |
-| `peran` | `peran` | `Enum Peran` | ✅ | `PENERIMA_MANFAAT` / `SPPG_ADMIN` / `PETUGAS` |
+| `peran` | `peran` | `Enum Peran` | ✅ | `SUPER_ADMIN` / `SPPG_ADMIN` / `PENERIMA_MANFAAT` |
 | `tingkat_kelas` | `tingkatKelas` | `String?` | ❌ | Hanya siswa. Contoh: `"5-B"` |
 | `riwayat_alergi` | `riwayatAlergi` | `Json?` | ❌ | Array: `["Kacang Tanah", "Udang"]` |
 | `nomor_kontak` | `nomorKontak` | `String?` | ❌ | No. HP wali siswa |
 | `poin_xp` | `poinXp` | `Int @default(0)` | ✅ | Gamifikasi: +50 XP per evaluasi |
+| `dampak_lingkungan_gram` | `dampakLingkunganGram` | `Float @default(0)` | ✅ | Akumulasi gram food waste dicegah (visualisasi gamifikasi) |
 | `id_sekolah` | `idSekolah` | `Int? (FK)` | ❌ | Relasi ke `sekolah` |
 | `dibuat_pada` | `dibuatPada` | `DateTime` | ✅ | Auto timestamp |
 | `diubah_pada` | `diubahPada` | `DateTime @updatedAt` | ✅ | Auto update |
@@ -124,18 +127,19 @@ eksekusi_topsis (berdiri sendiri — tidak berelasi langsung)
 
 ---
 
-### Tabel 4.B: `master_bahan` (Katalog Bahan Baku Sehat)
+### Tabel 4: `bahan_baku` (Master Bahan Baku Makanan)
+
+> Dikelola oleh Admin SPPG. Fitur 21 dari Gagasan Awal.
 
 | Kolom SQL | Field Prisma | Tipe | Wajib | Keterangan |
 |:---|:---|:---|:---:|:---|
 | `id` | `id` | `Int @id` | ✅ | Primary Key |
-| `nama_bahan` | `namaBahan` | `String` | ✅ | Contoh: `"Dada Ayam Bakar Kecap"` |
-| `kategori` | `kategori` | `Enum KategoriBahan` | ✅ | `LAUK_PAUK` / `SAYURAN` / `BUAH_DAN_SUSU` / `KARBOHIDRAT` |
-| `manfaat_nutrisi` | `manfaatNutrisi` | `String` | ✅ | Contoh: `"Sumber Utama Protein & Zat Besi"` |
-| `takaran_default` | `takaranDefault` | `String` | ✅ | Contoh: `"80 gram"` |
-| `stok_tersedia` | `stokTersedia` | `Int` | ❌ | Jumlah stok bahan baku |
-| `satuan_stok` | `satuanStok` | `String` | ❌ | Contoh: `"kg"`, `"gram"` |
-| `status_sehat` | `statusSehat` | `Boolean` | ✅ | Default: `true` |
+| `nama_bahan` | `namaBahan` | `String` | ✅ | Contoh: `"Dada Ayam"` |
+| `satuan` | `satuan` | `String` | ✅ | Contoh: `"gram"`, `"ml"`, `"butir"` |
+| `kalori_per_100g` | `kaloriPer100g` | `Float?` | ❌ | Nilai gizi per 100 gram |
+| `protein_per_100g` | `proteinPer100g` | `Float?` | ❌ | Protein per 100 gram |
+| `potensi_alergen` | `potensiAlergen` | `Boolean @default(false)` | ✅ | Apakah berpotensi alergen? |
+| `harga_per_satuan` | `hargaPerSatuan` | `Int?` | ❌ | Harga dalam Rupiah per satuan |
 | `dibuat_pada` | `dibuatPada` | `DateTime` | ✅ | Auto timestamp |
 | `diubah_pada` | `diubahPada` | `DateTime @updatedAt` | ✅ | Auto update |
 
@@ -157,9 +161,9 @@ eksekusi_topsis (berdiri sendiri — tidak berelasi langsung)
 
 ---
 
-### Tabel 6: `evaluasi_menu`
+### Tabel 7: `evaluasi_menu`
 
-Sumber data **4 dari 5 kriteria TOPSIS** (C1, C2, C3, C4).
+Sumber data **4 dari 5 kriteria TOPSIS** (C1, C2, C3, C4). Ulasan teks diproses oleh NLP.
 
 | Kolom SQL | Field Prisma | Tipe | Wajib | Keterangan |
 |:---|:---|:---|:---:|:---|
@@ -170,18 +174,19 @@ Sumber data **4 dari 5 kriteria TOPSIS** (C1, C2, C3, C4).
 | `penilaian_rasa` | `penilaianRasa` | `Int?` | ❌ | Rating 1–5 → **C1 TOPSIS (Benefit)** |
 | `tingkat_kesukaan` | `tingkatKesukaan` | `Int?` | ❌ | Rating 1–5 → **C2 TOPSIS (Benefit)** |
 | `kesesuaian_porsi` | `kesesuaianPorsi` | `Int?` | ❌ | Rating 1–5 → **C3 TOPSIS (Benefit)** |
-| `persentase_sisa_makanan` | `persentaseSisa` | `Float?` | ❌ | 0.0–100.0% → **C4 TOPSIS (Cost)** |
-| `masukan_kualitatif` | `masukanKualitatif` | `String?` | ❌ | Komentar bebas |
+| `persentase_dikonsumsi` | `persentaseDikonsumsi` | `Float?` | ❌ | 0.0–100.0% makanan yang dikonsumsi → **C4 TOPSIS (Benefit)** |
+| `volume_sisa_gram` | `volumeSisaGram` | `Float?` | ❌ | Estimasi volume sisa makanan dalam gram (laporan food waste) |
+| `ulasan_teks` | `ulasanTeks` | `String?` | ❌ | Ulasan teks bebas siswa → diproses oleh **NLP Sentiment Analysis** |
 | `dibuat_pada` | `dibuatPada` | `DateTime` | ✅ | Auto timestamp |
 
 > **Constraint Unik:** `(id_pengguna, id_jadwal)` — Satu siswa = satu evaluasi per jadwal.
 
 ---
 
-### Tabel 7: `konfirmasi`
+### Tabel 8: `konfirmasi`
 
-Sumber data **kriteria C5 TOPSIS** (tingkat penolakan).  
-Formula C5: `COUNT(TIDAK_HADIR) / COUNT(total konfirmasi) × 100`
+Sumber data **kriteria C5 TOPSIS** (Tingkat Penerimaan MBG — Benefit).  
+Formula C5: `COUNT(HADIR) / COUNT(total konfirmasi) × 100` ← persentase yang **menerima** MBG
 
 | Kolom SQL | Field Prisma | Tipe | Wajib | Keterangan |
 |:---|:---|:---|:---:|:---|
@@ -280,14 +285,37 @@ Formula C5: `COUNT(TIDAK_HADIR) / COUNT(total konfirmasi) × 100`
 
 ---
 
-## 4. Enum
+## 4. Tabel Tambahan: `hasil_nlp`
+
+Hasil analisis NLP Sentiment Analysis per ulasan teks siswa.
+
+| Kolom SQL | Field Prisma | Tipe | Wajib | Keterangan |
+|:---|:---|:---|:---:|:---|
+| `id` | `id` | `Int @id` | ✅ | Primary Key |
+| `id_evaluasi` | `idEvaluasi` | `Int (FK)` | ✅ | Relasi ke `evaluasi_menu` |
+| `id_jadwal` | `idJadwal` | `Int (FK)` | ✅ | Relasi ke `jadwal_menu` |
+| `sentimen` | `sentimen` | `Enum SentimenNlp` | ✅ | `POSITIF` / `NEGATIF` / `NETRAL` |
+| `kata_kunci` | `kataKunci` | `Json?` | ❌ | Array kata kunci yang diekstrak |
+| `skor_sentimen` | `skorSentimen` | `Float?` | ❌ | Skor confidence NLP (0.0–1.0) |
+| `dibuat_pada` | `dibuatPada` | `DateTime` | ✅ | Auto timestamp |
+
+---
+
+## 5. Enum
 
 ### `Peran`
 | Nilai | Keterangan |
 |:---|:---|
-| `PENERIMA_MANFAAT` | Siswa sekolah penerima program MBG |
-| `SPPG_ADMIN` | Admin Satuan Pelayanan Pemenuhan Gizi (akses penuh) |
-| `PETUGAS` | Petugas distribusi logistik di sekolah |
+| `SUPER_ADMIN` | Administrator sistem tertinggi — kelola sekolah, Admin SPPG, Penerima Manfaat |
+| `SPPG_ADMIN` | Admin Satuan Pelayanan Pemenuhan Gizi (akses operasional penuh) |
+| `PENERIMA_MANFAAT` | Siswa/siswi sekolah penerima program MBG |
+
+### `SentimenNlp`
+| Nilai | Keterangan |
+|:---|:---|
+| `POSITIF` | Ulasan menunjukkan sentimen positif terhadap menu |
+| `NEGATIF` | Ulasan menunjukkan sentimen negatif / keluhan |
+| `NETRAL` | Ulasan bersifat netral atau informatif |
 
 ### `KategoriMenu`
 | Nilai | Keterangan |
@@ -321,15 +349,17 @@ Formula C5: `COUNT(TIDAK_HADIR) / COUNT(total konfirmasi) × 100`
 
 ---
 
-## 5. Kriteria TOPSIS & Sumber Data
+## 6. Kriteria TOPSIS & Sumber Data
+
+> ⚠️ **PENTING:** Seluruh 5 kriteria bersifat **Benefit** — semakin tinggi nilai = semakin baik kualitas menu.
 
 | Kode | Nama Kriteria | Sifat | Bobot | Sumber Kolom |
 |:---|:---|:---|:---|:---|
-| C1 | Penilaian Rasa | Benefit | 0.20 | `evaluasi_menu.penilaian_rasa` (avg) |
-| C2 | Tingkat Kesukaan | Benefit | 0.15 | `evaluasi_menu.tingkat_kesukaan` (avg) |
-| C3 | Kesesuaian Porsi | Benefit | 0.10 | `evaluasi_menu.kesesuaian_porsi` (avg) |
-| C4 | Potensi Food Waste | Cost | 0.30 | `evaluasi_menu.persentase_sisa_makanan` (avg) |
-| C5 | Tingkat Penolakan | Cost | 0.25 | `konfirmasi` COUNT(TIDAK_HADIR) / COUNT(total) |
+| C1 | Rasa | **Benefit** ↑ | 0.20 | `evaluasi_menu.penilaian_rasa` (avg, skala 1–5) |
+| C2 | Tingkat Kesukaan | **Benefit** ↑ | 0.15 | `evaluasi_menu.tingkat_kesukaan` (avg, skala 1–5) |
+| C3 | Kesesuaian Porsi | **Benefit** ↑ | 0.10 | `evaluasi_menu.kesesuaian_porsi` (avg, skala 1–5) |
+| C4 | Tingkat Konsumsi Makanan | **Benefit** ↑ | 0.30 | `evaluasi_menu.persentase_dikonsumsi` (avg, %) |
+| C5 | Tingkat Penerimaan MBG | **Benefit** ↑ | 0.25 | `konfirmasi` COUNT(HADIR) / COUNT(total) × 100 (%) |
 
 ---
 

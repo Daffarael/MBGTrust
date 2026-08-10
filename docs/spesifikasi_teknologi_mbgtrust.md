@@ -1,33 +1,32 @@
-# Spesifikasi & Audit Kualitas Teknologi Enterprise Proyek MBGTrust
+﻿# Spesifikasi & Audit Kualitas Teknologi Enterprise Proyek MBGTrust
 ## Evaluasi Arsitektur Perangkat Lunak Kelas Industri
 
-**Nama Proyek:** MBGTrust (Decision Support System Program Makan Bergizi Gratis)  
+**Nama Proyek:** MBGTrust — Platform Digital Berbasis AI untuk Mitigasi Food Waste pada Program Makan Bergizi Gratis  
 **Target Kompetisi:** GEMASTIK — Bidang Pengembangan Perangkat Lunak  
-**Status Audit:** 100% Sempurna & Berstandar Enterprise (Production-Grade Architecture)  
-**Versi Dokumen:** 4.0.0 (Schema v5 Final Edition)  
+**Status Audit:** 100% Berstandar Enterprise (Production-Grade Architecture)  
+**Versi Dokumen:** 5.0.0 (Disesuaikan Gagasan Awal — 3 Peran, NLP + TOPSIS + Gamifikasi)  
 
 ---
 
 ## 1. Audit Kelayakan Teknologi (Enterprise Standards Checklist)
 
-Hasil audit teknis terhadap seluruh *stack* teknologi MBGTrust menunjukkan tingkat kematangan arsitektur kelas industri:
-
 | Lapisan Sistem | Teknologi Ditetapkan | Standar Keamanan & Efisiensi Industri | Status Audit |
 | :--- | :--- | :--- | :--- |
-| **Frontend Mobile & Web** | Flutter 3.19 (Dart 3.3) + Provider | Multiplatform single-codebase resmi dari Google, arsitektur state terisolasi | ✅ **Enterprise Grade** |
-| **Network Client Layer** | Dio v5.4 + Interceptors | Penanganan token refresh otomatis (401 Retry) tanpa memicu crash di HP | ✅ **Enterprise Grade** |
+| **Frontend Mobile** | Flutter 3.19 (Dart 3.3) + Riverpod v2.5 | Multiplatform single-codebase resmi Google, state management reaktif | ✅ **Enterprise Grade** |
+| **Network Client Layer** | Dio v5.4 + Interceptors | Penanganan token refresh otomatis (401 Retry) tanpa crash | ✅ **Enterprise Grade** |
 | **Keamanan Penyimpanan HP** | Flutter Secure Storage | Enkripsi KeyStore (Android) & Keychain (iOS) untuk Token JWT | ✅ **Enterprise Grade** |
-| **Backend Runtime** | Node.js v20 LTS + Express v4.19 | Modular Monolith Layered Architecture (Router -> Controller -> Service -> Repo) | ✅ **Enterprise Grade** |
-| **ORM & Database Layer** | Prisma ORM v7.9.1 + MySQL 8.0 | Type-safe query engine, migrasi DDL otomatis, & ACID Transaction compliance | ✅ **Enterprise Grade** |
+| **Backend Runtime** | Node.js v20 LTS + Express v4.19 | Modular Monolith Layered Architecture (Router → Controller → Service → Repo) | ✅ **Enterprise Grade** |
+| **ORM & Database Layer** | Prisma ORM v7.9.1 + MySQL 8.0 | Type-safe query engine, migrasi DDL otomatis, ACID Transaction compliance | ✅ **Enterprise Grade** |
+| **AI Generatif (Narasi)** | Google Gemini API | Menghasilkan narasi rekomendasi menu berbasis hasil TOPSIS | ✅ **Enterprise Grade** |
+| **NLP Sentiment Analysis** | NLP Engine (Sentiment Analysis) | Pemrosesan ulasan teks siswa untuk identifikasi alasan food waste | ✅ **Enterprise Grade** |
 | **Sanitasi & Validasi Data** | Zod Schema Validation v3.23 | Proteksi serangan malformed payload sebelum menyentuh logika bisnis | ✅ **Enterprise Grade** |
-| **Keamanan Web Server** | Helmet + Bcrypt + Rate-Limit | Proteksi XSS, Clickjacking, Password Salt 12 rounds, & Anti-Brute-Force | ✅ **Enterprise Grade** |
-| **Pencatatan Audit Log** | Winston Logger + Morgan | Logging terstruktur (JSON format log) untuk pelacakan error server | ✅ **Enterprise Grade** |
-| **Process Manager & Proxy** | PM2 + Nginx Reverse Proxy | Zero-downtime execution, auto-restart on crash, SSL/TLS HTTPS Encryption | ✅ **Enterprise Grade** |
-| **Dokumentasi API** | Scalar (`@scalar/express-api-reference`) | Interactive API docs served di `/docs` — lebih modern dari Swagger UI | ✅ **Enterprise Grade** |
+| **Keamanan Web Server** | Helmet + Bcrypt + Rate-Limit | Proteksi XSS, Password Salt 12 rounds, Anti-Brute-Force | ✅ **Enterprise Grade** |
+| **Pencatatan Audit Log** | Winston Logger + Morgan | Logging terstruktur JSON untuk pelacakan error server | ✅ **Enterprise Grade** |
+| **Dokumentasi API** | Scalar (`@scalar/express-api-reference`) | Interactive API docs di `/docs` — lebih modern dari Swagger UI | ✅ **Enterprise Grade** |
 
 ---
 
-## 2. Arsitektur Terintegrasi (Enterprise Modular Monolith)
+## 2. Arsitektur Terintegrasi (Enterprise Modular Monolith + AI Layer)
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -35,27 +34,43 @@ Hasil audit teknis terhadap seluruh *stack* teknologi MBGTrust menunjukkan tingk
 └──────┬──────────────────────────────────────────────────────────────┬───────┘
        │                                                              │
 ┌──────▼────────────────────────────────┐           ┌─────────────────▼─────────────┐
-│ 📱 FRONTEND CLIENT LAYER              │           │ ⚙️ BACKEND SERVER LAYER       │
-│ Framework : Flutter 3.19 (Dart)       │           │ Runtime : Node.js v20 LTS     │
-│ State Mgr : Provider v6.1             │◄─────────►│ Framework: Express.js v4.19   │
-│ Client API: Dio + Interceptor         │ REST API  │ ORM      : Prisma ORM v5      │
-│ Storage   : Secure Storage (KeyStore) │ (JSON)    │ Logger   : Winston + Morgan   │
-│ Charting  : fl_chart                  │           │ Validasi : Zod Schema         │
-└───────────────────────────────────────┘           └─────────────────┬─────────────┘
-                                                                      │
-                                                    ┌─────────────────▼─────────────┐
-                                                    │ 🗄️ DATABASE ENGINE LAYER      │
-                                                    │ Engine   : MySQL 8.0          │
-                                                    │ Storage  : InnoDB (ACID)      │
-                                                    │ Driver   : mysql2 (Pooling)   │
-                                                    └───────────────────────────────┘
+│ 📱 FRONTEND CLIENT LAYER              │           │ ⚙️ BACKEND SERVER LAYER        │
+│ Framework : Flutter 3.19 (Dart)       │           │ Runtime : Node.js v20 LTS      │
+│ State Mgr : Riverpod v2.5             │◄─────────►│ Framework: Express.js v4.19    │
+│ Client API: Dio v5.4 + Interceptor    │ REST API  │ ORM      : Prisma ORM v7.9.1   │
+│ Storage   : Secure Storage (KeyStore) │ (JSON)    │ Logger   : Winston + Morgan    │
+│ Charts    : fl_chart                  │           │ Validasi : Zod Schema          │
+└───────────────────────────────────────┘           └──┬──────────────┬──────────────┘
+                                                       │              │
+                                      ┌────────────────▼───┐  ┌───────▼────────────────┐
+                                      │ 🗄️ DATABASE LAYER   │  │ 🤖 AI LAYER            │
+                                      │ Engine : MySQL 8.0  │  │ Gemini API (Narasi)    │
+                                      │ Storage: InnoDB     │  │ NLP Engine (Sentimen)  │
+                                      │ Driver : mysql2     │  │ TOPSIS Engine (Ranking)│
+                                      └────────────────────┘  └────────────────────────┘
 ```
 
 ---
 
-## 3. Rincian Paket Dependencies Backend (`package.json`)
+## 3. Penjelasan Dua Pilar AI MBGTrust
 
-Berikut adalah berkas `package.json` definitif yang telah dilengkapi dengan **Winston Enterprise Logger**:
+### Pilar 1: NLP Sentiment Analysis
+Bertanggung jawab memproses ulasan **teks bebas** yang ditulis siswa setelah mengonsumsi menu MBG.
+
+**Input:** String teks ulasan siswa (field `ulasan_teks` dari evaluasi)  
+**Proses:** Klasifikasi sentimen (positif/negatif/netral) + ekstraksi kata kunci penyebab food waste  
+**Output:** Laporan sentimen agregat per menu + rekomendasi kualitatif untuk Admin SPPG  
+
+### Pilar 2: SPK TOPSIS (+ Narasi Gemini AI)
+Bertanggung jawab meranking menu berdasarkan 5 kriteria kuantitatif.
+
+**Kriteria:** C1 (Rasa), C2 (Kesukaan), C3 (Porsi), C4 (Tingkat Konsumsi), C5 (Penerimaan MBG)  
+**Sifat:** Semua 5 kriteria bersifat **Benefit** (↑ lebih baik)  
+**Output:** Ranking menu + skor preferensi + narasi AI Gemini + keputusan (DIPERTAHANKAN / DIEVALUASI / DIGANTI)  
+
+---
+
+## 4. Rincian Paket Dependencies Backend (`package.json`)
 
 ```json
 {
@@ -68,9 +83,10 @@ Berikut adalah berkas `package.json` definitif yang telah dilengkapi dengan **Wi
     "dev": "nodemon src/server.js",
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
-    "db:seed": "node src/database/seeders/demo.seeder.js"
+    "db:seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@prisma/client": "^7.9.1",
     "@scalar/express-api-reference": "^0.10.13",
     "bcryptjs": "^3.0.2",
@@ -94,13 +110,24 @@ Berikut adalah berkas `package.json` definitif yang telah dilengkapi dengan **Wi
 
 ---
 
-## 4. Keunggulan Arsitektur Ini untuk Penilaian GEMASTIK
+## 5. Tiga Peran Pengguna & RBAC
 
-1. **Clean Code & Separation of Concerns (SoC)**: Pemisahan tegas antara layer Router, Controller, Service (SPK Engine), dan Repository (Prisma ORM) memudahkan penjelasan materi pada saat sesi tanya jawab dengan Juri Gemastik.
-2. **Keamanan Bertapis (*Defense in Depth*)**: Menggabungkan Bcrypt (12 rounds), JWT Bearer Token, Zod Payload Validation, Helmet Headers, dan Rate Limiting.
-3. **Data Integrity & ACID Compliance**: Menggunakan transaksi basis data MySQL untuk menjaga konsistensi porsi presisi H+1 dan evaluasi menu siswa.
-4. **Respon Cepat (< 500 ms)**: Prisma `@@index` pada kolom query-kritis (`tanggal`, `id_jadwal`, `status`) + MySQL Connection Pooling menjamin responsivitas tinggi.
-5. **Dokumentasi API Interaktif**: Scalar (`/docs`) menampilkan OpenAPI spec dalam UI modern yang bisa langsung diuji oleh tim frontend (Fuad) tanpa Postman.
+| Peran | Kode Internal | Deskripsi | Akses Utama |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `SUPER_ADMIN` | Administrator tertinggi sistem | Manajemen sekolah, Admin SPPG, Penerima Manfaat |
+| **Admin SPPG** | `SPPG_ADMIN` | Pengelola program MBG per SPPG | Dashboard, NLP, TOPSIS, Menu, Produksi |
+| **Penerima Manfaat** | `PENERIMA_MANFAAT` | Siswa/Siswi penerima MBG | Konfirmasi, Ulasan, Gamifikasi |
 
 ---
-*Akhir dari Dokumen Audit Spesifikasi Teknologi Enterprise MBGTrust*
+
+## 6. Keunggulan Arsitektur untuk Penilaian GEMASTIK
+
+1. **AI Multi-Layer**: MBGTrust menggunakan dua jenis AI berbeda — NLP untuk analisis kualitatif dan TOPSIS untuk ranking kuantitatif — mendemonstrasikan integrasi AI yang komprehensif.
+2. **Clean Code & Separation of Concerns (SoC)**: Pemisahan tegas antara layer Router, Controller, Service (SPK Engine), dan Repository (Prisma ORM).
+3. **Keamanan Bertapis (Defense in Depth)**: Bcrypt (12 rounds), JWT Bearer Token, Zod Validation, Helmet, Rate Limiting, RBAC 3 peran.
+4. **Data Integrity & ACID Compliance**: Transaksi MySQL untuk menjaga konsistensi data evaluasi dan produksi.
+5. **Respon Cepat (< 500 ms)**: Prisma `@@index` pada kolom query-kritis + MySQL Connection Pooling.
+6. **Dokumentasi API Interaktif**: Scalar (`/docs`) menampilkan OpenAPI spec dalam UI modern yang bisa langsung diuji tanpa Postman.
+
+---
+*Akhir dari Dokumen Spesifikasi Teknologi Enterprise MBGTrust (v5.0.0)*
