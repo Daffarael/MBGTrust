@@ -483,7 +483,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
-                                    'Program Makan Bergizi Gratis (MBG) Siap Disajikan',
+                                    'Paket Makan Bergizi Gratis (MBG) Hari Ini Siap Disajikan',
                                     style: TextStyle(
                                       color: Colors.white70,
                                       fontSize: 12,

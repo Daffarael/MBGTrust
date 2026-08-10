@@ -16,131 +16,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    // Gunakan mikro-task tanpa memblokir rendering UI lokal
     Future.microtask(() {
       ref.read(authProvider.notifier).checkCurrentUser();
     });
-  }
-
-  void _showEditProfileModal() {
-    final user = ref.read(authProvider).user;
-    final nameEditController =
-        TextEditingController(text: user?.namaLengkap ?? '');
-    final gradeEditController =
-        TextEditingController(text: user?.tingkatKelas ?? '');
-    final phoneEditController =
-        TextEditingController(text: user?.nomorKontak ?? '');
-    final allergyEditController =
-        TextEditingController(text: user?.riwayatAlergi.join(', ') ?? '');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (modalContext) {
-        return Container(
-          padding: EdgeInsets.only(
-            top: 24,
-            left: 24,
-            right: 24,
-            bottom: MediaQuery.of(modalContext).viewInsets.bottom + 24,
-          ),
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Edit Profil Pengguna',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(modalContext),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Nama Lengkap',
-                controller: nameEditController,
-                prefixIcon: const Icon(Icons.person_outline_rounded),
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                label: 'Tingkat Kelas',
-                controller: gradeEditController,
-                prefixIcon: const Icon(Icons.class_outlined),
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                label: 'Nomor Telepon',
-                controller: phoneEditController,
-                keyboardType: TextInputType.phone,
-                prefixIcon: const Icon(Icons.phone_android_outlined),
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                label: 'Riwayat Alergi (Pisahkan Koma)',
-                controller: allergyEditController,
-                prefixIcon: const Icon(Icons.warning_amber_rounded),
-              ),
-              const SizedBox(height: 24),
-              CustomButton(
-                text: 'Simpan Perubahan',
-                onPressed: () async {
-                  List<String> allergies = allergyEditController.text
-                      .split(',')
-                      .map((e) => e.trim())
-                      .where((e) => e.isNotEmpty)
-                      .toList();
-
-                  final repo = ref.read(authRepositoryProvider);
-                  final nav = Navigator.of(modalContext);
-                  final messenger = ScaffoldMessenger.of(context);
-                  try {
-                    await repo.updateMyProfile(
-                      namaLengkap: nameEditController.text.trim(),
-                      tingkatKelas: gradeEditController.text.trim(),
-                      riwayatAlergi: allergies,
-                      nomorKontak: phoneEditController.text.trim(),
-                    );
-                    await ref.read(authProvider.notifier).checkCurrentUser();
-                    if (mounted) {
-                      nav.pop();
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Profil pengguna berhasil diperbarui!'),
-                          backgroundColor: AppColors.success,
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(e.toString()),
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _handleLogout() {
@@ -148,31 +27,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('Konfirmasi Keluar'),
-          content:
-              const Text('Apakah Anda yakin ingin keluar dari akun MBGTrust?'),
+          title: const Text('Konfirmasi Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: const Text('Apakah Anda yakin ingin keluar dari akun ini?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Batal',
-                  style: TextStyle(color: AppColors.textSecondary)),
+              child: const Text('Batal'),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
               onPressed: () async {
                 Navigator.pop(dialogContext);
                 await ref.read(authProvider.notifier).logout();
-                if (mounted) context.go('/login');
+                if (mounted) {
+                  context.go('/login');
+                }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+              ),
               child: const Text('Keluar'),
             ),
           ],
@@ -188,17 +61,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Profil'),
+        title: const Text('Profil Penerima Manfaat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
-            tooltip: 'Edit Profil',
-            onPressed: _showEditProfileModal,
-          ),
-        ],
       ),
-      body: authState.isLoading
+      body: (authState.isLoading && user == null)
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
@@ -347,41 +213,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 20),
 
                   // Action & Policy Section
-                  if (user?.peran == 'PENERIMA_MANFAAT' || user == null)
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.info_outline_rounded, color: AppColors.primaryDark, size: 22),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Identitas resmi (Nama, NIK, Sekolah, Kelas) dikelola terpusat oleh Admin. Anda hanya dapat memperbarui preferensi & alergi makanan.',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryDark,
-                                height: 1.3,
-                              ),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.info_outline_rounded, color: AppColors.primaryDark, size: 22),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Identitas resmi (Nama, NIK, Sekolah, Kelas) dikelola terpusat oleh Admin. Anda hanya dapat memperbarui preferensi & alergi makanan.',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryDark,
+                              height: 1.3,
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  else
-                    CustomButton(
-                      text: 'Edit Profil Saya',
-                      prefixIcon: const Icon(Icons.edit_outlined,
-                          size: 20, color: AppColors.primary),
-                      isOutlined: true,
-                      borderColor: AppColors.primary,
-                      onPressed: _showEditProfileModal,
+                        ),
+                      ],
                     ),
+                  ),
                   const SizedBox(height: 12),
 
                   CustomButton(

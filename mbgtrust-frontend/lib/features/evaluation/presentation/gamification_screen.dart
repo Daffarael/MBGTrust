@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/responsive_layout.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
@@ -107,13 +106,10 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   Widget build(BuildContext context) {
     return ResponsiveLayout(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Papan Peringkat & Dampak',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.pop(),
         ),
         bottom: TabBar(
           controller: _tabController,
