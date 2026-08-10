@@ -247,9 +247,9 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol 1: Lihat Papan Peringkat & Gamifikasi
+                // Tombol 1: Lihat Papan Peringkat & Dampak
                 CustomButton(
-                  text: 'Lihat Papan Peringkat & Gamifikasi',
+                  text: 'Lihat Papan Peringkat & Dampak',
                   prefixIcon: const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 18),
                   onPressed: () {
                     Navigator.pop(dialogCtx);

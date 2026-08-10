@@ -232,7 +232,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           _buildNavItem(
             index: 1,
-            label: 'Gamifikasi',
+            label: 'Peringkat',
             icon: Icons.emoji_events_outlined,
             activeIcon: Icons.emoji_events_rounded,
           ),
