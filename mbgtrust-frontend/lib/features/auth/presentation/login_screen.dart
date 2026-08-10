@@ -146,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 4),
                       const Text(
-                        'Platform Digital Berbasis AI untuk Mitigasi Food Waste pada Program Makan Bergizi Gratis',
+                        'Platform Digital Berbasis AI untuk Mitigasi Food Waste\npada Program Makan Bergizi',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,

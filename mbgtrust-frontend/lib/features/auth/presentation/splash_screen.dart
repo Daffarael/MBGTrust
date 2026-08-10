@@ -166,7 +166,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32.0),
                 child: Text(
-                  'Platform Digital Berbasis AI untuk Mitigasi Food Waste\npada Program Makan Bergizi Gratis',
+                  'Platform Digital Berbasis AI untuk Mitigasi Food Waste\npada Program Makan Bergizi',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white70,

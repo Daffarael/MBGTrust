@@ -848,11 +848,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       {'day': 'Sel', 'status': 'done', 'label': '0% Waste'},
       {'day': 'Rab', 'status': 'done', 'label': '0% Waste'},
       {'day': 'Kam', 'status': 'done', 'label': '0% Waste'},
-      {'day': 'Jum', 'status': 'today', 'label': 'Hari Ini 🔥'},
+      {'day': 'Jum', 'status': 'today', 'label': 'Hari Ini'},
     ];
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
@@ -869,36 +869,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: const [
-                  Icon(Icons.local_fire_department_rounded, color: Color(0xFFEF4444), size: 22),
-                  SizedBox(width: 8),
-                  Text(
-                    'Streak Presensi & Piring Bersih',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+              const Icon(Icons.local_fire_department_rounded, color: Color(0xFFEF4444), size: 22),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Streak Presensi & Piring Bersih',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
-                ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFFFCA5A5)),
                 ),
-                child: const Text(
-                  '7 Hari 🔥',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFDC2626),
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.local_fire_department_rounded, size: 14, color: Color(0xFFDC2626)),
+                    SizedBox(width: 4),
+                    Text(
+                      '7 Hari',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFDC2626),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -980,7 +985,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Habiskan porsi MBG hari ini untuk mempertahankan streak 🔥 dan klaim +50 XP!',
+                    'Habiskan porsi MBG hari ini untuk mempertahankan streak presensi dan klaim +50 XP!',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
