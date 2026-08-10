@@ -166,12 +166,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32.0),
                 child: Text(
-                  'Mitigasi Food Waste & AI Nutrisi Makan Bergizi Gratis',
+                  'Platform Digital Berbasis AI untuk Mitigasi Food Waste\npada Program Makan Bergizi Gratis',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 13,
-                    height: 1.3,
+                    height: 1.4,
                   ),
                 ),
               ),
@@ -207,10 +207,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'v1.0.0 • Kementerian SPPG & BGN RI',
+                      '© 2026 MBGTrust Platform • BGN Republik Indonesia',
                       style: TextStyle(
-                        color: Colors.white38,
+                        color: Colors.white54,
                         fontSize: 11,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ],
