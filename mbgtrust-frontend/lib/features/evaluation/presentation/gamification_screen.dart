@@ -107,6 +107,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     return ResponsiveLayout(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        centerTitle: true,
         title: const Text(
           'Papan Peringkat & Dampak',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),

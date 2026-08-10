@@ -324,44 +324,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'MBGTrust',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-            ),
-            Text(
-              stats['currentDateFormatted'] as String,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: const Text(
+          'Beranda Penerima Manfaat',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.3,
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded, color: AppColors.textPrimary),
-            tooltip: 'Profil Saya',
-            onPressed: () {
-              context.push('/profile');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-            tooltip: 'Keluar',
-            onPressed: () async {
-              await ref.read(authProvider.notifier).logout();
-              if (context.mounted) context.go('/login');
-            },
-          ),
-        ],
       ),
       body: Center(
         child: Container(
