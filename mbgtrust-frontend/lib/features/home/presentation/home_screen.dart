@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +19,49 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Status alur evaluasi harian siswa
   bool _hasEvaluatedToday = false;
+
+  // Real-time Live Clock Timer
+  Timer? _clockTimer;
+  String _timeString = '';
+  String _dateString = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _updateClock();
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        _updateClock();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
+  }
+
+  void _updateClock() {
+    final now = DateTime.now();
+    final hour = now.hour.toString().padLeft(2, '0');
+    final minute = now.minute.toString().padLeft(2, '0');
+    final second = now.second.toString().padLeft(2, '0');
+
+    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    final dayName = days[now.weekday - 1];
+    final monthName = months[now.month - 1];
+
+    setState(() {
+      _timeString = '$hour:$minute:$second WIB';
+      _dateString = '$dayName, ${now.day} $monthName ${now.year}';
+    });
+  }
 
   void _showRejectionReasonModal(BuildContext context) {
     String selectedReason = 'Sakit / Kurang Sehat';
@@ -320,7 +364,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final todayMenu = MockData.todayMenu;
     final tomorrowMenu = MockData.tomorrowMenu;
-    final stats = MockData.studentDashboardStats;
 
     return Scaffold(
       appBar: AppBar(
@@ -453,12 +496,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       letterSpacing: 0.3,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'Paket Makan Bergizi Gratis (MBG) Hari Ini Siap Disajikan',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 12,
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.25),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.access_time_filled_rounded, color: AppColors.secondary, size: 14),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '$_dateString • $_timeString',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -470,43 +530,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                // Ringkasan Kehadiran Siswa
-                const Text(
-                  'Ringkasan Kehadiran & Gizi',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDashboardStatTile(
-                        label: 'Total Diterima',
-                        value: '${stats['totalPortionsReceived']} Porsi',
-                        subtitle: 'Bulan Agustus 2026',
-                        icon: Icons.restaurant_rounded,
-                        iconColor: AppColors.primary,
-                        bgColor: AppColors.primaryLight,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildDashboardStatTile(
-                        label: 'Tingkat Kehadiran',
-                        value: '${stats['attendancePercentage']}%',
-                        subtitle: 'Presensi Makan',
-                        icon: Icons.check_circle_rounded,
-                        iconColor: AppColors.success,
-                        bgColor: AppColors.primaryLight,
-                      ),
-                    ),
-                  ],
-                ),
+                // Interactive Streak Presensi & Piring Bersih Card
+                _buildInteractiveStreakCard(),
                 const SizedBox(height: 24),
 
                 // ==========================================
@@ -815,20 +842,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildDashboardStatTile({
-    required String label,
-    required String value,
-    required String subtitle,
-    required IconData icon,
-    required Color iconColor,
-    required Color bgColor,
-  }) {
+  Widget _buildInteractiveStreakCard() {
+    final List<Map<String, dynamic>> weekDays = [
+      {'day': 'Sen', 'status': 'done', 'label': '0% Waste'},
+      {'day': 'Sel', 'status': 'done', 'label': '0% Waste'},
+      {'day': 'Rab', 'status': 'done', 'label': '0% Waste'},
+      {'day': 'Kam', 'status': 'done', 'label': '0% Waste'},
+      {'day': 'Jum', 'status': 'today', 'label': 'Hari Ini 🔥'},
+    ];
+
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -836,38 +871,124 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, size: 18, color: iconColor),
+              Row(
+                children: const [
+                  Icon(Icons.local_fire_department_rounded, color: Color(0xFFEF4444), size: 22),
+                  SizedBox(width: 8),
+                  Text(
+                    'Streak Presensi & Piring Bersih',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: iconColor,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFCA5A5)),
+                ),
+                child: const Text(
+                  '7 Hari 🔥',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFDC2626),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+          const SizedBox(height: 14),
+
+          // Weekly Streak Chips
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: weekDays.map((item) {
+              final isDone = item['status'] == 'done';
+              final isToday = item['status'] == 'today';
+              return Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isToday
+                        ? AppColors.primaryLight
+                        : isDone
+                            ? AppColors.primary.withValues(alpha: 0.08)
+                            : AppColors.border.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isToday
+                          ? AppColors.primary
+                          : isDone
+                              ? AppColors.primary.withValues(alpha: 0.4)
+                              : AppColors.border,
+                      width: isToday ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        item['day'] as String,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: isToday
+                              ? AppColors.primaryDark
+                              : isDone
+                                  ? AppColors.primary
+                                  : AppColors.textLight,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Icon(
+                        isToday
+                            ? Icons.local_fire_department_rounded
+                            : isDone
+                                ? Icons.check_circle_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                        size: 18,
+                        color: isToday
+                            ? const Color(0xFFEF4444)
+                            : isDone
+                                ? AppColors.primary
+                                : AppColors.textLight,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
           ),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.textLight,
+          const SizedBox(height: 14),
+
+          // Tip / Gamification Banner
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.secondaryLight.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: const [
+                Icon(Icons.lightbulb_outline_rounded, size: 18, color: AppColors.secondaryDark),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Habiskan porsi MBG hari ini untuk mempertahankan streak 🔥 dan klaim +50 XP!',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondaryDark,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
