@@ -14,9 +14,9 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
   final List<Map<String, dynamic>> _students = [
     {
       'nisn': '3171012345670001',
-      'name': 'Budi Santoso',
-      'school': 'SDN 01 Menteng',
-      'grade': 'Kelas 5-A',
+      'name': 'Faizullatif Fajran',
+      'school': 'MAN 2 Kota Padang',
+      'grade': 'Kelas XII.FA-3',
       'status': 'Aktif',
     },
     {

@@ -229,7 +229,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           child: Text(
                             (user?.namaLengkap.isNotEmpty ?? false)
                                 ? user!.namaLengkap[0].toUpperCase()
-                                : 'B',
+                                : 'F',
                             style: const TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
@@ -239,7 +239,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          user?.namaLengkap ?? 'Budi Santoso',
+                          user?.namaLengkap ?? 'Faizullatif Fajran',
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -286,13 +286,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         _buildProfileTile(
                           icon: Icons.school_outlined,
                           label: 'Sekolah',
-                          value: user?.namaSekolah ?? 'SDN 01 Menteng',
+                          value: user?.namaSekolah ?? 'MAN 2 Kota Padang',
                         ),
                         const Divider(height: 1, color: AppColors.border),
                         _buildProfileTile(
                           icon: Icons.class_outlined,
                           label: 'Tingkat Kelas',
-                          value: user?.tingkatKelas ?? '5-A',
+                          value: user?.tingkatKelas ?? 'XII.FA-3',
                         ),
                         const Divider(height: 1, color: AppColors.border),
                         _buildProfileTile(

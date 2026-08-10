@@ -14,9 +14,9 @@ class _ManageSchoolsScreenState extends State<ManageSchoolsScreen> {
   final List<Map<String, dynamic>> _schools = [
     {
       'id': 'SCH_001',
-      'name': 'SDN 01 Menteng',
-      'npsn': '20101234',
-      'region': 'Jakarta Pusat',
+      'name': 'MAN 2 Kota Padang',
+      'npsn': '10309988',
+      'region': 'Kota Padang',
       'studentsCount': 450,
       'status': 'Aktif',
     },

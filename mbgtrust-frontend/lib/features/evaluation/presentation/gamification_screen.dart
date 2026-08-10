@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/responsive_layout.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
 
-class GamificationScreen extends StatefulWidget {
+class GamificationScreen extends ConsumerStatefulWidget {
   const GamificationScreen({super.key});
 
   @override
-  State<GamificationScreen> createState() => _GamificationScreenState();
+  ConsumerState<GamificationScreen> createState() => _GamificationScreenState();
 }
 
-class _GamificationScreenState extends State<GamificationScreen>
+class _GamificationScreenState extends ConsumerState<GamificationScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final List<Map<String, dynamic>> _leaderboard = [
     {
       'rank': 1,
-      'name': 'Budi Santoso',
-      'class': 'Kelas 5-A',
+      'name': 'Faizullatif Fajran',
+      'class': 'Kelas XII.FA-3',
       'xp': 1250,
       'wasteSavedKg': 4.2,
       'icon': Icons.workspace_premium_rounded,
@@ -135,6 +137,15 @@ class _GamificationScreenState extends State<GamificationScreen>
   }
 
   Widget _buildLeaderboardTab() {
+    final user = ref.watch(authProvider).user;
+    final studentName = user?.namaLengkap ?? 'Faizullatif Fajran';
+    final schoolName = user?.namaSekolah ?? 'MAN 2 Kota Padang';
+
+    _leaderboard[0]['name'] = studentName;
+    if (user?.tingkatKelas != null) {
+      _leaderboard[0]['class'] = 'Kelas ${user!.tingkatKelas}';
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -169,24 +180,24 @@ class _GamificationScreenState extends State<GamificationScreen>
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        'Budi Santoso',
-                        style: TextStyle(
+                        studentName,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Pahlawan Makanan Level 4 • SDN 01 Menteng',
-                        style: TextStyle(
+                        'Pahlawan Makanan Level 4 • $schoolName',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Text(
+                      const SizedBox(height: 8),
+                      const Text(
                         '1.250 XP • Peringkat #1 di Sekolah',
                         style: TextStyle(
                           color: AppColors.secondaryLight,
