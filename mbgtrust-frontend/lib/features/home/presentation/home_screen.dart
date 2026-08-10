@@ -565,9 +565,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 8),
                           const Expanded(
                             child: Text(
-                              'Apakah kamu mengonsumsi MBG hari ini?',
+                              'Sudah Makan MBG Hari Ini?',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
@@ -874,7 +874,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(width: 8),
               const Expanded(
                 child: Text(
-                  'Streak Presensi & Piring Bersih',
+                  'Konsistensi Presensi',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -985,7 +985,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Habiskan porsi MBG hari ini untuk mempertahankan streak presensi dan klaim +50 XP!',
+                    'Isi konfirmasi konsumsi & ulasan hari ini untuk menjaga konsistensi presensi dan klaim +50 XP!',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
