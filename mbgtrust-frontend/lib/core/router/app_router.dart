@@ -6,6 +6,7 @@ import '../../features/admin/presentation/super_admin_profile_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/preferences_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
+import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/distribution/presentation/distribution_tracker_screen.dart';
 import '../../features/evaluation/presentation/gamification_screen.dart';
 import '../../features/evaluation/presentation/menu_detail_screen.dart';
@@ -23,8 +24,18 @@ import '../../features/sppg/presentation/sppg_dashboard_screen.dart';
 import '../../features/sppg/presentation/sppg_profile_screen.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/',
   routes: [
+    // === SPLASH & INTRO ===
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
+
     // === AUTHENTICATION ===
     GoRoute(
       path: '/login',
