@@ -458,7 +458,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
-                                          '$schoolName • Kelas $classGrade',
+                                          schoolName,
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 11,
@@ -496,7 +496,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       letterSpacing: 0.3,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    classGrade,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(

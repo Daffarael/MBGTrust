@@ -453,12 +453,14 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                     children: const [
                       Icon(Icons.assignment_turned_in_rounded, size: 24, color: AppColors.secondaryDark),
                       SizedBox(width: 8),
-                      Text(
-                        'Pilih Alasan Tidak Mengonsumsi MBG',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                      Expanded(
+                        child: Text(
+                          'Pilih Alasan Tidak Mengonsumsi MBG',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                     ],
