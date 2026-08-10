@@ -317,6 +317,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   const SizedBox(height: 28),
 
+                  // Navigation Menu Card (Gamification & Preferences)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.border, width: 1),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          onTap: () => context.push('/profil/gamifikasi'),
+                          leading: const Icon(Icons.emoji_events_rounded, color: AppColors.secondaryDark),
+                          title: const Text('Leaderboard & Dampak Lingkungan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          subtitle: const Text('Lihat XP, Peringkat Siswa, dan Efisiensi CO2', style: TextStyle(fontSize: 11)),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                        const Divider(height: 1, color: AppColors.border),
+                        ListTile(
+                          onTap: () => context.push('/profil/preferensi'),
+                          leading: const Icon(Icons.shield_outlined, color: AppColors.primary),
+                          title: const Text('Preferensi & Alergi Makanan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          subtitle: const Text('Atur pantangan makanan & riwayat alergen', style: TextStyle(fontSize: 11)),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
                   // Action Buttons
                   CustomButton(
                     text: 'Edit Profil Saya',

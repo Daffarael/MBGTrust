@@ -553,7 +553,7 @@ class _EstimationScreenState extends State<EstimationScreen> {
                           Expanded(
                             child: _buildStatCard(
                               title: 'Efisiensi Anggaran',
-                              valueText: 'Rp 750k',
+                              valueText: 'Rp 750.000',
                               subtitle: 'Penghematan Harian',
                               icon: Icons.savings_rounded,
                               color: Colors.blue,

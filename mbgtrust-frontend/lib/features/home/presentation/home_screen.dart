@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +5,8 @@ import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/image_utils.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
+import '../../auth/presentation/profile_screen.dart';
+import '../../evaluation/presentation/gamification_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -15,172 +16,185 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  // Status alur evaluasi hari ini & konfirmasi besok
+  // Status alur evaluasi harian siswa
   bool _hasEvaluatedToday = false;
-  bool _hasConfirmedTomorrow = false;
-  final bool _didNotReceiveFoodToday = false;
 
-  bool get _isNextDayUnlocked => _hasEvaluatedToday || _didNotReceiveFoodToday;
+  void _showRejectionReasonModal(BuildContext context) {
+    String selectedReason = 'Sakit / Kurang Sehat';
+    final customNoteController = TextEditingController();
 
-  // Countdown Timer State (Target Batas: Hari ini pukul 17:00 WIB)
-  late Timer _timer;
-  Duration _remainingTime = const Duration(hours: 4, minutes: 18, seconds: 30);
+    final List<String> reasonOptions = [
+      'Sakit / Kurang Sehat',
+      'Tidak Hadir / Izin Sekolah',
+      'Alergi Makanan / Pantangan Medis',
+      'Pantangan Agama',
+      'Lainnya',
+    ];
 
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                top: 24,
+                left: 20,
+                right: 20,
+                bottom: MediaQuery.of(modalCtx).viewInsets.bottom + 24,
+              ),
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Alasan Tidak Mengonsumsi MBG',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        onPressed: () => Navigator.pop(modalCtx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Pilih alasan utama mengapa kamu tidak mengonsumsi porsi MBG hari ini:',
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: reasonOptions.map((reason) {
+                      final isSelected = selectedReason == reason;
+                      return ChoiceChip(
+                        label: Text(reason),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setModalState(() {
+                              selectedReason = reason;
+                            });
+                          }
+                        },
+                        selectedColor: AppColors.secondaryLight,
+                        labelStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? AppColors.secondaryDark : AppColors.textPrimary,
+                        ),
+                        side: BorderSide(
+                          color: isSelected ? AppColors.secondaryDark : AppColors.border,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: customNoteController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      labelText: selectedReason == 'Lainnya'
+                          ? 'Tuliskan Alasan Spesifik (Wajib)'
+                          : 'Catatan Tambahan / Alasan Lainnya (Opsional)',
+                      hintText: 'Misal: Membawa bekal sendiri dari rumah',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(modalCtx);
+                      setState(() {
+                        _hasEvaluatedToday = true;
+                      });
+                      _showRejectionSuccessDialog(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondaryDark,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Kirim Laporan Alasan',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
-  void _startCountdown() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingTime.inSeconds > 0) {
-        if (mounted) {
-          setState(() {
-            _remainingTime = _remainingTime - const Duration(seconds: 1);
-          });
-        }
-      } else {
-        _timer.cancel();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$hours Jam : $minutes Menit : $seconds Detik';
-  }
-
-  void _showQrTicketDialog(BuildContext context) {
+  void _showRejectionSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => Dialog(
+      builder: (dialogCtx) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 380),
+          constraints: const BoxConstraints(maxWidth: 400),
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '🎫 Tiket MBG Digital',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 20),
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ],
-              ),
-              const Divider(),
-              const SizedBox(height: 12),
-
-              // QR Code Graphic Placeholder
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.15),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                decoration: const BoxDecoration(
+                  color: AppColors.secondaryLight,
+                  shape: BoxShape.circle,
                 ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.qr_code_2_rounded,
-                      size: 140,
-                      color: AppColors.primaryDark,
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'STATUS: VERIFIED / TERDAFTAR PORSI',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryDark,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                child: const Icon(Icons.check_circle_rounded, color: AppColors.secondaryDark, size: 44),
               ),
-              const SizedBox(height: 16),
-
-              // Student Info Text
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Nama: ${MockData.studentProfile['name']}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Sekolah: ${MockData.studentProfile['school']} (${MockData.studentProfile['classGrade']})',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      'Target Menu: ${MockData.tomorrowMenu['tanggal_jadwal']}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               const Text(
-                'Tunjukkan QR Code ini kepada Guru Piket / Petugas Sekolah saat pengambilan porsi di sekolah.',
+                'Laporan Alasan Diterima',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Terima kasih telah memberitahukan tim dapur SPPG. Data presensi dan evaluasimu telah diperbarui.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textLight,
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
                 ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 44),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -189,8 +203,114 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  int _selectedTab = 0;
+
+  Widget _buildAnimatedBottomNavBar() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(
+            index: 0,
+            label: 'Beranda',
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home_rounded,
+          ),
+          _buildNavItem(
+            index: 1,
+            label: 'Gamifikasi',
+            icon: Icons.emoji_events_outlined,
+            activeIcon: Icons.emoji_events_rounded,
+          ),
+          _buildNavItem(
+            index: 2,
+            label: 'Profil',
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required String label,
+    required IconData icon,
+    required IconData activeIcon,
+  }) {
+    final isSelected = _selectedTab == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedTab = index;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryLight : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? AppColors.primaryDark : AppColors.textSecondary,
+              size: 22,
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.primaryDark,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_selectedTab == 1) {
+      return Scaffold(
+        body: const GamificationScreen(),
+        bottomNavigationBar: _buildAnimatedBottomNavBar(),
+      );
+    }
+
+    if (_selectedTab == 2) {
+      return Scaffold(
+        body: const ProfileScreen(),
+        bottomNavigationBar: _buildAnimatedBottomNavBar(),
+      );
+    }
+
     final authState = ref.watch(authProvider);
     final user = authState.user;
 
@@ -251,83 +371,134 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Banner Selamat Datang Siswa
+                // Banner Selamat Datang Siswa (Glassmorphic Blur Image Overlay)
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  height: 180,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryDark],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.primary.withValues(alpha: 0.25),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Stack(
+                      children: [
+                        // Background Image
+                        Positioned.fill(
+                          child: Image.network(
+                            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+                            fit: BoxFit.cover,
+                            errorBuilder: (ctx, err, stack) => Container(
+                              color: AppColors.primaryDark,
                             ),
-                            child: Text(
-                              '$schoolName • Kelas $classGrade',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        // Dark Emerald Gradient Glassmorphism Overlay
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primaryDark.withValues(alpha: 0.92),
+                                  AppColors.primary.withValues(alpha: 0.85),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
                             ),
                           ),
-                          const Icon(
-                            Icons.verified_rounded,
-                            color: Colors.white,
-                            size: 20,
+                        ),
+                        // Content Padding & Layout
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: 0.3),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.school_rounded,
+                                          color: Colors.white,
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '$schoolName • Kelas $classGrade',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.verified_rounded,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Selamat Datang,',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    studentName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'Program Makan Bergizi Gratis (MBG) Siap Disajikan',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Selamat Datang,',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        studentName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Program Makan Bergizi Gratis (MBG) Siap Disajikan!',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
                 // Ringkasan Kehadiran Siswa
                 const Text(
@@ -367,144 +538,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 24),
 
                 // ==========================================
-                // BANNER LIVE COUNTDOWN TIMER (HILANG JIKA SUDAH KONFIRMASI)
+                // PRESENSI & EVALUASI MBG HARI INI
                 // ==========================================
-                if (!_hasConfirmedTomorrow) ...[
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.secondaryDark, Colors.deepOrange],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.orange.withValues(alpha: 0.25),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.timer_rounded,
-                                      color: Colors.white, size: 20),
-                                  SizedBox(width: 8),
-                                  Flexible(
-                                    child: Text(
-                                      'Sisa Waktu Konfirmasi Besok',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                'Batas 17:00 WIB',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          _formatDuration(_remainingTime),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          'Dapur SPPG Unit Kota Padang 01 membutuhkan konfirmasi sebelum pukul 17:00 WIB.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // ==========================================
-                // KARTU 1: EVALUASI MENU HARI INI
-                // ==========================================
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        '1. Evaluasi Menu Hari Ini',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _hasEvaluatedToday
-                            ? AppColors.primaryLight
-                            : AppColors.secondaryLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        _hasEvaluatedToday ? '✓ Ulasan Dikirim' : 'Belum Diisi',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: _hasEvaluatedToday
-                              ? AppColors.primaryDark
-                              : AppColors.secondaryDark,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
                 Container(
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: _hasEvaluatedToday
-                          ? AppColors.primary
-                          : AppColors.border,
+                      color: _hasEvaluatedToday ? AppColors.primary : AppColors.border,
                       width: _hasEvaluatedToday ? 2 : 1,
                     ),
                     boxShadow: [
@@ -518,20 +560,163 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.help_outline_rounded, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Apakah kamu mengonsumsi MBG hari ini?',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          if (_hasEvaluatedToday)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                '✓ Terjawab',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+
+                      if (_hasEvaluatedToday) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.primary),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.check_circle_rounded, color: AppColors.primaryDark, size: 20),
+                              SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  '✓ Evaluasi & Presensi Hari Ini Telah Dikirim',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryDark,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  final result = await context.push<bool>(
+                                    '/menu-detail',
+                                    extra: todayMenu,
+                                  );
+                                  if (result == true) {
+                                    setState(() => _hasEvaluatedToday = true);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                                label: const Text('Ya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () {
+                                  _showRejectionReasonModal(context);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.secondaryDark,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  side: const BorderSide(color: AppColors.secondaryDark),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.highlight_off_rounded, size: 18),
+                                label: const Text('Tidak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ==========================================
+                // DETAIL MENU MBG HARI INI (PORSI STATIS)
+                // ==========================================
+                const Text(
+                  'Paket Menu MBG Hari Ini',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                         child: Image.network(
                           ImageUtils.getDirectImageUrl(todayMenu['foto_url'] as String),
-                          height: 150,
+                          height: 160,
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (ctx, err, stack) => Container(
-                            height: 150,
+                            height: 160,
                             color: AppColors.primaryLight,
                             child: const Center(
-                              child: Icon(Icons.restaurant_menu_rounded,
-                                  size: 44, color: AppColors.primary),
+                              child: Icon(Icons.restaurant_menu_rounded, size: 44, color: AppColors.primary),
                             ),
                           ),
                         ),
@@ -541,15 +726,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              todayMenu['tanggal_jadwal'] as String,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  todayMenu['tanggal_jadwal'] as String,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryLight,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text(
+                                    '1 Porsi Standar Gizi (Statis)',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Text(
                               todayMenu['nama_menu'] as String,
                               style: const TextStyle(
@@ -560,138 +765,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Kandungan: ${todayMenu['kalori_kkal']} kkal • Protein ${todayMenu['protein_gram']}g',
+                              'Kandungan Nutrisi: ${todayMenu['kalori_kkal']} kkal • Protein ${todayMenu['protein_gram']}g • Karbohidrat ${todayMenu['karbohidrat_gram']}g',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
                             ),
-                            const SizedBox(height: 16),
-
-                            // SELESAI ULASAN: HILANGKAN TOMBOL EDIT & TAMPILKAN BADGE PERMANEN (BEBAS OVERFLOW)
-                            if (_hasEvaluatedToday) ...[
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 14),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryLight,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppColors.primary),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Icon(Icons.check_circle_rounded,
-                                        color: AppColors.primaryDark, size: 20),
-                                    SizedBox(width: 8),
-                                    Flexible(
-                                      child: Text(
-                                        '✓ Evaluasi Menu Telah Dikirim',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryDark,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ] else ...[
-                              ElevatedButton.icon(
-                                onPressed: () async {
-                                  final result = await context.push<bool>(
-                                      '/menu-detail',
-                                      extra: todayMenu);
-                                  if (result == true) {
-                                    setState(() => _hasEvaluatedToday = true);
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size(double.infinity, 46),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.rate_review_rounded,
-                                    size: 18),
-                                label: const Text(
-                                  'Isi Evaluasi Menu Hari Ini',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 // ==========================================
-                // KARTU 2: KONFIRMASI KETERSEDIAAN BESOK
+                // PRATINJAU MENU BESOK (INFO SEBAB KONFIRMASI DIHAPUS)
                 // ==========================================
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        '2. Konfirmasi Ketersediaan Besok',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _isNextDayUnlocked
-                            ? AppColors.primaryLight
-                            : AppColors.background,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _isNextDayUnlocked
-                              ? AppColors.primary
-                              : AppColors.border,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _isNextDayUnlocked
-                                ? Icons.lock_open_rounded
-                                : Icons.lock_outline_rounded,
-                            size: 14,
-                            color: _isNextDayUnlocked
-                                ? AppColors.primaryDark
-                                : AppColors.textLight,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _hasConfirmedTomorrow
-                                ? 'Selesai'
-                                : (_isNextDayUnlocked ? 'Terbuka' : 'Terkunci'),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: _isNextDayUnlocked
-                                  ? AppColors.primaryDark
-                                  : AppColors.textLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                const Text(
+                  'Pratinjau Menu Esok Hari',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 12),
 
@@ -699,43 +796,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _isNextDayUnlocked
-                          ? AppColors.border
-                          : AppColors.border.withValues(alpha: 0.5),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
-                        child: ColorFiltered(
-                          colorFilter: _isNextDayUnlocked
-                              ? const ColorFilter.mode(
-                                  Colors.transparent, BlendMode.multiply)
-                              : const ColorFilter.mode(
-                                  Colors.grey, BlendMode.saturation),
-                          child: Image.network(
-                            ImageUtils.getDirectImageUrl(tomorrowMenu['foto_url'] as String),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        child: Image.network(
+                          ImageUtils.getDirectImageUrl(tomorrowMenu['foto_url'] as String),
+                          height: 140,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (ctx, err, stack) => Container(
                             height: 140,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, stack) => Container(
-                              height: 140,
-                              color: AppColors.primaryLight,
-                              child: const Center(
-                                child: Icon(Icons.restaurant_menu_rounded,
-                                    size: 44, color: AppColors.primary),
-                              ),
+                            color: AppColors.primaryLight,
+                            child: const Center(
+                              child: Icon(Icons.restaurant_menu_rounded, size: 44, color: AppColors.primary),
                             ),
                           ),
                         ),
@@ -747,105 +824,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           children: [
                             Text(
                               tomorrowMenu['tanggal_jadwal'] as String,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: _isNextDayUnlocked
-                                    ? AppColors.secondaryDark
-                                    : AppColors.textLight,
+                                color: AppColors.secondaryDark,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               tomorrowMenu['nama_menu'] as String,
-                              style: TextStyle(
-                                fontSize: 17,
+                              style: const TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: _isNextDayUnlocked
-                                    ? AppColors.textPrimary
-                                    : AppColors.textLight,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Estimasi Nutrisi: ${tomorrowMenu['kalori_kkal']} kkal • Protein ${tomorrowMenu['protein_gram']}g',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
-                                color: _isNextDayUnlocked
-                                    ? AppColors.textSecondary
-                                    : AppColors.textLight,
+                                color: AppColors.textSecondary,
                               ),
                             ),
-                            const SizedBox(height: 16),
-
-                            if (!_isNextDayUnlocked) ...[
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: const [
-                                    Icon(Icons.lock_rounded,
-                                        size: 18, color: AppColors.textLight),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        'Selesaikan ulasan makanan hari ini terlebih dahulu untuk mengonfirmasi presensi menu besok.',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ] else if (_hasConfirmedTomorrow) ...[
-                              // SUDAH KONFIRMASI: TAMPILKAN TOMBOL LIHAT QR TIKET MBG
-                              ElevatedButton.icon(
-                                onPressed: () => _showQrTicketDialog(context),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.secondaryDark,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size(double.infinity, 46),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.qr_code_2_rounded,
-                                    size: 20),
-                                label: const Text(
-                                  '🎫 Lihat QR Tiket MBG Saya',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ] else ...[
-                              ElevatedButton.icon(
-                                onPressed: () async {
-                                  final result = await context.push<dynamic>(
-                                      '/next-day-confirmation');
-                                  if (result == true || result != null) {
-                                    setState(() => _hasConfirmedTomorrow = true);
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size(double.infinity, 46),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.event_available_rounded,
-                                    size: 18),
-                                label: const Text(
-                                  'Konfirmasi Ketersediaan Besok',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
                           ],
                         ),
                       ),
@@ -857,6 +858,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: _buildAnimatedBottomNavBar(),
     );
   }
 

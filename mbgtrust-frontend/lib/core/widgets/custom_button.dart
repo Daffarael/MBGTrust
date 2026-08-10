@@ -83,8 +83,6 @@ class CustomButton extends StatelessWidget {
                   Flexible(
                     child: Text(
                       text,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,

@@ -284,7 +284,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                             ),
                             title: _isDesktopSidebarExpanded
                                 ? const Text(
-                                    'Keluar (Logout)',
+                                    'Keluar',
                                     softWrap: true,
                                     style: TextStyle(
                                       fontSize: 13,
@@ -490,7 +490,7 @@ class _SppgAdminLayoutState extends State<SppgAdminLayout> {
                   leading: const Icon(Icons.logout_rounded,
                       color: AppColors.error),
                   title: const Text(
-                    'Keluar (Logout)',
+                    'Keluar',
                     softWrap: true,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,

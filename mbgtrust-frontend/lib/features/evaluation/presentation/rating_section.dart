@@ -24,6 +24,7 @@ class RatingSection extends ConsumerStatefulWidget {
 
 class _RatingSectionState extends ConsumerState<RatingSection> {
   bool _menerimaPorsi = true;
+  String _selectedReason = 'Sakit';
   int _penilaianRasa = 5;
   int _penilaianKesukaan = 4;
   int _penilaianPorsi = 4;
@@ -39,6 +40,19 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
   }
 
   void _showPreSubmitConfirmationDialog() {
+    if (_menerimaPorsi) {
+      final words = _commentController.text.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+      if (words.length < 3) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Mohon isi ulasan teks minimal 3 kata agar membantu tim dapur.'),
+            backgroundColor: AppColors.secondaryDark,
+          ),
+        );
+        return;
+      }
+    }
+
     showDialog(
       context: context,
       builder: (confirmCtx) => AlertDialog(
@@ -147,23 +161,19 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Icon Centang Sukses Green
+                // Icon Trophy / Pahlawan Makanan
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
                     color: AppColors.primaryLight,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: AppColors.primary,
-                    size: 48,
-                  ),
+                  child: const Icon(Icons.emoji_events_rounded, color: AppColors.primary, size: 44),
                 ),
                 const SizedBox(height: 14),
 
                 const Text(
-                  '✓ Evaluasi Menu Berhasil Dikirim!',
+                  'Kamu Pahlawan Makanan Hari Ini!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
@@ -171,10 +181,10 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
 
                 const Text(
-                  'Terima kasih Faizullatif Fajran!\nUlasan Anda membantu Dapur SPPG Unit Kota Padang 01 menjaga kualitas gizi di MAN 2 Kota Padang.',
+                  'Terima kasih telah menghabiskan makanan dan memberikan masukan jujur untuk Tim Dapur SPPG.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
@@ -184,54 +194,74 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                 ),
                 const SizedBox(height: 16),
 
-                // Status Unlock Banner
+                // Banner Feedback Gamifikasi & Impact CO2
                 Container(
                   width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.lock_open_rounded,
-                          size: 16, color: AppColors.primary),
-                      SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          'Konfirmasi Ketersediaan Menu Besok Terbuka!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.stars_rounded, color: AppColors.primary, size: 20),
+                          SizedBox(width: 6),
+                          Text(
+                            '+50 Poin XP Diberikan!',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryDark,
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Divider(height: 1),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: const [
+                          Row(
+                            children: [
+                              Icon(Icons.eco_rounded, size: 14, color: AppColors.primary),
+                              SizedBox(width: 4),
+                              Text('4.2 kg CO₂ Tercegah', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(Icons.water_drop_rounded, size: 14, color: Color(0xFF0284C7)),
+                              SizedBox(width: 4),
+                              Text('120 Liter Air Dihemat', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol Utama: Lanjut Konfirmasi Menu Besok
+                // Tombol 1: Lihat Papan Peringkat & Gamifikasi
                 CustomButton(
-                  text: 'Lanjut Konfirmasi Ketersediaan Besok ➔',
-                  prefixIcon: const Icon(Icons.event_available_rounded,
-                      color: Colors.white, size: 18),
+                  text: 'Lihat Papan Peringkat & Gamifikasi',
+                  prefixIcon: const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 18),
                   onPressed: () {
                     Navigator.pop(dialogCtx);
                     if (Navigator.canPop(parentContext)) {
                       Navigator.pop(parentContext, true);
                     }
-                    parentContext.push('/next-day-confirmation');
+                    parentContext.push('/profil/gamifikasi');
                   },
                 ),
                 const SizedBox(height: 8),
 
-                // Tombol Sekunder: Kembali ke Beranda
+                // Tombol 2: Kembali ke Beranda
                 TextButton(
                   onPressed: () {
                     Navigator.pop(dialogCtx);
@@ -286,7 +316,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                 ),
               ),
               Text(
-                '$currentValue / 5 ⭐',
+                '$currentValue / 5',
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -417,36 +447,64 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                 border: Border.all(color: AppColors.border),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info_outline_rounded,
-                      size: 40, color: AppColors.secondaryDark),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Anda Tidak Menerima Makanan Hari Ini',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+                  Row(
+                    children: const [
+                      Icon(Icons.assignment_turned_in_rounded, size: 24, color: AppColors.secondaryDark),
+                      SizedBox(width: 8),
+                      Text(
+                        'Pilih Alasan Tidak Mengonsumsi MBG',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Pengisian ulasan dikunci karena Anda tidak mengonsumsi makanan hari ini. Anda dapat langsung mengonfirmasi presensi menu untuk esok hari.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                      height: 1.4,
-                    ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      'Sakit',
+                      'Tidak Hadir / Izin',
+                      'Alergi Makanan',
+                      'Pantangan Agama / Lainnya'
+                    ].map((reason) {
+                      final isSelected = _selectedReason == reason;
+                      return ChoiceChip(
+                        label: Text(reason),
+                        selected: isSelected,
+                        selectedColor: AppColors.secondaryDark,
+                        backgroundColor: AppColors.surface,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : AppColors.textPrimary,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontSize: 12,
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() => _selectedReason = reason);
+                          }
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 14),
+                  CustomTextField(
+                    label: 'Catatan Khusus (Opsional)',
+                    hint: 'Tuliskan keterangan tambahan...',
+                    controller: _commentController,
+                    maxLines: 2,
                   ),
                   const SizedBox(height: 16),
                   CustomButton(
-                    text: 'Lanjut Konfirmasi Ketersediaan Besok ➔',
-                    prefixIcon: const Icon(Icons.event_available_rounded,
-                        size: 20, color: Colors.white),
-                    onPressed: () {
-                      context.push('/next-day-confirmation');
-                    },
+                    text: 'Kirim Alasan Penolakan',
+                    prefixIcon: const Icon(Icons.send_rounded, size: 18, color: Colors.white),
+                    isLoading: _isSubmitting,
+                    onPressed: _showPreSubmitConfirmationDialog,
                   ),
                 ],
               ),
