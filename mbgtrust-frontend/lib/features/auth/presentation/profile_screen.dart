@@ -346,15 +346,42 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Action Buttons
-                  CustomButton(
-                    text: 'Edit Profil Saya',
-                    prefixIcon: const Icon(Icons.edit_outlined,
-                        size: 20, color: AppColors.primary),
-                    isOutlined: true,
-                    borderColor: AppColors.primary,
-                    onPressed: _showEditProfileModal,
-                  ),
+                  // Action & Policy Section
+                  if (user?.peran == 'PENERIMA_MANFAAT' || user == null)
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.info_outline_rounded, color: AppColors.primaryDark, size: 22),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Identitas resmi (Nama, NIK, Sekolah, Kelas) dikelola terpusat oleh Admin. Anda hanya dapat memperbarui preferensi & alergi makanan.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryDark,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    CustomButton(
+                      text: 'Edit Profil Saya',
+                      prefixIcon: const Icon(Icons.edit_outlined,
+                          size: 20, color: AppColors.primary),
+                      isOutlined: true,
+                      borderColor: AppColors.primary,
+                      onPressed: _showEditProfileModal,
+                    ),
                   const SizedBox(height: 12),
 
                   CustomButton(

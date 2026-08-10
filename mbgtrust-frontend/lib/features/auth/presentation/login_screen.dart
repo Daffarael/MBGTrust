@@ -90,258 +90,289 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Logo Icon & Header
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      shape: BoxShape.circle,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.background,
+              AppColors.primaryLight.withValues(alpha: 0.3),
+              AppColors.background,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
+              child: Container(
+                padding: const EdgeInsets.all(24.0),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: AppColors.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
-                    child: const Icon(
-                      Icons.restaurant_menu_rounded,
-                      size: 48,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Title
-                  const Text(
-                    'MBGTrust Platform',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Mitigasi Food Waste & AI Nutrisi Program Makan Bergizi Gratis',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // 3 Role Switcher
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppColors.border.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        _buildRoleTab('Penerima Manfaat', 'Siswa'),
-                        _buildRoleTab('Admin SPPG', 'Admin SPPG'),
-                        _buildRoleTab('Super Admin', 'Super Admin'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Input Identity
-                  TextFormField(
-                    controller: _identityController,
-                    keyboardType: _selectedRole == 'Penerima Manfaat'
-                        ? TextInputType.number
-                        : TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: _selectedRole == 'Penerima Manfaat'
-                          ? 'NIK / NISN Siswa'
-                          : 'Email / Username $_selectedRole',
-                      prefixIcon: Icon(
-                        _selectedRole == 'Penerima Manfaat'
-                            ? Icons.badge_outlined
-                            : Icons.email_outlined,
-                        color: AppColors.textLight,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: AppColors.primary, width: 2),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Input tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Password Input
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _isObscured,
-                    decoration: InputDecoration(
-                      labelText: 'Kata Sandi',
-                      prefixIcon: const Icon(Icons.lock_outline_rounded,
-                          color: AppColors.textLight),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isObscured
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: AppColors.textLight,
-                        ),
-                        onPressed: () =>
-                            setState(() => _isObscured = !_isObscured),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: AppColors.primary, width: 2),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Kata sandi tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Submit Button
-                  ElevatedButton(
-                    onPressed: authState.isLoading ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: authState.isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                  ],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Header Brand Logo
+                      Center(
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.primary, AppColors.primaryDark],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          )
-                        : Text(
-                            'Masuk sebagai $_selectedRole',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Info Catatan Pengelolaan Akun oleh Super Admin
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.verified_user_rounded, color: AppColors.primaryDark, size: 20),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Seluruh akun & kata sandi Penerima Manfaat dikelola terpusat oleh Super Admin (1 Penerima Manfaat = 1 Akun Resmi).',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryDark,
-                              height: 1.3,
-                            ),
+                          child: const Icon(
+                            Icons.restaurant_menu_rounded,
+                            size: 40,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                      const SizedBox(height: 16),
 
-                  // Quick Demo Accounts Selector Card
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                      const Text(
+                        'MBGTrust Platform',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          letterSpacing: 0.3,
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Mitigasi Food Waste & AI Nutrisi Makan Bergizi Gratis',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // 3 Role Switcher Bar
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: AppColors.border.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            _buildRoleTab('Penerima Manfaat', 'Siswa'),
+                            _buildRoleTab('Admin SPPG', 'Admin SPPG'),
+                            _buildRoleTab('Super Admin', 'Super Admin'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Identity Field
+                      TextFormField(
+                        controller: _identityController,
+                        keyboardType: _selectedRole == 'Penerima Manfaat'
+                            ? TextInputType.number
+                            : TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: _selectedRole == 'Penerima Manfaat'
+                              ? 'NIK / NISN Siswa Terdaftar'
+                              : 'Email / Username $_selectedRole',
+                          prefixIcon: Icon(
+                            _selectedRole == 'Penerima Manfaat'
+                                ? Icons.badge_outlined
+                                : Icons.email_outlined,
+                            color: AppColors.textLight,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Input tidak boleh kosong';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Password Field
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _isObscured,
+                        decoration: InputDecoration(
+                          labelText: 'Kata Sandi',
+                          prefixIcon: const Icon(Icons.lock_outline_rounded,
+                              color: AppColors.textLight),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isObscured
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: AppColors.textLight,
+                            ),
+                            onPressed: () =>
+                                setState(() => _isObscured = !_isObscured),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Kata sandi tidak boleh kosong';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 22),
+
+                      // Submit Button
+                      ElevatedButton(
+                        onPressed: authState.isLoading ? null : _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: authState.isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'Masuk sebagai $_selectedRole',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Info Policy Banner
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
                           children: const [
-                            Icon(Icons.touch_app_rounded,
-                                size: 16, color: AppColors.primary),
-                            SizedBox(width: 6),
-                            Text(
-                              'Pilih Akun Demo (Klik Langsung):',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                            Icon(Icons.verified_user_rounded, color: AppColors.primaryDark, size: 20),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Seluruh akun & kata sandi dikelola terpusat oleh Super Admin (1 Penerima Manfaat = 1 Akun Resmi).',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryDark,
+                                  height: 1.3,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
-                        _buildDemoAccountTile(
-                          roleKey: 'Penerima Manfaat',
-                          title: 'Siswa / Penerima Manfaat',
-                          subtitle: 'NISN: 3171012345670001 • KataSandi123!',
+                      ),
+
+                      // Quick Demo Account Selector Card
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border),
                         ),
-                        const Divider(height: 12, color: AppColors.border),
-                        _buildDemoAccountTile(
-                          roleKey: 'Admin SPPG',
-                          title: 'Pengelola / Admin SPPG',
-                          subtitle: 'Email: admin.sppg@mbgtrust.id • AdminSPPG2026!',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(Icons.touch_app_rounded,
+                                    size: 16, color: AppColors.primary),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Pilih Akun Uji Coba (Klik Sekali):',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            _buildDemoAccountTile(
+                              roleKey: 'Penerima Manfaat',
+                              title: 'Siswa / Penerima Manfaat',
+                              subtitle: 'NISN: 3171012345670001 • KataSandi123!',
+                            ),
+                            const Divider(height: 12, color: AppColors.border),
+                            _buildDemoAccountTile(
+                              roleKey: 'Admin SPPG',
+                              title: 'Pengelola / Admin SPPG',
+                              subtitle: 'Email: admin.sppg@mbgtrust.id • AdminSPPG2026!',
+                            ),
+                            const Divider(height: 12, color: AppColors.border),
+                            _buildDemoAccountTile(
+                              roleKey: 'Super Admin',
+                              title: 'Administrator Sistem (Super Admin)',
+                              subtitle: 'Email: superadmin@mbgtrust.id • SuperAdmin2026!',
+                            ),
+                          ],
                         ),
-                        const Divider(height: 12, color: AppColors.border),
-                        _buildDemoAccountTile(
-                          roleKey: 'Super Admin',
-                          title: 'Administrator Sistem (Super Admin)',
-                          subtitle: 'Email: superadmin@mbgtrust.id • SuperAdmin2026!',
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -355,11 +386,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Expanded(
       child: GestureDetector(
         onTap: () => _switchRole(roleKey),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             label,
