@@ -627,7 +627,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                 ),
                                 icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
-                                label: const Text('Ya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                label: const Text('Sudah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -645,7 +645,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                 ),
                                 icon: const Icon(Icons.highlight_off_rounded, size: 18),
-                                label: const Text('Tidak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                label: const Text('Belum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                               ),
                             ),
                           ],
@@ -657,182 +657,227 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 24),
 
                 // ==========================================
-                // DETAIL MENU MBG HARI INI (PORSI STATIS)
+                // PRATINJAU MENU ESOK HARI (GAMIFIED MYSTERY CARD)
                 // ==========================================
-                const Text(
-                  'Paket Menu MBG Hari Ini',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Pratinjau Menu Esok Hari',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _hasEvaluatedToday ? AppColors.primaryLight : const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _hasEvaluatedToday ? AppColors.primary : const Color(0xFFF59E0B),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _hasEvaluatedToday ? Icons.lock_open_rounded : Icons.lock_rounded,
+                            size: 12,
+                            color: _hasEvaluatedToday ? AppColors.primaryDark : const Color(0xFFB45309),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _hasEvaluatedToday ? 'Terbuka' : 'Terkunci',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: _hasEvaluatedToday ? AppColors.primaryDark : const Color(0xFFB45309),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
 
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                if (!_hasEvaluatedToday)
+                  // Locked Teaser Card ("Bikin Kepo!")
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await context.push<bool>(
+                        '/menu-detail',
+                        extra: todayMenu,
+                      );
+                      if (result == true) {
+                        setState(() => _hasEvaluatedToday = true);
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFFBEB), Color(0xFFFEF3C7)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                        child: Image.network(
-                          ImageUtils.getDirectImageUrl(todayMenu['foto_url'] as String),
-                          height: 160,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, stack) => Container(
-                            height: 160,
-                            color: AppColors.primaryLight,
-                            child: const Center(
-                              child: Icon(Icons.restaurant_menu_rounded, size: 44, color: AppColors.primary),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.lock_person_rounded,
+                              size: 32,
+                              color: Color(0xFFD97706),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Penasaran Menu Lezat Esok Hari?',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF92400E),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Isi konfirmasi konsumsi & ulasan MBG hari ini untuk membuka rahasia paket menu esok hari!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFB45309),
+                              height: 1.3,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final result = await context.push<bool>(
+                                '/menu-detail',
+                                extra: todayMenu,
+                              );
+                              if (result == true) {
+                                setState(() => _hasEvaluatedToday = true);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFD97706),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            icon: const Icon(Icons.key_rounded, size: 16),
+                            label: const Text(
+                              'Buka Rahasia Menu (Beri Ulasan)',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                            ),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                  )
+                else
+                  // Unlocked Menu Preview Card
+                  GestureDetector(
+                    onTap: () {
+                      context.push('/menu-detail', extra: tomorrowMenu);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                            child: Image.network(
+                              ImageUtils.getDirectImageUrl(tomorrowMenu['foto_url'] as String),
+                              height: 150,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (ctx, err, stack) => Container(
+                                height: 150,
+                                color: AppColors.primaryLight,
+                                child: const Center(
+                                  child: Icon(Icons.restaurant_menu_rounded, size: 44, color: AppColors.primary),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      tomorrowMenu['tanggal_jadwal'] as String,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.primary),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
                                 Text(
-                                  todayMenu['tanggal_jadwal'] as String,
+                                  tomorrowMenu['nama_menu'] as String,
                                   style: const TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Text(
-                                    '1 Porsi Standar Gizi (Statis)',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryDark,
-                                    ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Nutrisi: ${tomorrowMenu['kalori_kkal']} kkal • Protein ${tomorrowMenu['protein_gram']}g • Karbo ${tomorrowMenu['karbohidrat_gram']}g',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              todayMenu['nama_menu'] as String,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Kandungan Nutrisi: ${todayMenu['kalori_kkal']} kkal • Protein ${todayMenu['protein_gram']}g • Karbohidrat ${todayMenu['karbohidrat_gram']}g',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // ==========================================
-                // PRATINJAU MENU BESOK (INFO SEBAB KONFIRMASI DIHAPUS)
-                // ==========================================
-                const Text(
-                  'Pratinjau Menu Esok Hari',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                        child: Image.network(
-                          ImageUtils.getDirectImageUrl(tomorrowMenu['foto_url'] as String),
-                          height: 140,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, stack) => Container(
-                            height: 140,
-                            color: AppColors.primaryLight,
-                            child: const Center(
-                              child: Icon(Icons.restaurant_menu_rounded, size: 44, color: AppColors.primary),
-                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              tomorrowMenu['tanggal_jadwal'] as String,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.secondaryDark,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              tomorrowMenu['nama_menu'] as String,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Estimasi Nutrisi: ${tomorrowMenu['kalori_kkal']} kkal • Protein ${tomorrowMenu['protein_gram']}g',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
