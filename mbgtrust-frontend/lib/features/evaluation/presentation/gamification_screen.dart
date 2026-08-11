@@ -445,35 +445,42 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const MbgTrustLogo(size: 30),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'MBGTrust',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryDark,
+                      Expanded(
+                        child: Row(
+                          children: const [
+                            MbgTrustLogo(size: 28),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'MBGTrust',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryDark,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark, size: 14),
+                            const Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark, size: 13),
                             const SizedBox(width: 4),
                             Text(
                               _isRankedUp ? '#15 (1.402 XP)' : '#30 (922 XP)',
                               style: const TextStyle(
-                                fontSize: 11,
+                                fontSize: 10.5,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryDark,
                               ),
@@ -502,6 +509,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                     ),
                     child: TabBar(
                       controller: _tabController,
+                      labelPadding: EdgeInsets.zero,
                       indicator: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(11),
