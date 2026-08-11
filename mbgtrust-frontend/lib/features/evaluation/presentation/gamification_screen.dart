@@ -565,7 +565,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          'Siswa Teladan Gizi',
+                          'Leaderboard Gizi',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -617,11 +617,6 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 3),
-                    const Text(
-                      'Peringkat diperbarui otomatis dari presensi & piring bersih.',
-                      style: TextStyle(fontSize: 10.5, color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 8),
 
