@@ -523,7 +523,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // KARTU 3: KARTU POIN XP SISWA & TOMBOL PERINGKAT
                   // ==========================================
                   GestureDetector(
-                    onTap: () => context.go('/gamification'),
+                    onTap: () => context.go('/profil/gamifikasi'),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
