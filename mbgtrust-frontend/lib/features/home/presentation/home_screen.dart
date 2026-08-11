@@ -360,8 +360,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final user = authState.user;
 
     final studentName = user?.namaLengkap ?? MockData.studentProfile['name'];
-    final schoolName = user?.namaSekolah ?? MockData.studentProfile['school'];
-    final classGrade = user?.tingkatKelas ?? MockData.studentProfile['classGrade'];
 
     final todayMenu = MockData.todayMenu;
     final tomorrowMenu = MockData.tomorrowMenu;
@@ -426,10 +424,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(height: 6),
 
-                  // Banner Selamat Datang Siswa (Teks Utuh Tanpa Terpotong, Height 118px)
+                  // Banner Selamat Datang Siswa (Format Baru: Nama Utama + XP + Jam Live)
                   Container(
                     width: double.infinity,
-                    height: 118,
+                    height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
@@ -471,53 +469,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           // Content Padding
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Top Row: School & XP Chip
+                                // Top Row: Greeting + Student Name & XP Chip
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.school_rounded, color: Colors.white, size: 11),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '$schoolName • $classGrade',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Selamat Datang,',
+                                          style: TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          studentName,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.2,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                    // XP Chip Emas Frosted Glass
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFD97706).withValues(alpha: 0.88),
-                                        borderRadius: BorderRadius.circular(10),
+                                        color: const Color(0xFFD97706).withValues(alpha: 0.9),
+                                        borderRadius: BorderRadius.circular(12),
                                         border: Border.all(color: const Color(0xFFFDE68A), width: 1.2),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFDE68A), size: 13),
+                                          const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFDE68A), size: 14),
                                           const SizedBox(width: 4),
                                           Text(
                                             _hasEvaluatedToday ? '1.402 XP' : '922 XP',
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 10,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -527,47 +528,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ],
                                 ),
 
-                                // Middle Row: Student Name Full (No Truncation)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Selamat Datang,',
-                                      style: TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Text(
-                                      studentName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                // Bottom Row: Date & Time Pill
+                                // Bottom Row: Full Live Date & Time Pill
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.25),
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.black.withValues(alpha: 0.28),
+                                    borderRadius: BorderRadius.circular(10),
                                     border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.calendar_today_rounded, color: AppColors.secondary, size: 10),
-                                      const SizedBox(width: 4),
+                                      const Icon(Icons.access_time_filled_rounded, color: AppColors.secondary, size: 11),
+                                      const SizedBox(width: 5),
                                       Text(
-                                        _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]}' : '11 Agustus 2026',
+                                        _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:41 WIB',
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 9.5,
+                                          fontSize: 10,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -581,17 +559,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
 
                   // Interactive Streak Presensi & Piring Bersih Card
                   _buildInteractiveStreakCard(),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
 
                   // ==========================================
                   // PRESENSI & EVALUASI MBG HARI INI (WITH MINI FOOD PREVIEW)
                   // ==========================================
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
@@ -769,7 +747,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 36),
 
                 // ==========================================
                 // PRATINJAU MENU ESOK HARI (GAMIFIED MYSTERY CARD)
@@ -1128,9 +1106,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Tip / Gamification Banner Compact
+          // Tip / Gamification Banner Compact (Text Utuh Tanpa Ellipsis)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.secondaryLight.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10),
@@ -1138,16 +1116,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Row(
               children: const [
                 Icon(Icons.lightbulb_outline_rounded, size: 16, color: AppColors.secondaryDark),
-                SizedBox(width: 6),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Ulas menu hari ini untuk klaim +50 XP & jaga streak presensi!',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    'Ulas menu hari ini untuk klaim +50 XP dan jaga streak presensi!',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.bold,
                       color: AppColors.secondaryDark,
+                      height: 1.35,
                     ),
                   ),
                 ),
