@@ -754,6 +754,12 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
 
   /// Tab 3: Dampak Lingkungan (Scientific Facts & Educational Cards)
   Widget _buildImpactTab() {
+    final double userWasteSaved = _isRankedUp ? 2.3 : 1.8;
+    final double userCo2Saved = double.parse((userWasteSaved * 2.5).toStringAsFixed(2));
+    final int userWaterSaved = (userWasteSaved * 300).round();
+    final int userPortionsSaved = (userWasteSaved * 3.5).round();
+    final int userShowersSaved = (userWaterSaved / 20).round();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -774,13 +780,13 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ),
           const SizedBox(height: 16),
 
-          // 3 Metric Cards Berbasis Data Ilmiah
+          // 3 Metric Cards Berbasis Data Ilmiah Dinamis
           Row(
             children: [
               Expanded(
                 child: _buildMetricCard(
                   iconData: Icons.restaurant_rounded,
-                  title: '2.3 kg',
+                  title: '${userWasteSaved.toStringAsFixed(1)} kg',
                   subtitle: 'Food Waste Diselamatkan',
                   color: AppColors.primaryLight,
                 ),
@@ -789,7 +795,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               Expanded(
                 child: _buildMetricCard(
                   iconData: Icons.eco_rounded,
-                  title: '5.75 kg',
+                  title: '${userCo2Saved.toStringAsFixed(2)} kg',
                   subtitle: 'Emisi CO₂ Tercegah',
                   color: const Color(0xFFDCFCE7),
                 ),
@@ -798,7 +804,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               Expanded(
                 child: _buildMetricCard(
                   iconData: Icons.water_drop_rounded,
-                  title: '690 Liter',
+                  title: '$userWaterSaved Liter',
                   subtitle: 'Air Bersih Dihemat',
                   color: const Color(0xFFE0F2FE),
                 ),
@@ -807,7 +813,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ),
           const SizedBox(height: 24),
 
-          // Kartu Penjelasan Edukatif Berbasis Fakta Lingkungan
+          // Kartu Penjelasan Edukatif Berbasis Fakta Lingkungan Dinamis
           const Text(
             'Konversi Dampak Lingkungan:',
             style: TextStyle(
@@ -821,22 +827,22 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           _buildImpactEquivalencyCard(
             icon: Icons.groups_rounded,
             color: const Color(0xFFD97706),
-            title: '8 Porsi Makanan Seimbang',
-            description: 'Total 2.3 kg sisa makanan yang kamu hindari setara dengan menyelamatkan 8 porsi nutrisi seimbang bagi yang membutuhkan.',
+            title: '$userPortionsSaved Porsi Makanan Seimbang',
+            description: 'Total ${userWasteSaved.toStringAsFixed(1)} kg sisa makanan yang kamu hindari setara dengan menyelamatkan $userPortionsSaved porsi nutrisi seimbang bagi yang membutuhkan.',
           ),
           const SizedBox(height: 10),
           _buildImpactEquivalencyCard(
             icon: Icons.park_rounded,
             color: AppColors.primary,
-            title: 'Pencegahan 5.75 kg CO₂e',
+            title: 'Pencegahan ${userCo2Saved.toStringAsFixed(2)} kg CO₂e',
             description: 'Mengurangi sampah organik dari TPA mencegah emisi gas metana yang setara dengan daya serap karbon 1 pohon rindang.',
           ),
           const SizedBox(height: 10),
           _buildImpactEquivalencyCard(
             icon: Icons.shower_rounded,
             color: const Color(0xFF0284C7),
-            title: '690 Liter Air Virtual Pertanian',
-            description: 'Menjaga air yang digunakan untuk irigasi bahan pangan lokal setara dengan 34 kali alokasi kebutuhan air mandi harian.',
+            title: '$userWaterSaved Liter Air Virtual Pertanian',
+            description: 'Menjaga air yang digunakan untuk irigasi bahan pangan lokal setara dengan $userShowersSaved kali alokasi kebutuhan air mandi harian.',
           ),
 
           const SizedBox(height: 28),
