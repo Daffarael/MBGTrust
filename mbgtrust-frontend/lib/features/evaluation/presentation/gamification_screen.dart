@@ -87,6 +87,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   ];
 
   late ScrollController _scrollController;
+  int _selectedScopeIndex = 0;
 
   @override
   void initState() {
@@ -480,20 +481,27 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // Segmented Pill TabBar
+                  // Segmented Pill TabBar Modern (Material Icons + Sleek Indicator)
                   Container(
-                    height: 40,
-                    padding: const EdgeInsets.all(2),
+                    height: 44,
+                    padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: AppColors.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.02),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: TabBar(
                       controller: _tabController,
                       indicator: BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(11),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primary.withValues(alpha: 0.3),
@@ -507,9 +515,36 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                       labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                       dividerColor: Colors.transparent,
                       tabs: const [
-                        Tab(text: '🏆 Peringkat'),
-                        Tab(text: '🏅 Lencana'),
-                        Tab(text: '🌿 Dampak'),
+                        Tab(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.emoji_events_rounded, size: 15),
+                              SizedBox(width: 5),
+                              Text('Peringkat'),
+                            ],
+                          ),
+                        ),
+                        Tab(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.workspace_premium_rounded, size: 15),
+                              SizedBox(width: 5),
+                              Text('Lencana'),
+                            ],
+                          ),
+                        ),
+                        Tab(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.eco_rounded, size: 15),
+                              SizedBox(width: 5),
+                              Text('Dampak'),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -545,7 +580,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Judul Papan Peringkat Tanpa Dev Terms / Banner
+          // Header Judul Papan Peringkat & Status Skop
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -564,13 +599,19 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                 ),
-                child: const Text(
-                  '50 Siswa Teratas',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryDark,
-                  ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.military_tech_rounded, color: AppColors.primaryDark, size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      '50 Siswa Teratas',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -579,6 +620,36 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           const Text(
             'Peringkat diperbarui secara otomatis berdasarkan konsistensi presensi & piring bersih harian.',
             style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 12),
+
+          // Tombol Filter Skop Peringkat Modern (Sekolah - Kelas - Nasional)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildScopeFilterChip(
+                  icon: Icons.school_rounded,
+                  label: 'MAN 2 Kota Padang',
+                  isSelected: _selectedScopeIndex == 0,
+                  onTap: () => setState(() => _selectedScopeIndex = 0),
+                ),
+                const SizedBox(width: 8),
+                _buildScopeFilterChip(
+                  icon: Icons.class_rounded,
+                  label: 'Kelas XI IPA 1',
+                  isSelected: _selectedScopeIndex == 1,
+                  onTap: () => setState(() => _selectedScopeIndex = 1),
+                ),
+                const SizedBox(width: 8),
+                _buildScopeFilterChip(
+                  icon: Icons.public_rounded,
+                  label: 'Nasional (SPPG BGN)',
+                  isSelected: _selectedScopeIndex == 2,
+                  onTap: () => setState(() => _selectedScopeIndex = 2),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 
@@ -1061,6 +1132,57 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildScopeFilterChip({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? Colors.white : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
