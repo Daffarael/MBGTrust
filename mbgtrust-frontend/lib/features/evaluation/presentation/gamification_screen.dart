@@ -85,13 +85,21 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     },
   ];
 
+  late ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    if (widget.justEvaluated) {
-      _triggerRankClimbAnimation();
-    }
+    _scrollController = ScrollController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.justEvaluated) {
+        _triggerRankClimbAnimation();
+      } else {
+        _scrollToUserRank(30, animate: true, duration: const Duration(milliseconds: 1400));
+      }
+    });
   }
 
   void _triggerRankClimbAnimation() {
@@ -99,19 +107,50 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       _isRankedUp = false;
     });
 
-    // Menjalankan animasi perpindahan peringkat dari #30 ke #15 secara halus
-    Future.delayed(const Duration(milliseconds: 600), () {
+    // 1. Langsung ke posisi #30 terlebih dahulu
+    _scrollToUserRank(30, animate: false);
+
+    // 2. Tunda 400ms, lalu ubah ke state ranked up (#15) dan luncurkan animasi scroll meluncur naik dari #30 ke #15!
+    Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
         setState(() {
           _isRankedUp = true;
         });
+        _scrollToUserRank(15, animate: true, duration: const Duration(milliseconds: 1800));
       }
     });
+  }
+
+  void _scrollToUserRank(int rank, {bool animate = true, Duration duration = const Duration(milliseconds: 1200)}) {
+    if (!_scrollController.hasClients) return;
+
+    // Setiap ubin kartu siswa tingginya ~66px + 8px spacing = 74px
+    const double itemHeight = 74.0;
+    const double headerHeight = 70.0;
+    final double targetItemTop = headerHeight + ((rank - 1) * itemHeight);
+
+    final double viewportHeight = MediaQuery.of(context).size.height;
+    double targetOffset = targetItemTop - (viewportHeight / 2) + (itemHeight / 2);
+
+    final double maxScroll = _scrollController.position.maxScrollExtent;
+    if (targetOffset < 0) targetOffset = 0;
+    if (targetOffset > maxScroll) targetOffset = maxScroll;
+
+    if (animate) {
+      _scrollController.animateTo(
+        targetOffset,
+        duration: duration,
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      _scrollController.jumpTo(targetOffset);
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -435,6 +474,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     final currentList = _generateLeaderboardData(rankedUp: _isRankedUp);
 
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,12 +591,16 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  item['name'] as String,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: isUser ? AppColors.primaryDark : AppColors.textPrimary,
+                                Flexible(
+                                  child: Text(
+                                    item['name'] as String,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: isUser ? AppColors.primaryDark : AppColors.textPrimary,
+                                    ),
                                   ),
                                 ),
                                 if (isUser) ...[
