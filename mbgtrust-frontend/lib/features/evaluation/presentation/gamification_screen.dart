@@ -87,7 +87,9 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   ];
 
   late ScrollController _scrollController;
-  int _selectedScopeIndex = 0;
+  int _selectedScopeIndex = 0; // 0: Kelas, 1: Sekolah, 2: Kota, 3: Provinsi, 4: Nasional
+  int _currentPage = 1;
+  int _rowsPerPage = 10; // 10, 25, 50, 0 (Semua)
 
   @override
   void initState() {
@@ -428,19 +430,29 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final int currentRankNumber = _isRankedUp ? 15 : 30;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
-            // Top Header Modern (Brand Logo + Live User Rank + Segmented TabBar)
+            // Top Sticky Container (Brand Logo + Live User Rank + Dynamic Segmented Bar + Scope Filter Pills)
             Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 border: const Border(bottom: BorderSide(color: AppColors.border, width: 1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -478,7 +490,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                             const Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark, size: 13),
                             const SizedBox(width: 4),
                             Text(
-                              _isRankedUp ? '#15 (1.402 XP)' : '#30 (922 XP)',
+                              '#$currentRankNumber (${_isRankedUp ? '1.402' : '922'} XP)',
                               style: const TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.bold,
@@ -529,11 +541,72 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                       ],
                     ),
                   ),
+
+                  // Fixed Scope Filter Chips (Urutan: Kelas -> Sekolah -> Kota -> Provinsi -> Nasional)
+                  if (_tabController.index == 0) ...[
+                    const SizedBox(height: 10),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildScopeFilterChip(
+                            icon: Icons.class_rounded,
+                            label: 'Kelas XI IPA 1',
+                            isSelected: _selectedScopeIndex == 0,
+                            onTap: () => setState(() {
+                              _selectedScopeIndex = 0;
+                              _currentPage = 1;
+                            }),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildScopeFilterChip(
+                            icon: Icons.school_rounded,
+                            label: 'MAN 2 Kota Padang',
+                            isSelected: _selectedScopeIndex == 1,
+                            onTap: () => setState(() {
+                              _selectedScopeIndex = 1;
+                              _currentPage = 1;
+                            }),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildScopeFilterChip(
+                            icon: Icons.location_city_rounded,
+                            label: 'Kota Padang',
+                            isSelected: _selectedScopeIndex == 2,
+                            onTap: () => setState(() {
+                              _selectedScopeIndex = 2;
+                              _currentPage = 1;
+                            }),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildScopeFilterChip(
+                            icon: Icons.account_balance_rounded,
+                            label: 'Sumatera Barat',
+                            isSelected: _selectedScopeIndex == 3,
+                            onTap: () => setState(() {
+                              _selectedScopeIndex = 3;
+                              _currentPage = 1;
+                            }),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildScopeFilterChip(
+                            icon: Icons.public_rounded,
+                            label: 'Nasional (SPPG BGN)',
+                            isSelected: _selectedScopeIndex == 4,
+                            onTap: () => setState(() {
+                              _selectedScopeIndex = 4;
+                              _currentPage = 1;
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
 
-            // Tab Content View
+            // Tab Content View Scrollable
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -547,13 +620,55 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ],
         ),
       ),
+      // Floating Button 'Posisi Saya' (Mencari Peringkat Siswa Secara Meluncur)
+      floatingActionButton: _tabController.index == 0
+          ? Container(
+              margin: const EdgeInsets.only(bottom: 74),
+              child: FloatingActionButton.extended(
+                onPressed: () {
+                  _scrollToUserRank(currentRankNumber, animate: true, duration: const Duration(milliseconds: 1400));
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.my_location_rounded, color: Colors.white, size: 18),
+                          const SizedBox(width: 8),
+                          Text('Posisi Anda berada di peringkat #$currentRankNumber!'),
+                        ],
+                      ),
+                      backgroundColor: AppColors.primaryDark,
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.only(bottom: 90, left: 16, right: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  );
+                },
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                icon: const Icon(Icons.my_location_rounded, size: 18),
+                label: Text(
+                  'Posisi Saya (#$currentRankNumber)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ),
+            )
+          : null,
       bottomNavigationBar: const StudentBottomNavBar(currentIndex: 0),
     );
   }
 
-  /// Tab 1: Papan Peringkat (50 Siswa Teratas)
+  /// Tab 1: Papan Peringkat Siswa (Paginasi + Seluruh Siswa)
   Widget _buildLeaderboardTab() {
-    final currentList = _generateLeaderboardData(rankedUp: _isRankedUp);
+    final fullList = _generateLeaderboardData(rankedUp: _isRankedUp);
+    final int totalItems = fullList.length;
+    final int totalPages = _rowsPerPage == 0 ? 1 : (totalItems / _rowsPerPage).ceil();
+
+    final int startIndex = _rowsPerPage == 0 ? 0 : (_currentPage - 1) * _rowsPerPage;
+    final int endIndex = _rowsPerPage == 0 ? totalItems : (startIndex + _rowsPerPage).clamp(0, totalItems);
+    final currentList = fullList.sublist(startIndex, endIndex);
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -561,86 +676,29 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Judul Papan Peringkat & Status Skop
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Siswa Teladan Gizi',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.military_tech_rounded, color: AppColors.primaryDark, size: 14),
-                    SizedBox(width: 4),
-                    Text(
-                      '50 Siswa Teratas',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          // Header Judul Papan Peringkat (Bersih Tanpa '50 Siswa Teratas')
+          const Text(
+            'Siswa Teladan Gizi',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           const Text(
             'Peringkat diperbarui secara otomatis berdasarkan konsistensi presensi & piring bersih harian.',
             style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // Tombol Filter Skop Peringkat Modern (Sekolah - Kelas - Nasional)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildScopeFilterChip(
-                  icon: Icons.school_rounded,
-                  label: 'MAN 2 Kota Padang',
-                  isSelected: _selectedScopeIndex == 0,
-                  onTap: () => setState(() => _selectedScopeIndex = 0),
-                ),
-                const SizedBox(width: 8),
-                _buildScopeFilterChip(
-                  icon: Icons.class_rounded,
-                  label: 'Kelas XI IPA 1',
-                  isSelected: _selectedScopeIndex == 1,
-                  onTap: () => setState(() => _selectedScopeIndex = 1),
-                ),
-                const SizedBox(width: 8),
-                _buildScopeFilterChip(
-                  icon: Icons.public_rounded,
-                  label: 'Nasional (SPPG BGN)',
-                  isSelected: _selectedScopeIndex == 2,
-                  onTap: () => setState(() => _selectedScopeIndex = 2),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Daftar 50 Siswa dengan Animasi Perpindahan Posisi
+          // Daftar Siswa dengan Animasi Perpindahan Posisi & Paginasi
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 600),
             switchInCurve: Curves.easeOutBack,
             switchOutCurve: Curves.easeIn,
             child: ListView.separated(
-              key: ValueKey(_isRankedUp),
+              key: ValueKey('${_isRankedUp}_${_selectedScopeIndex}_${_currentPage}_$_rowsPerPage'),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: currentList.length,
@@ -755,7 +813,119 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               },
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+
+          // Kontrol Baris per Halaman & Pagination Navigation (Next / Prev)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Tampilkan per Halaman:',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    Row(
+                      children: [10, 25, 50, 0].map((size) {
+                        final bool isSelected = _rowsPerPage == size;
+                        final String label = size == 0 ? 'Semua' : '$size';
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _rowsPerPage = size;
+                                _currentPage = 1;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppColors.primary : AppColors.background,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primary : AppColors.border,
+                                ),
+                              ),
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                if (_rowsPerPage != 0 && totalPages > 1) ...[
+                  const Divider(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: _currentPage > 1
+                            ? () {
+                                setState(() {
+                                  _currentPage--;
+                                });
+                                _scrollController.animateTo(
+                                  0,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
+                              }
+                            : null,
+                        icon: const Icon(Icons.chevron_left_rounded),
+                        color: AppColors.primary,
+                      ),
+                      Text(
+                        'Halaman $_currentPage dari $totalPages ($totalItems Siswa)',
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _currentPage < totalPages
+                            ? () {
+                                setState(() {
+                                  _currentPage++;
+                                });
+                                _scrollController.animateTo(
+                                  0,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
+                              }
+                            : null,
+                        icon: const Icon(Icons.chevron_right_rounded),
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 80),
         ],
       ),
     );
