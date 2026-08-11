@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/mbgtrust_logo.dart';
 import '../../../core/widgets/student_bottom_nav_bar.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
 
@@ -425,38 +426,108 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const Text(
-          'Papan Peringkat & Dampak Gizi',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: const [
-            Tab(icon: Icon(Icons.emoji_events_rounded, size: 18), text: 'Peringkat'),
-            Tab(icon: Icon(Icons.workspace_premium_rounded, size: 18), text: 'Lencana'),
-            Tab(icon: Icon(Icons.eco_rounded, size: 18), text: 'Dampak'),
-          ],
-        ),
-      ),
       body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
+        child: Column(
           children: [
-            _buildLeaderboardTab(),
-            _buildBadgesTab(),
-            _buildImpactTab(),
+            // Top Header Modern (Brand Logo + Live User Rank + Segmented TabBar)
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                border: const Border(bottom: BorderSide(color: AppColors.border, width: 1)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const MbgTrustLogo(size: 28),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'MBGTrust',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark, size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              _isRankedUp ? '#15 (1.402 XP)' : '#30 (922 XP)',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Segmented Pill TabBar
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: TabBar(
+                      controller: _tabController,
+                      indicator: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      labelColor: Colors.white,
+                      unselectedLabelColor: AppColors.textSecondary,
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      dividerColor: Colors.transparent,
+                      tabs: const [
+                        Tab(text: '🏆 Peringkat'),
+                        Tab(text: '🏅 Lencana'),
+                        Tab(text: '🌿 Dampak'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Tab Content View
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildLeaderboardTab(),
+                  _buildBadgesTab(),
+                  _buildImpactTab(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
