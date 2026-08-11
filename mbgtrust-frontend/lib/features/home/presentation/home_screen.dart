@@ -373,7 +373,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 640),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -383,7 +383,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       Row(
                         children: [
-                          const MbgTrustLogo(size: 28),
+                          const MbgTrustLogo(size: 26),
                           const SizedBox(width: 8),
                           const Text(
                             'MBGTrust',
@@ -397,7 +397,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       // Notification Bell Button
                       Container(
-                        padding: const EdgeInsets.all(7),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           shape: BoxShape.circle,
@@ -406,7 +406,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            const Icon(Icons.notifications_outlined, size: 17, color: AppColors.textPrimary),
+                            const Icon(Icons.notifications_outlined, size: 16, color: AppColors.textPrimary),
                             Positioned(
                               right: -1,
                               top: -1,
@@ -424,12 +424,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
-                  // Banner Selamat Datang Siswa (Kompak, Elegan, Ada Chip XP)
+                  // Banner Selamat Datang Siswa (Teks Utuh Tanpa Terpotong, Height 118px)
                   Container(
                     width: double.infinity,
-                    height: 112,
+                    height: 118,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
@@ -476,10 +476,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                // Top Row: School & XP Chip
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // School & Class Tag
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                                       decoration: BoxDecoration(
@@ -502,7 +502,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         ],
                                       ),
                                     ),
-                                    // XP Chip Emas Frosted Glass
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                                       decoration: BoxDecoration(
@@ -527,61 +526,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                   ],
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+
+                                // Middle Row: Student Name Full (No Truncation)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Flexible(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Selamat Datang,',
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          Text(
-                                            studentName,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
+                                    const Text(
+                                      'Selamat Datang,',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    // Date Pill
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.25),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.calendar_today_rounded, color: AppColors.secondary, size: 10),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]}' : '11 Agustus 2026',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 9.5,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
+                                    Text(
+                                      studentName,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
+                                ),
+
+                                // Bottom Row: Date & Time Pill
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.25),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.calendar_today_rounded, color: AppColors.secondary, size: 10),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]}' : '11 Agustus 2026',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -590,17 +581,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
                   // Interactive Streak Presensi & Piring Bersih Card
                   _buildInteractiveStreakCard(),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
                   // ==========================================
                   // PRESENSI & EVALUASI MBG HARI INI (WITH MINI FOOD PREVIEW)
                   // ==========================================
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
@@ -621,20 +612,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.restaurant_menu_rounded, color: AppColors.primary, size: 20),
+                            const Icon(Icons.restaurant_menu_rounded, color: AppColors.primary, size: 18),
                             const SizedBox(width: 8),
                             const Expanded(
                               child: Text(
                                 'Sudah Makan MBG Hari Ini?',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13.5,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: AppColors.primaryLight,
                                 borderRadius: BorderRadius.circular(8),
@@ -642,7 +633,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               child: const Text(
                                 'Hari Ini',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 9.5,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primaryDark,
                                 ),
@@ -650,11 +641,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
 
-                        // Mini Preview Menu Hari Ini
+                        // Mini Preview Menu Hari Ini (Teks Menu Utuh)
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: AppColors.background,
                             borderRadius: BorderRadius.circular(12),
@@ -666,8 +657,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 borderRadius: BorderRadius.circular(10),
                                 child: MbgFoodImage(
                                   imageUrl: (todayMenu['foto_url'] as String?) ?? '',
-                                  width: 48,
-                                  height: 48,
+                                  width: 44,
+                                  height: 44,
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -676,20 +667,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      todayMenu['nama_menu'] as String? ?? 'Nasi Daging Sapi Lada Hitam & Capcay',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                      todayMenu['nama_menu'] as String? ?? 'Nasi Ayam Bakar Kecap & Tumis Buncis',
+                                      maxLines: 2,
                                       style: const TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textPrimary,
+                                        height: 1.2,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       'Nutrisi: ${todayMenu['kalori_kkal']} kkal • Protein ${todayMenu['protein_gram']}g • Karbo ${todayMenu['karbohidrat_gram']}g',
                                       style: const TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 9.5,
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
@@ -699,12 +690,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
 
                         if (_hasEvaluatedToday) ...[
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
                             decoration: BoxDecoration(
                               color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(12),
@@ -719,7 +710,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   child: Text(
                                     'Evaluasi & Presensi Hari Ini Telah Dikirim (+50 XP)',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 11.5,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryDark,
                                     ),
@@ -745,12 +736,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    padding: const EdgeInsets.symmetric(vertical: 9),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                                  icon: const Icon(Icons.check_circle_outline_rounded, size: 17),
                                   label: const Text('Sudah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                 ),
                               ),
@@ -762,13 +753,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   },
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.secondaryDark,
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    padding: const EdgeInsets.symmetric(vertical: 9),
                                     side: const BorderSide(color: AppColors.secondaryDark),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  icon: const Icon(Icons.highlight_off_rounded, size: 18),
+                                  icon: const Icon(Icons.highlight_off_rounded, size: 17),
                                   label: const Text('Belum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                 ),
                               ),
@@ -778,8 +769,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                 // ==========================================
                 // PRATINJAU MENU ESOK HARI (GAMIFIED MYSTERY CARD)
