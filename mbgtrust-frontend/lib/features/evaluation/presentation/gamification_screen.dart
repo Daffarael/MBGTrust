@@ -94,7 +94,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       if (mounted) setState(() {});
     });
@@ -550,7 +550,13 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                         _buildDynamicTabItem(
                           index: 2,
                           icon: Icons.eco_rounded,
-                          label: 'Dampak & FAQ',
+                          label: 'Dampak',
+                        ),
+                        const SizedBox(width: 4),
+                        _buildDynamicTabItem(
+                          index: 3,
+                          icon: Icons.help_outline_rounded,
+                          label: 'FAQ',
                         ),
                       ],
                     ),
@@ -682,7 +688,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               ),
             ),
 
-            // Tab Content View Scrollable (Langsung Murni Leaderboard di Bawah Filter)
+            // Tab Content View Scrollable
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -690,6 +696,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                   _buildLeaderboardTab(),
                   _buildBadgesTab(),
                   _buildImpactTab(),
+                  _buildFaqTab(),
                 ],
               ),
             ),
@@ -1213,18 +1220,34 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
 
-          // Seksi FAQ & Edukasi MBG
+  /// Tab 4: Pusat Edukasi & Tanya Jawab MBG (FAQ)
+  Widget _buildFaqTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           const Text(
             'Pertanyaan Sering Diajukan (FAQ)',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 4),
+          const Text(
+            'Pusat informasi resmi seputar pengumpulan poin XP, lencana, dampak lingkungan, dan penyesuaian porsi gizi.',
+            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 16),
+
           _buildFaqItem(
             question: 'Bagaimana cara mengumpulkan XP dan naik peringkat?',
             answer: 'XP didapatkan secara otomatis setiap kali kamu mengonfirmasi presensi makan siang (+50 XP), menghabiskan porsi tanpa sisa (+50 XP), dan mengirim ulasan evaluasi harian.',
@@ -1243,6 +1266,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           _buildFaqItem(
             question: 'Bagaimana jika saya memiliki alergi terhadap menu hari ini?',
             answer: 'Kamu dapat memperbarui preferensi alergen di menu Profil > Preferensi Alergen. Dapur SPPG akan menyesuaikan variasi menu aman khusus untuk kebutuhan medismu.',
+          ),
+          const SizedBox(height: 8),
+          _buildFaqItem(
+            question: 'Kapan peringkat diperbarui?',
+            answer: 'Peringkat diperbarui secara real-time setiap kali kamu atau teman sekelasmu mengirimkan evaluasi makan siang harian.',
           ),
           const SizedBox(height: 80),
         ],
