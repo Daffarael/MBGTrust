@@ -377,367 +377,408 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Atas Modern (Pengganti AppBar Polos)
+                  // Header Atas Bersih (Logo MBGTrust & Notifikasi)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          const MbgTrustLogo(size: 32),
+                          const MbgTrustLogo(size: 30),
                           const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-                            ),
-                            child: Text(
-                              schoolName,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryDark,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          // Live Time Pill
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.access_time_filled_rounded, color: AppColors.primary, size: 13),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _timeString.isNotEmpty ? _timeString.split(' ')[0] : '12:00',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Notification Icon
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                const Icon(Icons.notifications_outlined, size: 18, color: AppColors.textPrimary),
-                                Positioned(
-                                  right: -1,
-                                  top: -1,
-                                  child: Container(
-                                    width: 7,
-                                    height: 7,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.error,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                // Banner Selamat Datang Siswa (Glassmorphic Blur Image Overlay)
-                Container(
-                  width: double.infinity,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.25),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Stack(
-                      children: [
-                        // Background Image
-                        Positioned.fill(
-                          child: Image.network(
-                            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-                            fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, stack) => Container(
+                          const Text(
+                            'MBGTrust',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
                               color: AppColors.primaryDark,
                             ),
                           ),
-                        ),
-                        // Dark Emerald Gradient Glassmorphism Overlay
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primaryDark.withValues(alpha: 0.92),
-                                  AppColors.primary.withValues(alpha: 0.85),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Content Padding & Layout
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(alpha: 0.3),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.school_rounded,
-                                          color: Colors.white,
-                                          size: 14,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          schoolName,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.verified_rounded,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Selamat Datang,',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    studentName,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    classGrade,
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.25),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(Icons.access_time_filled_rounded, color: AppColors.secondary, size: 14),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          '$_dateString • $_timeString',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            letterSpacing: 0.3,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Interactive Streak Presensi & Piring Bersih Card
-                _buildInteractiveStreakCard(),
-                const SizedBox(height: 24),
-
-                // ==========================================
-                // PRESENSI & EVALUASI MBG HARI INI
-                // ==========================================
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _hasEvaluatedToday ? AppColors.primary : AppColors.border,
-                      width: _hasEvaluatedToday ? 2 : 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.help_outline_rounded, color: AppColors.primary, size: 20),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              'Sudah Makan MBG Hari Ini?',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
-                      const SizedBox(height: 14),
-
-                      if (_hasEvaluatedToday) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.primary),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.check_circle_rounded, color: AppColors.primaryDark, size: 20),
-                              SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  'Evaluasi & Presensi Hari Ini Telah Dikirim',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                      // Notification Bell Button
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.border),
                         ),
-                      ] else ...[
-                        Row(
+                        child: Stack(
+                          clipBehavior: Clip.none,
                           children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  final result = await context.push<bool>(
-                                    '/menu-detail',
-                                    extra: todayMenu,
-                                  );
-                                  if (result == true) {
-                                    setState(() => _hasEvaluatedToday = true);
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
+                            const Icon(Icons.notifications_outlined, size: 18, color: AppColors.textPrimary),
+                            Positioned(
+                              right: -1,
+                              top: -1,
+                              child: Container(
+                                width: 7,
+                                height: 7,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.error,
+                                  shape: BoxShape.circle,
                                 ),
-                                icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
-                                label: const Text('Sudah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: () {
-                                  _showRejectionReasonModal(context);
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.secondaryDark,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  side: const BorderSide(color: AppColors.secondaryDark),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.highlight_off_rounded, size: 18),
-                                label: const Text('Belum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                               ),
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 12),
+
+                  // Banner Selamat Datang Siswa (Kompak, Elegan, Ada Chip XP)
+                  Container(
+                    width: double.infinity,
+                    height: 125,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                          blurRadius: 14,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          // Background Image
+                          Positioned.fill(
+                            child: Image.network(
+                              'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+                              fit: BoxFit.cover,
+                              errorBuilder: (ctx, err, stack) => Container(
+                                color: AppColors.primaryDark,
+                              ),
+                            ),
+                          ),
+                          // Dark Emerald Gradient Overlay
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.primaryDark.withValues(alpha: 0.94),
+                                    AppColors.primary.withValues(alpha: 0.88),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Content Padding
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // School & Class Tag
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.school_rounded, color: Colors.white, size: 12),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '$schoolName • $classGrade',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // XP Chip Emas Frosted Glass
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFD97706).withValues(alpha: 0.85),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: const Color(0xFFFDE68A), width: 1.2),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFDE68A), size: 14),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            _hasEvaluatedToday ? '1.402 XP' : '922 XP',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Selamat Datang,',
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          Text(
+                                            studentName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // Date Pill
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withValues(alpha: 0.25),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.calendar_today_rounded, color: AppColors.secondary, size: 11),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]}' : '11 Agustus 2026',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Interactive Streak Presensi & Piring Bersih Card
+                  _buildInteractiveStreakCard(),
+                  const SizedBox(height: 12),
+
+                  // ==========================================
+                  // PRESENSI & EVALUASI MBG HARI INI (WITH MINI FOOD PREVIEW)
+                  // ==========================================
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: _hasEvaluatedToday ? AppColors.primary : AppColors.border,
+                        width: _hasEvaluatedToday ? 1.5 : 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.restaurant_menu_rounded, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Text(
+                                'Sudah Makan MBG Hari Ini?',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'Hari Ini',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryDark,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Mini Preview Menu Hari Ini
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: MbgFoodImage(
+                                  imageUrl: (todayMenu['foto_url'] as String?) ?? '',
+                                  width: 48,
+                                  height: 48,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      todayMenu['nama_menu'] as String? ?? 'Nasi Daging Sapi Lada Hitam & Capcay',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Nutrisi: ${todayMenu['kalori_kkal']} kkal • Protein ${todayMenu['protein_gram']}g • Karbo ${todayMenu['karbohidrat_gram']}g',
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        if (_hasEvaluatedToday) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.primary),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.check_circle_rounded, color: AppColors.primaryDark, size: 18),
+                                SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    'Evaluasi & Presensi Hari Ini Telah Dikirim (+50 XP)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ] else ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    final result = await context.push<bool>(
+                                      '/menu-detail',
+                                      extra: todayMenu,
+                                    );
+                                    if (result == true) {
+                                      setState(() => _hasEvaluatedToday = true);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                                  label: const Text('Sudah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () {
+                                    _showRejectionReasonModal(context);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.secondaryDark,
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    side: const BorderSide(color: AppColors.secondaryDark),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.highlight_off_rounded, size: 18),
+                                  label: const Text('Belum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                 const SizedBox(height: 24),
 
                 // ==========================================
@@ -1097,23 +1138,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Tip / Gamification Banner
+          // Tip / Gamification Banner Compact
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: AppColors.secondaryLight.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: const [
-                Icon(Icons.lightbulb_outline_rounded, size: 18, color: AppColors.secondaryDark),
-                SizedBox(width: 8),
+                Icon(Icons.lightbulb_outline_rounded, size: 16, color: AppColors.secondaryDark),
+                SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Isi konfirmasi konsumsi & ulasan hari ini untuk menjaga konsistensi presensi dan klaim +50 XP!',
+                    'Ulas menu hari ini untuk klaim +50 XP & jaga streak presensi!',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
                       color: AppColors.secondaryDark,
                     ),
                   ),
