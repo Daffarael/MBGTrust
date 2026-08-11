@@ -129,29 +129,41 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   }
 
   void _scrollToUserRank(int rank, {bool animate = true, Duration duration = const Duration(milliseconds: 1200)}) {
-    if (!_scrollController.hasClients) return;
-
-    // Setiap ubin kartu siswa tingginya ~66px + 8px spacing = 74px
-    const double itemHeight = 74.0;
-    const double headerHeight = 70.0;
-    final double targetItemTop = headerHeight + ((rank - 1) * itemHeight);
-
-    final double viewportHeight = MediaQuery.of(context).size.height;
-    double targetOffset = targetItemTop - (viewportHeight / 2) + (itemHeight / 2);
-
-    final double maxScroll = _scrollController.position.maxScrollExtent;
-    if (targetOffset < 0) targetOffset = 0;
-    if (targetOffset > maxScroll) targetOffset = maxScroll;
-
-    if (animate) {
-      _scrollController.animateTo(
-        targetOffset,
-        duration: duration,
-        curve: Curves.easeInOutCubic,
-      );
-    } else {
-      _scrollController.jumpTo(targetOffset);
+    // 1. Otomatis beralih ke halaman paginasi tempat posisi peringkat siswa berada
+    if (_rowsPerPage > 0) {
+      final int targetPage = (rank / _rowsPerPage).ceil();
+      if (_currentPage != targetPage) {
+        setState(() {
+          _currentPage = targetPage;
+        });
+      }
     }
+
+    // 2. Setelah halaman di-render, luncurkan scroll ke ubin kartu siswa pada halaman tersebut
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+
+      final int startIndex = _rowsPerPage == 0 ? 0 : (_currentPage - 1) * _rowsPerPage;
+      final int itemIndexInPage = (rank - 1 - startIndex).clamp(0, _rowsPerPage > 0 ? _rowsPerPage - 1 : 49);
+
+      const double itemHeight = 74.0;
+      final double targetItemTop = itemIndexInPage * itemHeight;
+
+      final double maxScroll = _scrollController.position.maxScrollExtent;
+      double targetOffset = targetItemTop;
+      if (targetOffset < 0) targetOffset = 0;
+      if (targetOffset > maxScroll) targetOffset = maxScroll;
+
+      if (animate) {
+        _scrollController.animateTo(
+          targetOffset,
+          duration: duration,
+          curve: Curves.easeInOutCubic,
+        );
+      } else {
+        _scrollController.jumpTo(targetOffset);
+      }
+    });
   }
 
   @override
@@ -454,15 +466,15 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Row 1: Logo MBGTrust & User Rank Badge
+                  // Row 1: Logo MBGTrust & User Rank Badge (Konsisten 100% dengan Profile & Home)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Row(
                           children: const [
-                            MbgTrustLogo(size: 28),
-                            SizedBox(width: 6),
+                            MbgTrustLogo(size: 30),
+                            SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 'MBGTrust',
@@ -479,7 +491,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(12),
@@ -488,12 +500,12 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark, size: 13),
+                            const Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark, size: 14),
                             const SizedBox(width: 4),
                             Text(
                               '#$currentRankNumber (${_isRankedUp ? '1.402' : '922'} XP)',
                               style: const TextStyle(
-                                fontSize: 10.5,
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryDark,
                               ),
