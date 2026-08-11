@@ -491,10 +491,10 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // Segmented Pill TabBar Modern (Material Icons + Sleek Indicator)
+                  // Dynamic Segmented Bar (Tab Aktif Flex 2 Ekspansi Ikon + Teks, Tab Non-Aktif Flex 1 Hanya Ikon)
                   Container(
-                    height: 44,
-                    padding: const EdgeInsets.all(3),
+                    height: 46,
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: BorderRadius.circular(14),
@@ -507,60 +507,24 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                         ),
                       ],
                     ),
-                    child: TabBar(
-                      controller: _tabController,
-                      labelPadding: EdgeInsets.zero,
-                      indicator: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(11),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      labelColor: Colors.white,
-                      unselectedLabelColor: AppColors.textSecondary,
-                      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                      dividerColor: Colors.transparent,
-                      tabs: [
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.emoji_events_rounded, size: 16),
-                              if (_tabController.index == 0) ...[
-                                const SizedBox(width: 5),
-                                const Text('Peringkat'),
-                              ],
-                            ],
-                          ),
+                    child: Row(
+                      children: [
+                        _buildDynamicTabItem(
+                          index: 0,
+                          icon: Icons.emoji_events_rounded,
+                          label: 'Peringkat',
                         ),
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.workspace_premium_rounded, size: 16),
-                              if (_tabController.index == 1) ...[
-                                const SizedBox(width: 5),
-                                const Text('Lencana'),
-                              ],
-                            ],
-                          ),
+                        const SizedBox(width: 4),
+                        _buildDynamicTabItem(
+                          index: 1,
+                          icon: Icons.workspace_premium_rounded,
+                          label: 'Lencana',
                         ),
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.eco_rounded, size: 16),
-                              if (_tabController.index == 2) ...[
-                                const SizedBox(width: 5),
-                                const Text('Dampak'),
-                              ],
-                            ],
-                          ),
+                        const SizedBox(width: 4),
+                        _buildDynamicTabItem(
+                          index: 2,
+                          icon: Icons.eco_rounded,
+                          label: 'Dampak',
                         ),
                       ],
                     ),
@@ -1199,6 +1163,67 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDynamicTabItem({
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
+    final bool isSelected = _tabController.index == index;
+
+    return Expanded(
+      flex: isSelected ? 2 : 1,
+      child: GestureDetector(
+        onTap: () {
+          _tabController.animateTo(index);
+          setState(() {});
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: isSelected ? Colors.white : AppColors.textSecondary,
+              ),
+              if (isSelected) ...[
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
