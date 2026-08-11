@@ -377,34 +377,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Atas Bersih (Logo MBGTrust & Notifikasi)
-                  // Header Atas Modern (Konsisten 100% dengan Profil & Peringkat)
-                  // Header Atas Modern (Logo MBGTrust + Frosted Gold XP Badge + Bell)
-                  // Header Atas Modern (Logo MBGTrust + Bell Notifikasi)
-                  Row(
-                    children: const [
-                      MbgTrustLogo(size: 30),
-                      SizedBox(width: 8),
-                      Text(
-                        'MBGTrust',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
                   // ==========================================
-                  // KARTU 1: BANNER SELAMAT DATANG SISWA
+                  // KARTU HERO TERPADU (FULL EMERALD GRADIENT)
+                  // Menggabungkan Header, Salam Datang, Waktu Live, & Poin XP
                   // ==========================================
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       gradient: const LinearGradient(
                         colors: [
                           AppColors.primaryDark,
@@ -415,8 +396,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.22),
-                          blurRadius: 10,
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                          blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
                       ],
@@ -424,151 +405,166 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Selamat Datang,',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          studentName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // ==========================================
-                  // KARTU 2: DEDICATED CARD TANGGAL & WAKTU LIVE
-                  // ==========================================
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 9.0),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.border),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.access_time_filled_rounded, color: AppColors.primary, size: 16),
-                        const SizedBox(width: 8),
-                        Text(
-                          _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:58 WIB',
-                          style: const TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // ==========================================
-                  // KARTU 3: KARTU POIN XP SISWA & TOMBOL PERINGKAT
-                  // ==========================================
-                  GestureDetector(
-                    onTap: () => context.go('/profil/gamifikasi'),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.border),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFEF3C7),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFFFDE68A)),
-                                ),
-                                child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 20),
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Total Poin XP',
-                                    style: TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textSecondary,
-                                    ),
+                        // Sub-Baris 1: Menyapa Nama Siswa & Logo Glassmorphic MBGTrust
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Selamat Datang,',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  const SizedBox(height: 1),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  studentName,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                              ),
+                              child: Row(
+                                children: const [
+                                  MbgTrustLogo(size: 20),
+                                  SizedBox(width: 5),
                                   Text(
-                                    _hasEvaluatedToday ? '1.402 XP' : '922 XP',
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                    'MBGTrust',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ],
                               ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Sub-Baris 2: Tanggal & Waktu WIB Live Pill
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.access_time_filled_rounded, color: Colors.white, size: 14),
+                              const SizedBox(width: 6),
+                              Text(
+                                _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:58 WIB',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ],
                           ),
-                          // Tombol Menuju Halaman Peringkat
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                            ),
-                            child: Row(
-                              children: const [
-                                Text(
-                                  'Peringkat',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryDark,
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(color: Colors.white24, height: 1),
+                        const SizedBox(height: 12),
+
+                        // Sub-Baris 3: Total Poin XP & Tombol Peringkat
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFEF3C7),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: const Color(0xFFFDE68A)),
                                   ),
+                                  child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 18),
                                 ),
-                                SizedBox(width: 3),
-                                Icon(Icons.chevron_right_rounded, color: AppColors.primaryDark, size: 16),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Total Poin XP',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 1),
+                                    Text(
+                                      _hasEvaluatedToday ? '1.402 XP' : '922 XP',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
+                            // Tombol Menuju Halaman Peringkat
+                            InkWell(
+                              onTap: () => context.go('/profil/gamifikasi'),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: const [
+                                    Text(
+                                      'Peringkat',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryDark,
+                                      ),
+                                    ),
+                                    SizedBox(width: 3),
+                                    Icon(Icons.chevron_right_rounded, color: AppColors.primaryDark, size: 16),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
                   // Interactive Streak Presensi Card
                   _buildInteractiveStreakCard(),
