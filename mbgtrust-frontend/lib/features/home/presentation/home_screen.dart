@@ -576,46 +576,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ],
                         ),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.eco_rounded, color: AppColors.primaryDark, size: 13),
+                              SizedBox(width: 5),
+                              Text(
+                                'Lencana Piring Bersih',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
                               ),
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.eco_rounded, color: AppColors.primaryDark, size: 11),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Piring Bersih',
-                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEF2F2),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFFCA5A5)),
-                              ),
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.local_fire_department_rounded, color: Color(0xFFDC2626), size: 11),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    '7 Hari',
-                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
