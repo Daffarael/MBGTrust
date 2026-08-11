@@ -376,12 +376,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Atas Bersih (Logo MBGTrust & Notifikasi)
+                  // Header Atas Modern (Konsisten 100% dengan Profil & Peringkat)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          const MbgTrustLogo(size: 26),
+                          const MbgTrustLogo(size: 30),
                           const SizedBox(width: 8),
                           const Text(
                             'MBGTrust',
@@ -395,22 +396,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       // Notification Bell Button
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           shape: BoxShape.circle,
                           border: Border.all(color: AppColors.border),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            const Icon(Icons.notifications_outlined, size: 16, color: AppColors.textPrimary),
+                            const Icon(Icons.notifications_outlined, size: 18, color: AppColors.textPrimary),
                             Positioned(
                               right: -1,
                               top: -1,
                               child: Container(
-                                width: 6,
-                                height: 6,
+                                width: 7,
+                                height: 7,
                                 decoration: const BoxDecoration(
                                   color: AppColors.error,
                                   shape: BoxShape.circle,
@@ -422,7 +430,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
 
                   // Banner Selamat Datang Siswa (Format Baru: Nama Utama + XP + Jam Live)
                   Container(

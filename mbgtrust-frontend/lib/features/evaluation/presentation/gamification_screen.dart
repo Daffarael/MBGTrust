@@ -443,7 +443,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                     children: [
                       Row(
                         children: [
-                          const MbgTrustLogo(size: 28),
+                          const MbgTrustLogo(size: 30),
                           const SizedBox(width: 8),
                           const Text(
                             'MBGTrust',
