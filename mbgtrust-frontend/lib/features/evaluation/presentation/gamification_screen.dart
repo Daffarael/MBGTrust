@@ -437,9 +437,9 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       body: SafeArea(
         child: Column(
           children: [
-            // Top Sticky Container (Brand Logo + Live User Rank + Dynamic Segmented Bar + Scope Filter Pills)
+            // Top Sticky Container (Brand Logo + Live User Rank + Dynamic Segmented Bar + Title & Locator + Scope Filter Pills)
             Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 border: const Border(bottom: BorderSide(color: AppColors.border, width: 1)),
@@ -454,6 +454,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Row 1: Logo MBGTrust & User Rank Badge
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -502,11 +503,12 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  // Dynamic Segmented Bar (Tab Aktif Flex 2 Ekspansi Ikon + Teks, Tab Non-Aktif Flex 1 Hanya Ikon)
+                  const SizedBox(height: 8),
+
+                  // Row 2: Dynamic Segmented Bar
                   Container(
-                    height: 46,
-                    padding: const EdgeInsets.all(4),
+                    height: 44,
+                    padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: BorderRadius.circular(14),
@@ -542,9 +544,76 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                     ),
                   ),
 
-                  // Fixed Scope Filter Chips (Urutan: Kelas -> Sekolah -> Kota -> Provinsi -> Nasional)
+                  // Fixed Title, Description & Scope Filter Chips (Hanya saat Tab Peringkat Aktif)
                   if (_tabController.index == 0) ...[
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
+                    // Row 3: Title & Locator Button 'Posisi Saya'
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Siswa Teladan Gizi',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            _scrollToUserRank(currentRankNumber, animate: true, duration: const Duration(milliseconds: 1400));
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    const Icon(Icons.my_location_rounded, color: Colors.white, size: 18),
+                                    const SizedBox(width: 8),
+                                    Text('Posisi Anda berada di peringkat #$currentRankNumber!'),
+                                  ],
+                                ),
+                                backgroundColor: AppColors.primaryDark,
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.my_location_rounded, color: AppColors.primaryDark, size: 13),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Posisi Saya (#$currentRankNumber)',
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryDark,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    const Text(
+                      'Peringkat diperbarui otomatis dari presensi & piring bersih.',
+                      style: TextStyle(fontSize: 10.5, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Row 4: Scope Filter Pills (Urutan: Kelas -> Sekolah -> Kota -> Provinsi -> Nasional)
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -606,7 +675,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               ),
             ),
 
-            // Tab Content View Scrollable
+            // Tab Content View Scrollable (Langsung Murni Leaderboard di Bawah Filter)
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -620,42 +689,6 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ],
         ),
       ),
-      // Floating Button 'Posisi Saya' (Mencari Peringkat Siswa Secara Meluncur)
-      floatingActionButton: _tabController.index == 0
-          ? Container(
-              margin: const EdgeInsets.only(bottom: 74),
-              child: FloatingActionButton.extended(
-                onPressed: () {
-                  _scrollToUserRank(currentRankNumber, animate: true, duration: const Duration(milliseconds: 1400));
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.my_location_rounded, color: Colors.white, size: 18),
-                          const SizedBox(width: 8),
-                          Text('Posisi Anda berada di peringkat #$currentRankNumber!'),
-                        ],
-                      ),
-                      backgroundColor: AppColors.primaryDark,
-                      duration: const Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      margin: const EdgeInsets.only(bottom: 90, left: 16, right: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  );
-                },
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                elevation: 4,
-                icon: const Icon(Icons.my_location_rounded, size: 18),
-                label: Text(
-                  'Posisi Saya (#$currentRankNumber)',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-              ),
-            )
-          : null,
       bottomNavigationBar: const StudentBottomNavBar(currentIndex: 0),
     );
   }
@@ -672,27 +705,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
 
     return SingleChildScrollView(
       controller: _scrollController,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Judul Papan Peringkat (Bersih Tanpa '50 Siswa Teratas')
-          const Text(
-            'Siswa Teladan Gizi',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Peringkat diperbarui secara otomatis berdasarkan konsistensi presensi & piring bersih harian.',
-            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 14),
-
-          // Daftar Siswa dengan Animasi Perpindahan Posisi & Paginasi
+          // Daftar Siswa dengan Animasi Perpindahan Posisi & Paginasi (Langsung Murni Leaderboard)
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 600),
             switchInCurve: Curves.easeOutBack,
