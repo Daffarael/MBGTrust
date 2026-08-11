@@ -140,32 +140,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     },
   ];
 
-  final List<Map<String, dynamic>> _badges = [
-    {
-      'iconData': Icons.cleaning_services_rounded,
-      'title': 'Piring Bersih 7 Hari',
-      'desc': 'Menghabiskan makanan 7 hari berturut-turut',
-      'unlocked': true,
-    },
-    {
-      'iconData': Icons.eco_rounded,
-      'title': 'Pahlawan Lingkungan',
-      'desc': 'Berhasil mencegah 3 kg food waste',
-      'unlocked': true,
-    },
-    {
-      'iconData': Icons.access_time_filled_rounded,
-      'title': 'Tepat Waktu',
-      'desc': 'Mengonfirmasi presensi harian tepat waktu',
-      'unlocked': true,
-    },
-    {
-      'iconData': Icons.emoji_events_rounded,
-      'title': 'Top 3 Peringkat',
-      'desc': 'Masuk peringkat 3 besar siswa terhemat sekolah',
-      'unlocked': true,
-    },
-  ];
+
 
   @override
   void initState() {
@@ -260,7 +235,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ],
         ),
       ),
-      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 1),
+      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 0),
     );
   }
 
@@ -425,34 +400,38 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ),
           const SizedBox(height: 20),
 
-          // Papan Peringkat Header & Simuasi Button
+          // Papan Peringkat Header & Simulasi Button (Siswa Teladan Gizi)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Top Siswa Terhemat Makanan',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+              const Expanded(
+                child: Text(
+                  'Siswa Teladan Gizi',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: _triggerRankUpSequence,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.primary),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: const [
                       Icon(Icons.flash_on_rounded, size: 14, color: AppColors.primaryDark),
                       SizedBox(width: 4),
                       Text(
-                        'Simulasi Naik (#4➔#1)',
+                        'Simulasi Naik',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -603,7 +582,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Dampak Nyata Kontribusimu',
+            'Dampak Nyata Aksi Gizi Siswa',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -612,108 +591,181 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ),
           const SizedBox(height: 4),
           const Text(
-            'Setiap porsi makanan yang kamu habiskan membantu menjaga bumi dari emisi gas rumah kaca.',
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            'Dengan menghabiskan porsi MBG harian, kamu aktif menyelamatkan sumber daya alam & mendukung keberlanjutan program gizi sekolah!',
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // 3 Environmental Metrics Grid
+          // 3 Environmental & Social Metric Cards
           Row(
             children: [
               Expanded(
                 child: _buildMetricCard(
-                  iconData: Icons.eco_rounded,
+                  iconData: Icons.restaurant_rounded,
                   title: '4.2 kg',
-                  subtitle: 'Emisi CO₂ Tercegah',
+                  subtitle: 'Food Waste Diselamatkan',
                   color: AppColors.primaryLight,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMetricCard(
+                  iconData: Icons.eco_rounded,
+                  title: '12.6 kg',
+                  subtitle: 'Emisi CO₂ Tercegah',
+                  color: const Color(0xFFDCFCE7),
+                ),
+              ),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildMetricCard(
                   iconData: Icons.water_drop_rounded,
-                  title: '120 Liter',
+                  title: '360 Liter',
                   subtitle: 'Air Bersih Dihemat',
                   color: const Color(0xFFE0F2FE),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildMetricCard(
-                  iconData: Icons.restaurant_rounded,
-                  title: '14 Porsi',
-                  subtitle: 'Makanan Diselamatkan',
-                  color: AppColors.secondaryLight,
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
 
-          // Badges Section
+          // Kartu Analogi Dampak Nyata
           const Text(
-            'Lencana Penghargaan Siswa',
+            'Setara Dampak Nyata di Lingkungan:',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
 
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.3,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+          _buildImpactEquivalencyCard(
+            icon: Icons.groups_rounded,
+            color: const Color(0xFFD97706),
+            title: '14 Porsi Makanan Utuh',
+            description: 'Jumlah makanan yang berhasil kamu hemat setara dengan memberi makan 14 porsi tambahan bagi yang membutuhkan!',
+          ),
+          const SizedBox(height: 10),
+          _buildImpactEquivalencyCard(
+            icon: Icons.park_rounded,
+            color: AppColors.primary,
+            title: 'Menanam 2 Pohon Rindang',
+            description: 'Pencegahan gas metana dari food waste setara dengan manfaat penyerapan karbon oleh 2 pohon di MAN 2 Kota Padang.',
+          ),
+          const SizedBox(height: 10),
+          _buildImpactEquivalencyCard(
+            icon: Icons.shower_rounded,
+            color: const Color(0xFF0284C7),
+            title: '18 Kali Mandi Bersih',
+            description: 'Penghematan air virtual bahan pertanian yang kamu jaga setara dengan 18 kali alokasi mandi harian.',
+          ),
+
+          const SizedBox(height: 28),
+
+          // Banner Ajakan Pahlawan Piring Bersih
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF065F46), Color(0xFF047857)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF047857).withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            itemCount: _badges.length,
-            itemBuilder: (context, index) {
-              final badge = _badges[index];
-              final isUnlocked = badge['unlocked'] as bool;
-              return Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isUnlocked ? AppColors.surface : AppColors.border.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isUnlocked ? AppColors.primary.withValues(alpha: 0.5) : AppColors.border,
+            child: Row(
+              children: const [
+                Icon(Icons.volunteer_activism_rounded, color: Color(0xFFFDE68A), size: 36),
+                SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Jadilah Pahlawan Piring Bersih!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 3),
+                      Text(
+                        'Ajak teman sekelasmu untuk selalu mengonsumsi porsi MBG secara bijak setiap hari.',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      badge['iconData'] as IconData,
-                      size: 32,
-                      color: isUnlocked ? AppColors.primary : AppColors.textLight,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      badge['title'],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isUnlocked ? AppColors.textPrimary : AppColors.textLight,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      badge['desc'],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: isUnlocked ? AppColors.textSecondary : AppColors.textLight,
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImpactEquivalencyCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String description,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
-              );
-            },
+                const SizedBox(height: 3),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -727,19 +779,19 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
-          Icon(iconData, size: 28, color: AppColors.primaryDark),
-          const SizedBox(height: 8),
+          Icon(iconData, color: AppColors.primaryDark, size: 22),
+          const SizedBox(height: 6),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),

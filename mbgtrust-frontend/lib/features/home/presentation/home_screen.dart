@@ -887,7 +887,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 0),
+      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 1),
     );
   }
 

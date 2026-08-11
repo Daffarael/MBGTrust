@@ -12,19 +12,19 @@ class StudentBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 3 Master Navigasi Siswa
-    final List<Map<String, dynamic>> allItems = [
+    // 3 Master Navigasi Siswa dalam Urutan STATIS: Peringkat - Beranda - Profil
+    final List<Map<String, dynamic>> navItems = [
       {
         'id': 0,
-        'route': '/home',
-        'icon': Icons.home_rounded,
-        'label': 'Beranda',
-      },
-      {
-        'id': 1,
         'route': '/profil/gamifikasi',
         'icon': Icons.emoji_events_rounded,
         'label': 'Peringkat',
+      },
+      {
+        'id': 1,
+        'route': '/home',
+        'icon': Icons.home_rounded,
+        'label': 'Beranda',
       },
       {
         'id': 2,
@@ -34,23 +34,11 @@ class StudentBottomNavBar extends StatelessWidget {
       },
     ];
 
-    // Susun item agar menu aktif SELALU berada di posisi TENGAH (index 1)
-    final Map<String, dynamic> activeItem = allItems[currentIndex];
-    final List<Map<String, dynamic>> otherItems =
-        allItems.where((item) => item['id'] != currentIndex).toList();
-
-    // Pastikan susunan 3 slot: [Left Item, Active Center Item, Right Item]
-    final List<Map<String, dynamic>> displaySlots = [
-      otherItems[0],
-      activeItem,
-      otherItems[1],
-    ];
-
     return SafeArea(
       top: false,
       child: Container(
         margin: const EdgeInsets.only(left: 20, right: 20, bottom: 16),
-        height: 72,
+        height: 70,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(40),
@@ -69,8 +57,9 @@ class StudentBottomNavBar extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: displaySlots.map((item) {
-            final bool isActive = item['id'] == currentIndex;
+          children: List.generate(navItems.length, (index) {
+            final item = navItems[index];
+            final bool isActive = currentIndex == index;
 
             return Expanded(
               child: GestureDetector(
@@ -81,41 +70,38 @@ class StudentBottomNavBar extends StatelessWidget {
                 },
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  switchInCurve: Curves.easeOutBack,
+                  duration: const Duration(milliseconds: 300),
+                  switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeIn,
                   transitionBuilder: (child, animation) {
                     return ScaleTransition(
                       scale: animation,
-                      child: FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      ),
+                      child: child,
                     );
                   },
                   child: isActive
-                      ? _buildActiveCenterCircularBadge(item)
-                      : _buildInactiveSideItem(item),
+                      ? _buildActiveCircularBadge(item)
+                      : _buildInactiveItem(item),
                 ),
               ),
             );
-          }).toList(),
+          }),
         ),
       ),
     );
   }
 
-  /// Tampilan Menu Aktif: Bulat Menonjol (Prominent Circular Active State) di Posisi Tengah
-  Widget _buildActiveCenterCircularBadge(Map<String, dynamic> item) {
+  /// Tampilan Menu Aktif: Bulat Menonjol (Prominent Circular Active State)
+  Widget _buildActiveCircularBadge(Map<String, dynamic> item) {
     return Column(
       key: ValueKey('active_${item['id']}'),
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Transform.translate(
-          offset: const Offset(0, -6),
+          offset: const Offset(0, -5),
           child: Container(
-            width: 50,
-            height: 50,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: const LinearGradient(
@@ -126,7 +112,7 @@ class StudentBottomNavBar extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withValues(alpha: 0.4),
-                  blurRadius: 12,
+                  blurRadius: 10,
                   spreadRadius: 1,
                   offset: const Offset(0, 4),
                 ),
@@ -152,8 +138,8 @@ class StudentBottomNavBar extends StatelessWidget {
     );
   }
 
-  /// Tampilan Menu Non-Aktif di Samping (Kiri & Kanan)
-  Widget _buildInactiveSideItem(Map<String, dynamic> item) {
+  /// Tampilan Menu Non-Aktif
+  Widget _buildInactiveItem(Map<String, dynamic> item) {
     return Column(
       key: ValueKey('inactive_${item['id']}'),
       mainAxisAlignment: MainAxisAlignment.center,
