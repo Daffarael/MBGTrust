@@ -1,4 +1,4 @@
-﻿# Master Product Requirement Document (PRD) & Technical Roadmap
+# Master Product Requirement Document (PRD) & Technical Roadmap
 ## MBGTrust — Frontend Client Layer (Flutter 3.19 Enterprise Architecture)
 
 **Nama Proyek:** MBGTrust — Platform Digital Berbasis AI untuk Mitigasi Food Waste pada Program Makan Bergizi Gratis  
@@ -96,21 +96,49 @@ body: Center(
 ---
 
 ### 🔵 PERAN 2: ADMIN SPPG (Pengelola Program MBG)
-1. **Login Admin SPPG (`/sppg/login`)** — Halaman login khusus Admin SPPG.
-2. **Dashboard Utama (`/sppg/dashboard`)** — Rekapitulasi data harian real-time, ringkasan statistik program.
-3. **Dashboard Hasil NLP (`/sppg/analitik/nlp`)** — Tampilkan hasil analisis sentimen ulasan siswa, kata kunci penyebab food waste, sentimen positif/negatif per menu.
-4. **Rekomendasi AI — Porsi & Komposisi (`/sppg/analitik/rekomendasi`)** — Tampilkan rekomendasi penyesuaian porsi dan komposisi menu dari hasil SPK TOPSIS + AI Gemini.
-5. **Tren Food Waste & Akurasi Prediksi (`/sppg/analitik/tren`)** — Grafik tren food waste dari waktu ke waktu dan tingkat akurasi prediksi porsi.
-6. **Master Bahan Baku (`/sppg/bahan-baku`)** — CRUD bahan baku makanan (nama, satuan, nilai gizi, harga).
-7. **Master Menu (`/sppg/menu`)** — CRUD menu dengan referensi bahan baku, informasi gizi, dan alergen.
-8. **Jadwal Menu Harian (`/sppg/jadwal`)** — Atur jadwal menu per sekolah per hari.
-9. **SPK TOPSIS Engine (`/sppg/spk`)** — Eksekusi analisis TOPSIS, lihat perankingan menu, baca narasi AI.
-10. **Rekap Estimasi Produksi (`/sppg/produksi`)** — Kalkulasi porsi H+1 berdasarkan data konfirmasi siswa.
-11. **Tracking Distribusi (`/sppg/distribusi`)** — Pantau status pengiriman makanan ke sekolah.
+1. **Otentikasi Login (`/login`)** — Login terpadu dengan deteksi otomatis peran Admin SPPG.
+2. **Dashboard Utama (`/sppg/dashboard`)** — Rekapitulasi data real-time food waste, ringkasan statistik program & status operasional.
+3. **Dashboard Hasil NLP (`/sppg/analitik/nlp`)** — Tampilkan hasil analisis sentimen ulasan siswa & kata kunci penyebab food waste per menu.
+4. **Rekomendasi AI (`/sppg/analitik/rekomendasi`)** — Tampilkan rekomendasi penyesuaian porsi & perbaikan komposisi menu dari TOPSIS + AI.
+5. **Tren Food Waste (`/sppg/analitik/tren`)** — Grafik tren food waste dari waktu ke waktu dan tingkat akurasi prediksi model.
+6. **Master Bahan Baku (`/manage-ingredients`)** — CRUD bahan baku makanan sehat (nama, kategori, nilai gizi, status stok).
+7. **Master Menu (`/manage-menu`)** — CRUD menu MBG dengan rincian komposisi bahan baku, nilai gizi, dan alergen.
+8. **Jadwal Menu Batch Mingguan (`/create-schedule`)** — Penyusunan jadwal menu Senin–Jumat (diisi setiap hari Jumat sebelum pemesanan logistik).
+9. **SPK TOPSIS Engine (`/sppg/topsis-spk-engine`)** — Engine eksekusi TOPSIS, visualisasi matriks keputusan, dan penerapan ranking menu otomatis.
+10. **Pemantauan Status Produksi (`/estimation`)** — Pelacakan alur dapur (Persiapan → Memasak → Packing → Siap Kirim).
+11. **Tracking Distribusi (`/distribution-tracker`)** — Pantau status pengiriman paket makanan ke sekolah mitra (Dalam Perjalanan, Sampai di Sekolah).
 
 ---
 
-## 4. Kriteria TOPSIS — Catatan untuk Tampilan Frontend
+## 4. Struktur 5 Modul Resmi Codebase (`lib/features/`)
+
+```
+lib/features/
+├── 1_user_management/         <-- [MODUL 1: MANAJEMEN PENGGUNA]
+│   ├── auth/                  (Login, Preferences, Splash)
+│   ├── profile/               (Profil Saya)
+│   └── admin/                 (Super Admin: Manage Sekolah, SPPG Admins, Siswa)
+│
+├── 2_evaluation_reporting/    <-- [MODUL 2: PELAPORAN & EVALUASI]
+│   ├── home/                  (Beranda & Menu Hari Ini)
+│   ├── evaluation/            (Detail Menu, Gamifikasi & Leaderboard)
+│   └── rating/                (Ulasan Tekstual, Rating, & Laporan % Waste)
+│
+├── 3_dashboard_analytics/     <-- [MODUL 3: DASHBOARD & ANALITIK]
+│   └── sppg/                  (Dashboard SPPG, NLP Sentiment Analysis, Tren Waste, Profil)
+│
+├── 4_dss_engine/              <-- [MODUL 4: SISTEM PENDUKUNG KEPUTUSAN]
+│   └── topsis/                (Engine SPK TOPSIS & Rekomendasi AI)
+│
+└── 5_menu_production/         <-- [MODUL 5: MANAJEMEN MENU & PRODUKSI]
+    ├── menu/                  (Master Menu, Master Bahan Baku, Jadwal Mingguan, SPK TOPSIS Screen)
+    ├── production/            (Status Produksi Dapur & Collapsible Sidebar Layout)
+    └── distribution/          (Tracking Pengiriman Logistik)
+```
+
+---
+
+## 5. Kriteria TOPSIS — Catatan untuk Tampilan Frontend
 
 > ⚠️ **PENTING:** Seluruh 5 kriteria bersifat **Benefit**. Tampilkan dengan indikator "lebih tinggi = lebih baik" di seluruh visualisasi TOPSIS.
 
@@ -124,63 +152,61 @@ body: Center(
 
 ---
 
-## 5. Technical Roadmap GEMASTIK
+## 6. Technical Roadmap GEMASTIK
 
 ### Target Halaman (Prioritas Tinggi → Rendah)
 
 **P0 — Kritis (Harus Ada):**
 - Login 3 peran (Siswa, Admin SPPG, Super Admin)
-- Konfirmasi konsumsi harian siswa
-- Form ulasan teks + rating
-- Dashboard SPPG + rekap data
-- SPK TOPSIS Engine (eksekusi + hasil)
+- Form ulasan teks + rating + % sisa makanan siswa
+- Dashboard SPPG + rekap data real-time
+- SPK TOPSIS Engine (eksekusi + visualisasi matriks)
 
 **P1 — Penting:**
-- Gamifikasi siswa (poin + leaderboard + dampak lingkungan)
-- Dashboard NLP (hasil analisis sentimen)
-- Master bahan baku & menu
-- Tren food waste & akurasi prediksi
+- Gamifikasi siswa (poin XP + leaderboard + dampak lingkungan)
+- Dashboard NLP (analisis sentimen ulasan)
+- Master bahan baku & menu makanan
+- Tren food waste & akurasi model
+- Jadwal Menu Batch Mingguan (Senin-Jumat)
 
 **P2 — Tambahan:**
 - Super Admin panel (manajemen sekolah & akun)
 - Detail komposisi bahan per menu
-- Ekspor laporan PDF/Excel
 
 ---
 
-## 6. Struktur Navigasi GoRouter
+## 7. Struktur Navigasi GoRouter
 
 ```dart
-// 3 Grup Navigasi berdasarkan Peran
-/login              → Pemilihan peran (Siswa / Admin SPPG / Super Admin)
-/sppg/login         → Login Admin SPPG
-/admin/login        → Login Super Admin
+// 1. Otentikasi & Profil
+/login              → Login terpadu (Siswa / Admin SPPG / Super Admin)
+/profile            → Profil Siswa
+/sppg/profil-saya   → Profil Admin SPPG
+/admin/profil-saya  → Profil Super Admin
 
-// === SISWA ROUTES ===
+// 2. Siswa / Penerima Manfaat
 /home               → Beranda siswa + menu hari ini
-/konfirmasi         → Konfirmasi konsumsi MBG
-/ulasan             → Form ulasan teks + rating + sisa makanan
-/profil             → Profil siswa + poin XP
 /profil/gamifikasi  → Leaderboard + visualisasi dampak lingkungan
 /profil/preferensi  → Preferensi & alergi
 
-// === ADMIN SPPG ROUTES ===
+// 3. Admin SPPG (Modular via Collapsible Sidebar)
 /sppg/dashboard          → Dashboard utama
 /sppg/analitik/nlp       → Hasil NLP Sentiment Analysis
 /sppg/analitik/rekomendasi → Rekomendasi AI porsi & komposisi
 /sppg/analitik/tren      → Tren food waste
-/sppg/bahan-baku         → Master bahan baku
-/sppg/menu               → Master menu
-/sppg/jadwal             → Jadwal menu harian
-/sppg/spk                → SPK TOPSIS Engine
-/sppg/produksi           → Rekap estimasi produksi
-/sppg/distribusi         → Tracking distribusi
+/manage-ingredients      → Master bahan baku makanan
+/manage-menu             → Master katalog menu
+/create-schedule         → Jadwal menu batch mingguan (Senin-Jumat)
+/sppg/topsis-spk-engine  → Engine SPK TOPSIS
+/estimation              → Pemantauan status produksi dapur
+/distribution-tracker    → Tracking pengiriman distribusi
 
-// === SUPER ADMIN ROUTES ===
+// 4. Super Admin
 /admin/sekolah           → Manajemen sekolah
 /admin/sppg-admin        → Manajemen akun Admin SPPG
 /admin/penerima-manfaat  → Manajemen akun siswa
 ```
+
 
 ---
 *Akhir dari Frontend PRD MBGTrust (v5.0.0) — Disesuaikan dengan Gagasan Awal*

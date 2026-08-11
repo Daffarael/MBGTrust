@@ -1,27 +1,25 @@
 import 'package:go_router/go_router.dart';
-import '../../features/admin/presentation/manage_schools_screen.dart';
-import '../../features/admin/presentation/manage_sppg_admins_screen.dart';
-import '../../features/admin/presentation/manage_students_screen.dart';
-import '../../features/admin/presentation/super_admin_profile_screen.dart';
-import '../../features/auth/presentation/login_screen.dart';
-import '../../features/auth/presentation/preferences_screen.dart';
-import '../../features/auth/presentation/profile_screen.dart';
-import '../../features/auth/presentation/splash_screen.dart';
-import '../../features/distribution/presentation/distribution_tracker_screen.dart';
-import '../../features/evaluation/presentation/gamification_screen.dart';
-import '../../features/evaluation/presentation/menu_detail_screen.dart';
-import '../../features/evaluation/presentation/next_day_confirmation_screen.dart';
-import '../../features/home/presentation/home_screen.dart';
-import '../../features/menu/presentation/create_schedule_screen.dart';
-import '../../features/menu/presentation/manage_ingredients_screen.dart';
-import '../../features/menu/presentation/manage_menu_screen.dart';
-import '../../features/menu/presentation/sppg_topsis_spk_screen.dart';
-import '../../features/production/presentation/estimation_screen.dart';
-import '../../features/sppg/presentation/ai_recommendations_screen.dart';
-import '../../features/sppg/presentation/food_waste_trend_screen.dart';
-import '../../features/sppg/presentation/nlp_sentiment_screen.dart';
-import '../../features/sppg/presentation/sppg_dashboard_screen.dart';
-import '../../features/sppg/presentation/sppg_profile_screen.dart';
+import '../../../features/1_user_management/admin/presentation/manage_schools_screen.dart';
+import '../../../features/1_user_management/admin/presentation/manage_sppg_admins_screen.dart';
+import '../../../features/1_user_management/admin/presentation/manage_students_screen.dart';
+import '../../../features/1_user_management/admin/presentation/super_admin_profile_screen.dart';
+import '../../../features/1_user_management/auth/presentation/login_screen.dart';
+import '../../../features/1_user_management/auth/presentation/preferences_screen.dart';
+import '../../../features/1_user_management/auth/presentation/profile_screen.dart';
+import '../../../features/1_user_management/auth/presentation/splash_screen.dart';
+import '../../../features/2_evaluation_reporting/evaluation/presentation/gamification_screen.dart';
+import '../../../features/2_evaluation_reporting/evaluation/presentation/menu_detail_screen.dart';
+import '../../../features/2_evaluation_reporting/home/presentation/home_screen.dart';
+import '../../../features/3_dashboard_analytics/sppg/presentation/ai_recommendations_screen.dart';
+import '../../../features/3_dashboard_analytics/sppg/presentation/food_waste_trend_screen.dart';
+import '../../../features/3_dashboard_analytics/sppg/presentation/nlp_sentiment_screen.dart';
+import '../../../features/3_dashboard_analytics/sppg/presentation/sppg_dashboard_screen.dart';
+import '../../../features/3_dashboard_analytics/sppg/presentation/sppg_profile_screen.dart';
+import '../../../features/5_menu_production/distribution/presentation/distribution_tracker_screen.dart';
+import '../../../features/5_menu_production/menu/presentation/create_schedule_screen.dart';
+import '../../../features/5_menu_production/menu/presentation/manage_ingredients_screen.dart';
+import '../../../features/5_menu_production/menu/presentation/manage_menu_screen.dart';
+import '../../../features/5_menu_production/menu/presentation/sppg_topsis_spk_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -86,10 +84,6 @@ final GoRouter appRouter = GoRouter(
         return MenuDetailScreen(menuData: extraMap);
       },
     ),
-    GoRoute(
-      path: '/next-day-confirmation',
-      builder: (context, state) => const NextDayConfirmationScreen(),
-    ),
 
     // === ADMIN SPPG ROUTES ===
     GoRoute(
@@ -151,10 +145,6 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
-      path: '/estimation',
-      builder: (context, state) => const EstimationScreen(),
-    ),
-    GoRoute(
       path: '/distribution-tracker',
       builder: (context, state) => const DistributionTrackerScreen(),
     ),
@@ -178,3 +168,4 @@ final GoRouter appRouter = GoRouter(
     ),
   ],
 );
+
