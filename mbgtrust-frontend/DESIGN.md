@@ -71,6 +71,9 @@ Dokumen ini merupakan panduan arsitektur, sistem desain, dan spesifikasi fungsio
 - **Aturan Bebas Elipsis (Zero Text Truncation Rule)**:
   - Seluruh teks informasi penting (nama lengkap siswa, nama sekolah, rincian menu makanan, lencana XP, dan himbauan presensi) **DILARANG TERPOTONG** (`...` / `overflow: TextOverflow.ellipsis`).
   - Seluruh teks harus tampil utuh, lengkap, dan estetik dengan pembungkusan baris (*multiline wrap*), penyesuaian ukuran font dinamis, serta tata letak pembagi ruang yang proporsional.
+- **Aturan Bebas Emoji Unicode (Icon-Based UI Rule)**:
+  - **DILARANG** menggunakan emoji karakter Unicode (seperti 🔥, 🥩, 🍚, 🥑, 🏆, 💡, 🌿, 🏅) di dalam teks atau komponen UI.
+  - Seluruh indikator visual HARUS menggunakan **Flutter Material Icons** (`Icon(Icons.local_fire_department_rounded)`, `Icon(Icons.workspace_premium_rounded)`, `Icon(Icons.restaurant_rounded)`, `Icon(Icons.grain_rounded)`, `Icon(Icons.eco_rounded)`, `Icon(Icons.access_time_filled_rounded)`) agar tampilan konsisten, seragam antar-device, dan tidak merusak estetika tipografi.
 - **Bottom Navigation Bar (`StudentBottomNavBar`)**:
   - Navigasi melayang (*floating*) dengan margin bawah `16px` & *border radius* `40px`.
   - **Urutan Statis Tetap**: `Peringkat (Index 0)` — `Beranda (Index 1)` — `Profil (Index 2)`.
