@@ -338,7 +338,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Status Rantai Pasok & Dapur SPPG',
+                  'Alur Persiapan & Pengiriman Menu Esok Hari',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -350,37 +350,46 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Proses persiapan porsi makanan bergizi esok hari (Kontrak API Modul 2):',
+            'Tahapan jadwal operasional Dapur SPPG MAN 2 Kota Padang:',
             style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
 
-          // Timeline Status Production
-          _buildStatusTimelineItem(
-            step: '1',
-            title: 'Verifikasi & Penerimaan Bahan Baku',
-            subtitle: 'Bahan segar lokal telah diperiksa tim gizi & disimpan di Cold Storage SPPG (17:00 WIB).',
-            isCompleted: true,
-            isCurrent: false,
-          ),
-          const SizedBox(height: 12),
-          _buildStatusTimelineItem(
-            step: '2',
-            title: 'Proses Pemasakan & Olah Dapur',
-            subtitle: 'Koki SPPG MAN 2 Kota Padang memulai proses memasak pukul 04:00 WIB esok pagi.',
-            isCompleted: false,
-            isCurrent: true,
-          ),
-          const SizedBox(height: 12),
-          _buildStatusTimelineItem(
-            step: '3',
-            title: 'Distribusi & Penyajian di Sekolah',
-            subtitle: 'Armada MBGTrust mengantar porsi siap santap pukul 06:30 WIB.',
-            isCompleted: false,
-            isCurrent: false,
+          // Timeline Menyambung Bergaris dengan Jam Operasional Dinamis
+          _buildConnectedTimeline(
+            steps: [
+              {
+                'time': '17:00 WIB',
+                'title': 'Inspeksi & Verifikasi Kesegaran Bahan',
+                'subtitle': 'Bahan segar lokal (protein, buah, & sayur) diperiksa tim gizi dan disimpan aman di Cold Storage SPPG.',
+                'isCompleted': true,
+                'isCurrent': false,
+              },
+              {
+                'time': '04:30 WIB',
+                'title': 'Olah Dapur & Pengemasan Gizi Seimbang',
+                'subtitle': 'Koki SPPG mengolah masakan higienis dan mengemas porsi dalam wadah ramah lingkungan.',
+                'isCompleted': false,
+                'isCurrent': true,
+              },
+              {
+                'time': '06:30 WIB',
+                'title': 'Pengiriman Armada MBGTrust ke Sekolah',
+                'subtitle': 'Mobil kurir khusus bertolak mengantar porsi hangat langsung dari Dapur SPPG ke MAN 2 Kota Padang.',
+                'isCompleted': false,
+                'isCurrent': false,
+              },
+              {
+                'time': '07:15 WIB',
+                'title': 'Tiba di Sekolah & Siap Disajikan',
+                'subtitle': 'Porsi MBG diterima tim sekolah dan siap disajikan hangat bagi siswa saat jam istirahat.',
+                'isCompleted': false,
+                'isCurrent': false,
+              },
+            ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Banner Jumlah Porsi
           Container(
@@ -429,69 +438,167 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
     );
   }
 
-  Widget _buildStatusTimelineItem({
-    required String step,
-    required String title,
-    required String subtitle,
-    required bool isCompleted,
-    required bool isCurrent,
+  Widget _buildConnectedTimeline({
+    required List<Map<String, dynamic>> steps,
   }) {
-    final color = isCompleted
-        ? AppColors.primary
-        : isCurrent
-            ? const Color(0xFFD97706)
-            : AppColors.textLight;
+    return Column(
+      children: List.generate(steps.length, (index) {
+        final step = steps[index];
+        final bool isLast = index == steps.length - 1;
+        final bool isCompleted = step['isCompleted'] as bool;
+        final bool isCurrent = step['isCurrent'] as bool;
+        final String timeStr = step['time'] as String;
+        final String title = step['title'] as String;
+        final String subtitle = step['subtitle'] as String;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: isCompleted || isCurrent ? color : Colors.transparent,
-            shape: BoxShape.circle,
-            border: Border.all(color: color, width: 2),
-          ),
-          child: Center(
-            child: isCompleted
-                ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
-                : Text(
-                    step,
+        final Color nodeColor = isCompleted
+            ? AppColors.primary
+            : isCurrent
+                ? const Color(0xFFD97706)
+                : AppColors.textLight;
+
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Kolom 1: Lencana Waktu (Jam)
+              SizedBox(
+                width: 65,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    timeStr,
                     style: TextStyle(
-                      color: isCurrent ? Colors.white : color,
+                      fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                      color: isCompleted
+                          ? AppColors.primaryDark
+                          : isCurrent
+                              ? const Color(0xFF92400E)
+                              : AppColors.textSecondary,
                     ),
                   ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isCurrent ? const Color(0xFF92400E) : AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
+
+              // Kolom 2: Lingkaran Node & Garis Menyambung
+              SizedBox(
+                width: 28,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: isCompleted || isCurrent ? nodeColor : AppColors.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: nodeColor, width: 2),
+                        boxShadow: isCurrent
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFFD97706).withValues(alpha: 0.3),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Center(
+                        child: isCompleted
+                            ? const Icon(Icons.check_rounded, color: Colors.white, size: 13)
+                            : isCurrent
+                                ? const Icon(Icons.microwave_rounded, color: Colors.white, size: 11)
+                                : Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: nodeColor,
+                                    ),
+                                  ),
+                      ),
+                    ),
+                    if (!isLast)
+                      Expanded(
+                        child: Container(
+                          width: 2,
+                          color: isCompleted
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // Kolom 3: Kartu Informasi Tahapan
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isCurrent
+                        ? const Color(0xFFFEF3C7).withValues(alpha: 0.6)
+                        : isCompleted
+                            ? AppColors.primaryLight.withValues(alpha: 0.3)
+                            : AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isCurrent
+                          ? const Color(0xFFF59E0B)
+                          : isCompleted
+                              ? AppColors.primary.withValues(alpha: 0.3)
+                              : AppColors.border,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: isCurrent ? const Color(0xFF92400E) : AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          if (isCurrent)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD97706),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text(
+                                'Proses Aktif',
+                                style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        );
+      }),
     );
   }
 

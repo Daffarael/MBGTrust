@@ -139,7 +139,24 @@ Dokumen ini merupakan panduan arsitektur, sistem desain, dan spesifikasi fungsio
 
 ---
 
-## 6. Pedoman Bahasa & Tata Tulis (PUEBI / EYD 5)
+## 6. Kontrak API Resmi Peran Siswa / Penerima Manfaat (Student API Contract)
+
+Seluruh antarmuka aplikasi siswa (*Penerima Manfaat*) mengonsumsi REST API resmi terenkripsi `HTTPS / TLS 1.3` dengan otentikasi `Authorization: Bearer <JWT_TOKEN>`:
+
+| Endpoint Path | Metode HTTP | Deskripsi Fungsi Operasional | Payload Utama / Response Envelope |
+| :--- | :---: | :--- | :--- |
+| `/api/v1/auth/login` | `POST` | Otentikasi masuk siswa menggunakan NISN dan kata sandi | `{ nisn, password }` ➔ `{ token, user: { id, name, school, class } }` |
+| `/api/v1/auth/me` | `GET` | Memuat profil lengkap siswa & riwayat alergen makanan | `{ id, nisn, name, school, class, allergens: [...] }` |
+| `/api/v1/jadwal/hari-ini` | `GET` | Mengambil data menu MBG hari ini, nutrisi, & presensi | `{ scheduleId, menuName, calories, protein, streakDays, status }` |
+| `/api/v1/jadwal/besok` | `GET` | Pratinjau menu esok hari & status timeline Dapur SPPG | `{ scheduleId, menuName, supplyChainTimeline: [ { time, title, status } ] }` |
+| `/api/v1/jadwal/:id/evaluasi` | `POST` | Mengirim ulasan evaluasi cepat (<15 detik) porsi harian | `{ menerimaPorsi, rasa, kesukaan, porsi, wastePercentage, comment }` |
+| `/api/v1/evaluasi/leaderboard` | `GET` | Memuat 50 Siswa Teratas & sekuens rank climb (#30 ➔ #15) | `{ userRank, totalStudents: 50, leaderboard: [ { rank, name, xp, wasteSaved } ] }` |
+| `/api/v1/evaluasi/lencana` | `GET` | Memuat 10 Lencana MBG & status klaim sertifikat | `{ badges: [ { id, title, desc, icon, unlocked, shareUrl } ] }` |
+| `/api/v1/evaluasi/dampak` | `GET` | Memuat kalkulasi dampak lingkungan (FAO/Kementan RI) | `{ foodWasteSavedKg, co2PreventedKg, waterSavedLiters }` |
+
+---
+
+## 7. Pedoman Bahasa & Tata Tulis (PUEBI / EYD 5)
 
 - **Standardisasi**: Menggunakan Bahasa Indonesia formal yang ramah pengguna, santun, dan menginspirasi siswa.
-- **Eliminasi Istilah Pengujian**: Tidak menggunakan kata-kata pengujian seperti *"simulasi"*, *"demo"*, atau spanduk dev. Seluruh teks siap untuk publikasi produksi resmi.
+- **Eliminasi Istilah Pengujian**: Tidak menggunakan kata-kata teknis backend/developer seperti *"Kontrak API Modul 2"*, *"simulasi"*, *"demo"*, atau spanduk dev pada antarmuka siswa. Seluruh teks siap untuk publikasi produksi resmi.
