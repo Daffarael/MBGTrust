@@ -378,6 +378,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Header Atas Bersih (Logo MBGTrust & Notifikasi)
                   // Header Atas Modern (Konsisten 100% dengan Profil & Peringkat)
                   // Header Atas Modern (Logo MBGTrust + Frosted Gold XP Badge + Bell)
+                  // Header Atas Modern (Logo MBGTrust + Bell Notifikasi)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -395,85 +396,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          // Frosted Gold XP Badge di Top Header
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFFDE68A)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.03),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                      // Notification Bell Button
+                      Container(
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.border),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 14),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _hasEvaluatedToday ? '1.402 XP' : '922 XP',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFB45309),
-                                  ),
+                          ],
+                        ),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            const Icon(Icons.notifications_outlined, size: 18, color: AppColors.textPrimary),
+                            Positioned(
+                              right: -1,
+                              top: -1,
+                              child: Container(
+                                width: 7,
+                                height: 7,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.error,
+                                  shape: BoxShape.circle,
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Notification Bell Button
-                          Container(
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.border),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.03),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                const Icon(Icons.notifications_outlined, size: 18, color: AppColors.textPrimary),
-                                Positioned(
-                                  right: -1,
-                                  top: -1,
-                                  child: Container(
-                                    width: 7,
-                                    height: 7,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.error,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // ==========================================
-                  // KARTU 1: BANNER SELAMAT DATANG & WAKTU LIVE (MEWAH & BEBAS OVERFLOW)
+                  // KARTU 1: BANNER SELAMAT DATANG SISWA
                   // ==========================================
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(14.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       gradient: const LinearGradient(
@@ -513,42 +479,155 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             letterSpacing: 0.2,
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        // Live Clock Badge Transparan Mewah
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.access_time_filled_rounded, color: AppColors.secondary, size: 12),
-                              const SizedBox(width: 6),
-                              Text(
-                                _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:55 WIB',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // ==========================================
+                  // KARTU 2: DEDICATED CARD TANGGAL & WAKTU LIVE
+                  // ==========================================
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 9.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.access_time_filled_rounded, color: AppColors.primary, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:58 WIB',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
+
+                  // ==========================================
+                  // KARTU 3: DEDICATED CARD XP DAN LENCANA
+                  // ==========================================
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEF3C7),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: const Color(0xFFFDE68A)),
+                              ),
+                              child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 20),
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _hasEvaluatedToday ? '1.402 XP' : '922 XP',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 1),
+                                const Text(
+                                  'Level 3 • Pejuang Gizi',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.eco_rounded, color: AppColors.primaryDark, size: 11),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Piring Bersih',
+                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEF2F2),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFFCA5A5)),
+                              ),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.local_fire_department_rounded, color: Color(0xFFDC2626), size: 11),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    '7 Hari',
+                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   // Interactive Streak Presensi Card
                   _buildInteractiveStreakCard(),
                   const SizedBox(height: 8),
 
                   // ==========================================
-                  // PRESENSI & EVALUASI MBG HARI INI (WITH 4 NUTRIENT MATERIAL ICON BOXES)
+                  // KARTU 4: PRESENSI & EVALUASI MBG HARI INI
                   // ==========================================
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -953,10 +1032,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Dedicated XP & Badges Card (Scrollable Below the Fold)
-                  _buildStudentXpAndBadgeCard(),
-                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -1164,108 +1239,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStudentXpAndBadgeCard() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // XP & Level Info
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFFDE68A)),
-                ),
-                child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 22),
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _hasEvaluatedToday ? '1.402 XP' : '922 XP',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Level 3 • Pejuang Gizi',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // Active Badges Preview
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.eco_rounded, color: AppColors.primaryDark, size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      'Piring Bersih',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF2F2),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFCA5A5)),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.local_fire_department_rounded, color: Color(0xFFDC2626), size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      '7 Hari',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
