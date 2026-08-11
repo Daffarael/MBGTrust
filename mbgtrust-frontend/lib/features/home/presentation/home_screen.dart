@@ -432,10 +432,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Banner Selamat Datang Siswa (Format Baru: Nama Utama + XP + Jam Live)
+                  // Banner Selamat Datang Siswa (Ringkas & Mewah: Nama + Jam Live)
                   Container(
                     width: double.infinity,
-                    height: 100,
+                    height: 82,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
@@ -477,72 +477,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           // Content Padding
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Top Row: Greeting + Student Name & XP Chip
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Selamat Datang,',
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          studentName,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.2,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    // XP Chip Emas Frosted Glass
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFD97706).withValues(alpha: 0.9),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: const Color(0xFFFDE68A), width: 1.2),
+                                    const Text(
+                                      'Selamat Datang,',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFDE68A), size: 14),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            _hasEvaluatedToday ? '1.402 XP' : '922 XP',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      studentName,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.2,
                                       ),
                                     ),
                                   ],
                                 ),
-
-                                // Bottom Row: Full Live Date & Time Pill
+                                // Bottom Live Time Pill
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.black.withValues(alpha: 0.28),
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -550,7 +519,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       const Icon(Icons.access_time_filled_rounded, color: AppColors.secondary, size: 11),
                                       const SizedBox(width: 5),
                                       Text(
-                                        _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:41 WIB',
+                                        _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]} WIB' : 'Selasa, 11 Agustus 2026 • 16:46 WIB',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -574,7 +543,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 10),
 
                   // ==========================================
-                  // PRESENSI & EVALUASI MBG HARI INI (WITH MINI FOOD PREVIEW)
+                  // PRESENSI & EVALUASI MBG HARI INI (WITH MINI FOOD PREVIEW & 4 NUTRIENT BOXES)
                   // ==========================================
                   Container(
                     padding: const EdgeInsets.all(14),
@@ -604,14 +573,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               child: Text(
                                 'Sudah Makan MBG Hari Ini?',
                                 style: TextStyle(
-                                  fontSize: 13.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: AppColors.primaryLight,
                                 borderRadius: BorderRadius.circular(8),
@@ -627,61 +596,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
 
-                        // Mini Preview Menu Hari Ini (Teks Menu Utuh)
+                        // Mini Preview Menu Hari Ini + 4 Kotak Nutrisi Presisi
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: AppColors.background,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: AppColors.border),
                           ),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: MbgFoodImage(
-                                  imageUrl: (todayMenu['foto_url'] as String?) ?? '',
-                                  width: 44,
-                                  height: 44,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
+                              Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: MbgFoodImage(
+                                      imageUrl: (todayMenu['foto_url'] as String?) ?? '',
+                                      width: 44,
+                                      height: 44,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
                                       todayMenu['nama_menu'] as String? ?? 'Nasi Ayam Bakar Kecap & Tumis Buncis',
-                                      maxLines: 2,
                                       style: const TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textPrimary,
                                         height: 1.2,
                                       ),
                                     ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Nutrisi: ${todayMenu['kalori_kkal']} kkal • Protein ${todayMenu['protein_gram']}g • Karbo ${todayMenu['karbohidrat_gram']}g',
-                                      style: const TextStyle(
-                                        fontSize: 9.5,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              // 4 Kotak Nutrisi Presisi
+                              Row(
+                                children: [
+                                  _buildNutrientMiniBox('🔥', '${todayMenu['kalori_kkal']}', 'kkal'),
+                                  const SizedBox(width: 6),
+                                  _buildNutrientMiniBox('🥩', '${todayMenu['protein_gram']}g', 'Protein'),
+                                  const SizedBox(width: 6),
+                                  _buildNutrientMiniBox('🍚', '${todayMenu['karbohidrat_gram']}g', 'Karbo'),
+                                  const SizedBox(width: 6),
+                                  _buildNutrientMiniBox('🥑', '${todayMenu['lemak_gram'] ?? 14.2}g', 'Lemak'),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
 
                         if (_hasEvaluatedToday) ...[
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                             decoration: BoxDecoration(
                               color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(12),
@@ -696,7 +669,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   child: Text(
                                     'Evaluasi & Presensi Hari Ini Telah Dikirim (+50 XP)',
                                     style: TextStyle(
-                                      fontSize: 11.5,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryDark,
                                     ),
@@ -722,7 +695,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(vertical: 9),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -739,7 +712,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   },
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.secondaryDark,
-                                    padding: const EdgeInsets.symmetric(vertical: 9),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
                                     side: const BorderSide(color: AppColors.secondaryDark),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -755,7 +728,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 54),
 
                 // ==========================================
                 // PRATINJAU MENU ESOK HARI (GAMIFIED MYSTERY CARD)
@@ -974,6 +947,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+
+                  // Dedicated XP & Badges Card (Scrollable Below the Fold)
+                  _buildStudentXpAndBadgeCard(),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -1138,6 +1116,149 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNutrientMiniBox(String icon, String value, String label) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(icon, style: const TextStyle(fontSize: 10)),
+                const SizedBox(width: 3),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentXpAndBadgeCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // XP & Level Info
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFDE68A)),
+                ),
+                child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 22),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _hasEvaluatedToday ? '1.402 XP' : '922 XP',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Level 3 • Pejuang Gizi',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // Active Badges Preview
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.eco_rounded, color: AppColors.primaryDark, size: 12),
+                    SizedBox(width: 4),
+                    Text(
+                      'Piring Bersih',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFCA5A5)),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.local_fire_department_rounded, color: Color(0xFFDC2626), size: 12),
+                    SizedBox(width: 4),
+                    Text(
+                      '7 Hari',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
