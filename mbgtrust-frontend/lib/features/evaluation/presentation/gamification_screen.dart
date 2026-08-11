@@ -550,7 +550,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                         _buildDynamicTabItem(
                           index: 2,
                           icon: Icons.eco_rounded,
-                          label: 'Dampak',
+                          label: 'Dampak & FAQ',
                         ),
                       ],
                     ),
@@ -1191,7 +1191,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pahlawan Piring Bersih MAN 2',
+                        'Pahlawan Piring Bersih MBG Indonesia',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -1213,7 +1213,75 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
+
+          // Seksi FAQ & Edukasi MBG
+          const Text(
+            'Pertanyaan Sering Diajukan (FAQ)',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _buildFaqItem(
+            question: 'Bagaimana cara mengumpulkan XP dan naik peringkat?',
+            answer: 'XP didapatkan secara otomatis setiap kali kamu mengonfirmasi presensi makan siang (+50 XP), menghabiskan porsi tanpa sisa (+50 XP), dan mengirim ulasan evaluasi harian.',
+          ),
+          const SizedBox(height: 8),
+          _buildFaqItem(
+            question: 'Bagaimana cara membuka Lencana Prestasi Gizi?',
+            answer: 'Lencana prestasi seperti "Penyelamat Pangan" atau "Presensi Disiplin" otomatis terbuka ketika kamu mencapai milestone presensi harian secara konsisten.',
+          ),
+          const SizedBox(height: 8),
+          _buildFaqItem(
+            question: 'Mengapa piring bersih bermanfaat bagi lingkungan?',
+            answer: 'Menghabiskan makanan mencegah terbentuknya gas metana (CO₂e) di TPA dan menghemat ratusan liter air virtual yang digunakan petani dalam proses budidaya pangan.',
+          ),
+          const SizedBox(height: 8),
+          _buildFaqItem(
+            question: 'Bagaimana jika saya memiliki alergi terhadap menu hari ini?',
+            answer: 'Kamu dapat memperbarui preferensi alergen di menu Profil > Preferensi Alergen. Dapur SPPG akan menyesuaikan variasi menu aman khusus untuk kebutuhan medismu.',
+          ),
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFaqItem({required String question, required String answer}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: ExpansionTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+        iconColor: AppColors.primary,
+        collapsedIconColor: AppColors.textSecondary,
+        leading: const Icon(Icons.help_outline_rounded, color: AppColors.primary, size: 20),
+        title: Text(
+          question,
+          style: const TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        children: [
+          Text(
+            answer,
+            style: const TextStyle(
+              fontSize: 11.5,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+          ),
         ],
       ),
     );
