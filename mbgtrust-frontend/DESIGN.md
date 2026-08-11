@@ -159,7 +159,7 @@ Seluruh antarmuka aplikasi siswa (*Penerima Manfaat*) mengonsumsi REST API resmi
 | `/api/v1/evaluasi/leaderboard` | `GET` | Memuat 50 Siswa Teratas & sekuens rank climb (#30 ➔ #15) | `{ userRank, totalStudents: 50, leaderboard: [ { rank, name, xp, wasteSaved } ] }` |
 | `/api/v1/evaluasi/lencana` | `GET` | Memuat 10 Lencana MBG & status klaim sertifikat | `{ badges: [ { id, title, desc, icon, unlocked, shareUrl } ] }` |
 | `/api/v1/evaluasi/dampak` | `GET` | Memuat kalkulasi dampak lingkungan (FAO/Kementan RI) | `{ foodWasteSavedKg, co2PreventedKg, waterSavedLiters }` |
-| `/api/v1/notifikasi` | `GET` | Memuat daftar notifikasi sistem, presensi, dapur SPPG, & pencapaian XP | `{ unreadCount: 2, notifications: [ { id, title, body, category, isRead, timestamp } ] }` |
+
 
 ---
 
