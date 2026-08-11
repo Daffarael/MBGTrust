@@ -810,7 +810,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Unlocked Menu Preview Card
                   GestureDetector(
                     onTap: () {
-                      context.push('/menu-detail', extra: tomorrowMenu);
+                      final Map<String, dynamic> extraMap = Map<String, dynamic>.from(tomorrowMenu);
+                      extraMap['isPreview'] = true;
+                      context.push('/menu-detail', extra: extraMap);
                     },
                     child: Container(
                       decoration: BoxDecoration(

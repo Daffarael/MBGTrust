@@ -48,9 +48,6 @@ dependencies:
   # Efek Animasi Vektor Interaktif (Lottie)
   lottie: ^3.1.2
 
-  # Komponen Navigasi Melayang dengan Animasi Liquid Curved (Curved Navigation Bar)
-  curved_navigation_bar: ^1.0.6
-
 # Dependensi Pengembang & Pengujian
 dev_dependencies:
   flutter_test:
