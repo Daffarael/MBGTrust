@@ -149,16 +149,17 @@ Dokumen ini merupakan panduan arsitektur, sistem desain, dan spesifikasi fungsio
 
 Seluruh antarmuka aplikasi siswa (*Penerima Manfaat*) mengonsumsi REST API resmi terenkripsi `HTTPS / TLS 1.3` dengan otentikasi `Authorization: Bearer <JWT_TOKEN>`:
 
-| Endpoint Path | Metode HTTP | Deskripsi Fungsi Operasional | Payload Utama / Response Envelope |
+| Endpoint Path | Metode HTTP | Deskripsi Fungsi Operasional | Payload Utama / Response Envelope (Sesuai `docs/api_specification_contract.md`) |
 | :--- | :---: | :--- | :--- |
-| `/api/v1/auth/login` | `POST` | Otentikasi masuk siswa menggunakan NISN dan kata sandi | `{ nisn, password }` ➔ `{ token, user: { id, name, school, class } }` |
-| `/api/v1/auth/me` | `GET` | Memuat profil lengkap siswa & riwayat alergen makanan | `{ id, nisn, name, school, class, allergens: [...] }` |
-| `/api/v1/jadwal/hari-ini` | `GET` | Mengambil data menu MBG hari ini, nutrisi, & presensi | `{ scheduleId, menuName, calories, protein, streakDays, status }` |
-| `/api/v1/jadwal/besok` | `GET` | Pratinjau menu esok hari & status timeline Dapur SPPG | `{ scheduleId, menuName, supplyChainTimeline: [ { time, title, status } ] }` |
-| `/api/v1/jadwal/:id/evaluasi` | `POST` | Mengirim ulasan evaluasi cepat (<15 detik) porsi harian | `{ menerimaPorsi, rasa, kesukaan, porsi, wastePercentage, comment }` |
-| `/api/v1/evaluasi/leaderboard` | `GET` | Memuat 50 Siswa Teratas & sekuens rank climb (#30 ➔ #15) | `{ userRank, totalStudents: 50, leaderboard: [ { rank, name, xp, wasteSaved } ] }` |
-| `/api/v1/evaluasi/lencana` | `GET` | Memuat 10 Lencana MBG & status klaim sertifikat | `{ badges: [ { id, title, desc, icon, unlocked, shareUrl } ] }` |
-| `/api/v1/evaluasi/dampak` | `GET` | Memuat kalkulasi dampak lingkungan (FAO/Kementan RI) | `{ foodWasteSavedKg, co2PreventedKg, waterSavedLiters }` |
+| `/api/v1/otentikasi/masuk` | `POST` | Otentikasi masuk siswa menggunakan NIK/NISN & kata sandi | `{ nik_nisn, kata_sandi }` ➔ `{ token_akses, pengguna: { id_pengguna, nama_lengkap, peran } }` |
+| `/api/v1/pengguna/profil-saya` | `GET` | Memuat profil lengkap siswa, sekolah, kelas, & riwayat alergi | `{ id_pengguna, nama_lengkap, tingkat_kelas, riwayat_alergi, nomor_telepon }` |
+| `/api/v1/jadwal/hari-ini` | `GET` | Mengambil data menu MBG hari ini, nutrisi, & status evaluasi | `{ id_jadwal, menu: { nama_menu, kalori_kkal }, status_evaluasi_pengguna }` |
+| `/api/v1/jadwal/besok` | `GET` | Pratinjau menu H+1 & status timeline distribusi Dapur SPPG | `{ id_jadwal, menu: { nama_menu, kalori_kkal }, status_konfirmasi_pengguna }` |
+| `/api/v1/jadwal/:idJadwal/evaluasi` | `POST` | Mengirim ulasan evaluasi porsi & tingkat sisa makanan (<15 dtk) | `{ menerima_porsi, penilaian_rasa, tingkat_kesukaan, persentase_sisa_makanan }` |
+| `/api/v1/jadwal/:idJadwal/konfirmasi` | `POST` | Mengirim konfirmasi presensi / penolakan kehadiran H+1 | `{ status_kehadiran, kode_alasan_penolakan, catatan_khusus }` |
+| `/api/v1/evaluasi-harian/peringkat` | `GET` | Memuat klasemen leaderboard XP (#30 ➔ #15) & filter tingkat | `{ userRank, totalStudents: 50, leaderboard: [ { rank, name, xp, wasteSaved } ] }` |
+| `/api/v1/evaluasi-harian/lencana` | `GET` | Memuat 10 lencana prestasi MBG & klaim sertifikat digital | `{ badges: [ { id, title, desc, icon, unlocked, shareUrl } ] }` |
+| `/api/v1/evaluasi-harian/dampak` | `GET` | Memuat kalkulasi dampak lingkungan (FAO / Kementan RI) | `{ foodWasteSavedKg, co2PreventedKg, waterSavedLiters }` |
 
 
 ---
