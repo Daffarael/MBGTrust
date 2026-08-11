@@ -20,45 +20,56 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _showRankUpAnimation = false;
+  bool _isRankedUp = false;
 
-  final List<Map<String, dynamic>> _leaderboard = [
+  // Data Papan Peringkat Awal (Faizullatif Fajran berada di Peringkat #4 sebelum evaluasi)
+  final List<Map<String, dynamic>> _initialLeaderboard = [
     {
+      'id': 'usr_2',
       'rank': 1,
-      'name': 'Faizullatif Fajran',
-      'class': 'Kelas XII.FA-3',
+      'name': 'Siti Nurhaliza',
+      'class': 'Kelas XII.IPA-1',
       'xp': 1250,
       'wasteSavedKg': 4.2,
       'icon': Icons.workspace_premium_rounded,
       'iconColor': Color(0xFFD97706),
+      'isUser': false,
     },
     {
+      'id': 'usr_3',
       'rank': 2,
-      'name': 'Siti Nurhaliza',
-      'class': 'Kelas XII.IPA-1',
+      'name': 'Ahmad Fauzi',
+      'class': 'Kelas XI.IPS-2',
       'xp': 1180,
       'wasteSavedKg': 3.9,
       'icon': Icons.military_tech_rounded,
       'iconColor': Color(0xFF64748B),
+      'isUser': false,
     },
     {
+      'id': 'usr_4',
       'rank': 3,
-      'name': 'Ahmad Fauzi',
-      'class': 'Kelas XI.IPS-2',
+      'name': 'Dewi Lestari',
+      'class': 'Kelas XI.IPA-3',
       'xp': 1050,
       'wasteSavedKg': 3.5,
       'icon': Icons.stars_rounded,
       'iconColor': Color(0xFFB45309),
+      'isUser': false,
     },
     {
+      'id': 'usr_1',
       'rank': 4,
-      'name': 'Dewi Lestari',
-      'class': 'Kelas XI.IPA-3',
-      'xp': 920,
+      'name': 'Faizullatif Fajran',
+      'class': 'Kelas XII.FA-3',
+      'xp': 950,
       'wasteSavedKg': 3.1,
       'icon': Icons.star_outline_rounded,
       'iconColor': AppColors.primary,
+      'isUser': true,
     },
     {
+      'id': 'usr_5',
       'rank': 5,
       'name': 'Rizky Pratama',
       'class': 'Kelas X.1',
@@ -66,6 +77,66 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       'wasteSavedKg': 2.8,
       'icon': Icons.verified_user_rounded,
       'iconColor': AppColors.primary,
+      'isUser': false,
+    },
+  ];
+
+  // Data Papan Peringkat Setelah Evaluasi (Faizullatif Fajran NAIK PERINGKAT ke #1)
+  final List<Map<String, dynamic>> _rankedUpLeaderboard = [
+    {
+      'id': 'usr_1',
+      'rank': 1,
+      'name': 'Faizullatif Fajran',
+      'class': 'Kelas XII.FA-3',
+      'xp': 1300,
+      'wasteSavedKg': 4.5,
+      'icon': Icons.workspace_premium_rounded,
+      'iconColor': Color(0xFFD97706),
+      'isUser': true,
+    },
+    {
+      'id': 'usr_2',
+      'rank': 2,
+      'name': 'Siti Nurhaliza',
+      'class': 'Kelas XII.IPA-1',
+      'xp': 1250,
+      'wasteSavedKg': 4.2,
+      'icon': Icons.military_tech_rounded,
+      'iconColor': Color(0xFF64748B),
+      'isUser': false,
+    },
+    {
+      'id': 'usr_3',
+      'rank': 3,
+      'name': 'Ahmad Fauzi',
+      'class': 'Kelas XI.IPS-2',
+      'xp': 1180,
+      'wasteSavedKg': 3.9,
+      'icon': Icons.stars_rounded,
+      'iconColor': Color(0xFFB45309),
+      'isUser': false,
+    },
+    {
+      'id': 'usr_4',
+      'rank': 4,
+      'name': 'Dewi Lestari',
+      'class': 'Kelas XI.IPA-3',
+      'xp': 1050,
+      'wasteSavedKg': 3.5,
+      'icon': Icons.star_outline_rounded,
+      'iconColor': AppColors.primary,
+      'isUser': false,
+    },
+    {
+      'id': 'usr_5',
+      'rank': 5,
+      'name': 'Rizky Pratama',
+      'class': 'Kelas X.1',
+      'xp': 850,
+      'wasteSavedKg': 2.8,
+      'icon': Icons.verified_user_rounded,
+      'iconColor': AppColors.primary,
+      'isUser': false,
     },
   ];
 
@@ -101,8 +172,24 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     if (widget.justEvaluated) {
-      _showRankUpAnimation = true;
+      _triggerRankUpSequence();
     }
+  }
+
+  void _triggerRankUpSequence() {
+    setState(() {
+      _isRankedUp = false;
+      _showRankUpAnimation = true;
+    });
+
+    // Menjalankan sekuens animasi perpindahan peringkat dari #4 ke #1 secara otomatis!
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) {
+        setState(() {
+          _isRankedUp = true;
+        });
+      }
+    });
   }
 
   @override
@@ -182,10 +269,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     final studentName = user?.namaLengkap ?? 'Faizullatif Fajran';
     final schoolName = user?.namaSekolah ?? 'MAN 2 Kota Padang';
 
-    _leaderboard[0]['name'] = studentName;
-    if (user?.tingkatKelas != null) {
-      _leaderboard[0]['class'] = 'Kelas ${user!.tingkatKelas}';
-    }
+    final currentList = _isRankedUp ? _rankedUpLeaderboard : _initialLeaderboard;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -231,7 +315,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                                 Icon(Icons.stars_rounded, color: Color(0xFFD97706), size: 24),
                                 SizedBox(width: 8),
                                 Text(
-                                  'NAIK PERINGKAT SISWA! 🎉',
+                                  'SELEBRASI NAIK PERINGKAT! 🎉',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -247,9 +331,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                           ],
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          'Selamat! Ulasan & presensi MBG kamu baru saja menambah +50 XP. Posisi kamu naik ke Peringkat #1 Pahlawan Makanan!',
-                          style: TextStyle(
+                        Text(
+                          _isRankedUp
+                              ? 'Selamat Faizullatif! Ulasan jujur kamu berhasil menambah +350 XP. Posisi kamu NAIK PERINGKAT dari #4 ke #1 Pahlawan Makanan Sekolah!'
+                              : 'Memproses penambahan +350 XP presensi & ulasan MBG hari ini...',
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFFB45309),
                             height: 1.3,
@@ -263,12 +349,16 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               },
             ),
           ],
-          // Hero Profile Card
-          Container(
+
+          // Hero Profile Card (Animated Rank & XP)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.primaryDark],
+              gradient: LinearGradient(
+                colors: _isRankedUp
+                    ? [const Color(0xFF047857), const Color(0xFF065F46)]
+                    : [AppColors.primary, AppColors.primaryDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -286,7 +376,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.white,
-                  child: const Icon(Icons.workspace_premium_rounded, size: 36, color: AppColors.primary),
+                  child: Icon(
+                    _isRankedUp ? Icons.workspace_premium_rounded : Icons.star_rounded,
+                    size: 36,
+                    color: _isRankedUp ? const Color(0xFFD97706) : AppColors.primary,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -302,19 +396,25 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                         ),
                       ),
                       Text(
-                        'Pahlawan Makanan Level 4 • $schoolName',
+                        'Pahlawan Makanan • $schoolName',
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        '1.250 XP • Peringkat #1 di Sekolah',
-                        style: TextStyle(
-                          color: AppColors.secondaryLight,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        child: Text(
+                          _isRankedUp
+                              ? '1.300 XP • Peringkat #1 di Sekolah 🎉'
+                              : '950 XP • Peringkat #4 di Sekolah',
+                          key: ValueKey(_isRankedUp),
+                          style: const TextStyle(
+                            color: AppColors.secondaryLight,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -323,106 +423,173 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // Papan Peringkat Header
+          // Papan Peringkat Header & Simuasi Button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 'Top Siswa Terhemat Makanan',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
-              Text(
-                'Bulan Ini',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              InkWell(
+                onTap: _triggerRankUpSequence,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary),
+                  ),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.flash_on_rounded, size: 14, color: AppColors.primaryDark),
+                      SizedBox(width: 4),
+                      Text(
+                        'Simulasi Naik (#4➔#1)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
 
-          // Leaderboard List
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _leaderboard.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final item = _leaderboard[index];
-              final isMe = index == 0;
-              final IconData iconData = item['icon'] as IconData;
-              final Color iconColor = item['iconColor'] as Color;
+          // Leaderboard List (Animated Item Swap)
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 600),
+            switchInCurve: Curves.easeOutBack,
+            switchOutCurve: Curves.easeIn,
+            child: ListView.separated(
+              key: ValueKey(_isRankedUp),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: currentList.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final item = currentList[index];
+                final bool isUser = item['isUser'] as bool? ?? false;
+                final IconData iconData = item['icon'] as IconData;
+                final Color iconColor = item['iconColor'] as Color;
 
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isMe ? AppColors.primaryLight.withValues(alpha: 0.4) : AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isMe ? AppColors.primary : AppColors.border,
-                    width: isMe ? 1.5 : 1.0,
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isUser
+                        ? AppColors.primaryLight.withValues(alpha: 0.6)
+                        : AppColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isUser ? AppColors.primary : AppColors.border,
+                      width: isUser ? 2.0 : 1.0,
+                    ),
+                    boxShadow: isUser
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : null,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 28,
-                      child: Text(
-                        '#${item['rank']}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: index < 3 ? AppColors.secondaryDark : AppColors.textSecondary,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 28,
+                        child: Text(
+                          '#${item['rank']}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: index < 3 ? AppColors.secondaryDark : AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
-                    Icon(iconData, color: iconColor, size: 24),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Icon(iconData, color: iconColor, size: 24),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  item['name'] as String,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: isUser ? AppColors.primaryDark : AppColors.textPrimary,
+                                  ),
+                                ),
+                                if (isUser) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text(
+                                      'Saya',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            Text(
+                              item['class'] as String,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            item['name'],
+                            '${item['xp']} XP',
                             style: const TextStyle(
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: AppColors.textPrimary,
+                              color: AppColors.primary,
                             ),
                           ),
                           Text(
-                            '${item['class']} • ${item['wasteSavedKg']} kg diselamatkan',
+                            '${item['wasteSavedKg']} kg hemat',
                             style: const TextStyle(
-                              fontSize: 11,
+                              fontSize: 10,
                               color: AppColors.textSecondary,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${item['xp']} XP',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryDark,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
