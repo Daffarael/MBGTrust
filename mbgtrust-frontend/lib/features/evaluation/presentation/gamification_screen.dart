@@ -35,7 +35,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     {
       'rank': 2,
       'name': 'Siti Nurhaliza',
-      'class': 'Kelas 5-B',
+      'class': 'Kelas XII.IPA-1',
       'xp': 1180,
       'wasteSavedKg': 3.9,
       'icon': Icons.military_tech_rounded,
@@ -44,7 +44,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     {
       'rank': 3,
       'name': 'Ahmad Fauzi',
-      'class': 'Kelas 5-A',
+      'class': 'Kelas XI.IPS-2',
       'xp': 1050,
       'wasteSavedKg': 3.5,
       'icon': Icons.stars_rounded,
@@ -53,7 +53,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     {
       'rank': 4,
       'name': 'Dewi Lestari',
-      'class': 'Kelas 4-C',
+      'class': 'Kelas XI.IPA-3',
       'xp': 920,
       'wasteSavedKg': 3.1,
       'icon': Icons.star_outline_rounded,
@@ -62,7 +62,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     {
       'rank': 5,
       'name': 'Rizky Pratama',
-      'class': 'Kelas 5-A',
+      'class': 'Kelas X.1',
       'xp': 850,
       'wasteSavedKg': 2.8,
       'icon': Icons.verified_user_rounded,
@@ -115,22 +115,59 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   @override
   Widget build(BuildContext context) {
     return ResponsiveLayout(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: const Text(
-          'Papan Peringkat & Dampak',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          tabs: const [
-            Tab(icon: Icon(Icons.emoji_events_rounded), text: 'Papan Peringkat'),
-            Tab(icon: Icon(Icons.eco_rounded), text: 'Dampak Lingkungan'),
-          ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(110),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primaryDark, AppColors.primary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.emoji_events_rounded, color: AppColors.secondary, size: 20),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Papan Peringkat & Dampak',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: AppColors.secondary,
+                  indicatorWeight: 3,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  tabs: const [
+                    Tab(icon: Icon(Icons.emoji_events_rounded, size: 18), text: 'Papan Peringkat'),
+                    Tab(icon: Icon(Icons.eco_rounded, size: 18), text: 'Dampak Lingkungan'),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: const StudentBottomNavBar(currentIndex: 1),

@@ -892,10 +892,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildInteractiveStreakCard() {
     final List<Map<String, dynamic>> weekDays = [
       {'day': 'Sen', 'status': 'done', 'label': '0% Waste'},
-      {'day': 'Sel', 'status': 'done', 'label': '0% Waste'},
-      {'day': 'Rab', 'status': 'done', 'label': '0% Waste'},
-      {'day': 'Kam', 'status': 'done', 'label': '0% Waste'},
-      {'day': 'Jum', 'status': 'today', 'label': 'Hari Ini'},
+      {'day': 'Sel', 'status': _hasEvaluatedToday ? 'done' : 'today', 'label': _hasEvaluatedToday ? '0% Waste' : 'Hari Ini'},
+      {'day': 'Rab', 'status': 'upcoming', 'label': 'Mendatang'},
+      {'day': 'Kam', 'status': 'upcoming', 'label': 'Mendatang'},
+      {'day': 'Jum', 'status': 'upcoming', 'label': 'Mendatang'},
     ];
 
     return Container(

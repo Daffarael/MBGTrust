@@ -24,18 +24,26 @@ class ResponsiveLayout extends StatelessWidget {
       backgroundColor: backgroundColor ?? AppColors.background,
       appBar: appBar,
       body: SafeArea(
-        child: Center(
+        child: Align(
+          alignment: Alignment.topCenter,
           child: Container(
             constraints: const BoxConstraints(maxWidth: 640),
+            width: double.infinity,
+            height: double.infinity,
             child: child,
           ),
         ),
       ),
       bottomNavigationBar: bottomNavigationBar != null
-          ? Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 640),
-                child: bottomNavigationBar,
+          ? SafeArea(
+              top: false,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 640),
+                  width: double.infinity,
+                  child: bottomNavigationBar,
+                ),
               ),
             )
           : null,
