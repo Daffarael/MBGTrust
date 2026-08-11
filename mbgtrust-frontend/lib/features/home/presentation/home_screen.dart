@@ -261,6 +261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'iconColor': AppColors.primary,
         'isRead': false,
         'category': 'Presensi',
+        'route': '/home',
       },
       {
         'id': '2',
@@ -271,6 +272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'iconColor': const Color(0xFF0284C7),
         'isRead': false,
         'category': 'Dapur SPPG',
+        'route': '/next-day-confirmation',
       },
       {
         'id': '3',
@@ -281,6 +283,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'iconColor': const Color(0xFFD97706),
         'isRead': true,
         'category': 'Pemberitahuan',
+        'route': '/profil/gamifikasi',
       },
       {
         'id': '4',
@@ -291,6 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'iconColor': AppColors.primary,
         'isRead': true,
         'category': 'Prestasi',
+        'route': '/profil/gamifikasi',
       },
       {
         'id': '5',
@@ -301,6 +305,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         'iconColor': const Color(0xFF059669),
         'isRead': true,
         'category': 'Menu',
+        'route': '/next-day-confirmation',
       },
     ];
 
@@ -416,6 +421,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             setModalState(() {
                               item['isRead'] = true;
                             });
+                            Navigator.pop(modalCtx);
+                            final String targetRoute = item['route'] as String;
+                            if (targetRoute != '/home') {
+                              context.go(targetRoute);
+                            }
                           },
                           borderRadius: BorderRadius.circular(14),
                           child: Container(
