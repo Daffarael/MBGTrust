@@ -617,6 +617,84 @@
 }
 ```
 
+#### 3.5 Ambil Leaderboard Peringkat XP Siswa
+* **Endpoint:** `GET /api/v1/evaluasi-harian/peringkat`
+* **Hak Akses:** `[AUTH: PENERIMA_MANFAAT]`
+* **Query Parameters:** `?filter=KELAS&halaman=1&batas=10&cari_peringkat_saya=true`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Klasemen peringkat XP siswa berhasil diambil.",
+  "data": {
+    "posisi_peringkat_saya": 15,
+    "total_poin_xp_saya": 1402,
+    "total_siswa_terdaftar": 50,
+    "halaman_saat_ini": 2,
+    "total_halaman": 5,
+    "daftar_peringkat": [
+      {
+        "peringkat": 15,
+        "nama_lengkap": "Faizullatif Fajran",
+        "sekolah": "MAN 2 Padang",
+        "tingkat_kelas": "XII.FA-3",
+        "total_xp": 1402,
+        "total_makanan_tercegah_kg": 2.3,
+        "is_user_current": true
+      }
+    ]
+  }
+}
+```
+
+#### 3.6 Ambil Daftar Lencana MBG & Status Klaim
+* **Endpoint:** `GET /api/v1/evaluasi-harian/lencana`
+* **Hak Akses:** `[AUTH: PENERIMA_MANFAAT]`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Daftar lencana MBG berhasil diambil.",
+  "data": {
+    "total_terbuka": 4,
+    "total_lencana": 10,
+    "daftar_lencana": [
+      {
+        "id_lencana": "badge_01",
+        "judul": "Pahlawan Piring Bersih",
+        "deskripsi": "Selesaikan presensi piring bersih 7 hari berturut-turut.",
+        "kategori": "Konsistensi",
+        "terbuka": true,
+        "tanggal_terbuka": "2026-08-05T12:00:00Z",
+        "dapat_diklaim_sertifikat": true,
+        "url_sertifikat_pdf": "https://api.mbgtrust.id/v1/sertifikat/badge_01.pdf"
+      }
+    ]
+  }
+}
+```
+
+#### 3.7 Ambil Kalkulasi Dampak Lingkungan MBG
+* **Endpoint:** `GET /api/v1/evaluasi-harian/dampak`
+* **Hak Akses:** `[AUTH: PENERIMA_MANFAAT]`
+* **Respon Berhasil (200 OK):**
+```json
+{
+  "sukses": true,
+  "kode_status": 200,
+  "pesan": "Metrik kalkulasi dampak lingkungan berhasil diambil.",
+  "data": {
+    "makanan_diselamatkan_kg": 2.3,
+    "emisi_co2_dicegah_kg": 5.8,
+    "air_bersih_dihemat_liter": 414,
+    "metode_kalkulasi": "Formula Standar FAO & Kementan RI (1kg Food Waste = 2.5kg CO2e & 180L Water Footprint)",
+    "komitmen_nasional": "Pahlawan Piring Bersih MBG Indonesia"
+  }
+}
+```
+
 ---
 
 ### 🟣 Modul 4 & 5: Perencanaan Produksi & Tracking Logistik
@@ -828,4 +906,4 @@
 * *(Mengembalikan berkas `Content-Type: application/pdf` atau `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`)*
 
 ---
-*Akhir dari Dokumen Kontrak Spesifikasi API Eksklusif (v3.0.0 — 26 Endpoints)*
+*Akhir dari Dokumen Kontrak Spesifikasi API Eksklusif (v5.0.0 — 29 Endpoints Resmi)*
