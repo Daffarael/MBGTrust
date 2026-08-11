@@ -93,6 +93,9 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (mounted) setState(() {});
+    });
     _scrollController = ScrollController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -514,14 +517,16 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                       unselectedLabelColor: AppColors.textSecondary,
                       labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                       dividerColor: Colors.transparent,
-                      tabs: const [
+                      tabs: [
                         Tab(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.emoji_events_rounded, size: 15),
-                              SizedBox(width: 5),
-                              Text('Peringkat'),
+                              const Icon(Icons.emoji_events_rounded, size: 16),
+                              if (_tabController.index == 0) ...[
+                                const SizedBox(width: 5),
+                                const Text('Peringkat'),
+                              ],
                             ],
                           ),
                         ),
@@ -529,9 +534,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.workspace_premium_rounded, size: 15),
-                              SizedBox(width: 5),
-                              Text('Lencana'),
+                              const Icon(Icons.workspace_premium_rounded, size: 16),
+                              if (_tabController.index == 1) ...[
+                                const SizedBox(width: 5),
+                                const Text('Lencana'),
+                              ],
                             ],
                           ),
                         ),
@@ -539,9 +546,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.eco_rounded, size: 15),
-                              SizedBox(width: 5),
-                              Text('Dampak'),
+                              const Icon(Icons.eco_rounded, size: 16),
+                              if (_tabController.index == 2) ...[
+                                const SizedBox(width: 5),
+                                const Text('Dampak'),
+                              ],
                             ],
                           ),
                         ),
