@@ -238,6 +238,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ],
               ),
             ),
+      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 2),
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/widgets.dart';
 import 'rating_section.dart';
 
 class MenuDetailScreen extends StatefulWidget {
@@ -89,20 +90,9 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    photoUrl,
+                  MbgFoodImage(
+                    imageUrl: photoUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(
-                      color: AppColors.primaryLight,
-                      child: const Center(
-                        child: Icon(
-                          Icons.restaurant_menu_rounded,
-                          size: 60,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
                   ),
                   Container(
                     decoration: BoxDecoration(

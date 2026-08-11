@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/mock_data.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/image_utils.dart';
+import '../../../core/widgets/widgets.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
 import '../../auth/presentation/profile_screen.dart';
 import '../../evaluation/presentation/gamification_screen.dart';
@@ -830,18 +830,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                            child: Image.network(
-                              ImageUtils.getDirectImageUrl(tomorrowMenu['foto_url'] as String),
+                            child: MbgFoodImage(
+                              imageUrl: tomorrowMenu['foto_url'] as String,
                               height: 150,
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (ctx, err, stack) => Container(
-                                height: 150,
-                                color: AppColors.primaryLight,
-                                child: const Center(
-                                  child: Icon(Icons.restaurant_menu_rounded, size: 44, color: AppColors.primary),
-                                ),
-                              ),
                             ),
                           ),
                           Padding(
@@ -892,7 +885,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildAnimatedBottomNavBar(),
+      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 0),
     );
   }
 

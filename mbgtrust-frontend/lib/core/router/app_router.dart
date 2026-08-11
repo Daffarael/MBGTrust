@@ -53,7 +53,11 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/profil/gamifikasi',
-      builder: (context, state) => const GamificationScreen(),
+      builder: (context, state) {
+        final extraMap = state.extra as Map<String, dynamic>?;
+        final justEvaluated = extraMap?['justEvaluated'] as bool? ?? false;
+        return GamificationScreen(justEvaluated: justEvaluated);
+      },
     ),
     GoRoute(
       path: '/profil/preferensi',

@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/responsive_layout.dart';
+import '../../../core/widgets/student_bottom_nav_bar.dart';
 import '../../auth/presentation/providers/auth_provider.dart';
 
 class GamificationScreen extends ConsumerStatefulWidget {
-  const GamificationScreen({super.key});
+  final bool justEvaluated;
+
+  const GamificationScreen({
+    super.key,
+    this.justEvaluated = false,
+  });
 
   @override
   ConsumerState<GamificationScreen> createState() => _GamificationScreenState();
@@ -14,6 +20,7 @@ class GamificationScreen extends ConsumerStatefulWidget {
 class _GamificationScreenState extends ConsumerState<GamificationScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _showRankUpAnimation = false;
 
   final List<Map<String, dynamic>> _leaderboard = [
     {
@@ -86,7 +93,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       'iconData': Icons.emoji_events_rounded,
       'title': 'Top 3 Peringkat',
       'desc': 'Masuk peringkat 3 besar siswa terhemat sekolah',
-      'unlocked': false,
+      'unlocked': true,
     },
   ];
 
@@ -94,6 +101,9 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    if (widget.justEvaluated) {
+      _showRankUpAnimation = true;
+    }
   }
 
   @override
@@ -123,6 +133,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           ],
         ),
       ),
+      bottomNavigationBar: const StudentBottomNavBar(currentIndex: 1),
       child: TabBarView(
         controller: _tabController,
         children: [
@@ -148,6 +159,77 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Rank-Up Celebration Animated Banner
+          if (_showRankUpAnimation) ...[
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutBack,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: value,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFEF3C7), Color(0xFFFDE68A)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.25),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(Icons.stars_rounded, color: Color(0xFFD97706), size: 24),
+                                SizedBox(width: 8),
+                                Text(
+                                  'NAIK PERINGKAT SISWA! 🎉',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF92400E),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF92400E)),
+                              onPressed: () => setState(() => _showRankUpAnimation = false),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Selamat! Ulasan & presensi MBG kamu baru saja menambah +50 XP. Posisi kamu naik ke Peringkat #1 Pahlawan Makanan!',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFB45309),
+                            height: 1.3,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
           // Hero Profile Card
           Container(
             padding: const EdgeInsets.all(20),

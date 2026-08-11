@@ -256,7 +256,7 @@ class _RatingSectionState extends ConsumerState<RatingSection> {
                     if (Navigator.canPop(parentContext)) {
                       Navigator.pop(parentContext, true);
                     }
-                    parentContext.push('/profil/gamifikasi');
+                    parentContext.go('/profil/gamifikasi', extra: {'justEvaluated': true});
                   },
                 ),
                 const SizedBox(height: 8),
