@@ -18,6 +18,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
+  late Animation<double> _rotateAnimation;
 
   String _loadingText = 'Memuat Sistem MBGTrust...';
   Timer? _textTimer;
@@ -38,17 +39,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1800),
+      duration: const Duration(milliseconds: 2200),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.92, end: 1.08).animate(
+    _scaleAnimation = Tween<double>(begin: 0.94, end: 1.06).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.75, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.easeInOut,
       ),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
+    _rotateAnimation = Tween<double>(begin: 0.0, end: 0.05).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.easeInOut,
@@ -106,8 +114,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF0F172A),
-              Color(0xFF064E3B),
+              Color(0xFF06201B),
+              Color(0xFF043427),
               Color(0xFF0F172A),
             ],
             begin: Alignment.topCenter,
@@ -119,31 +127,43 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // Animated Pulsing Logo
+              // Animated WOW Pulsing Glow & Rotation Aura Logo
               AnimatedBuilder(
                 animation: _animationController,
                 builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Opacity(
-                      opacity: _fadeAnimation.value,
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primaryDark.withValues(alpha: 0.25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
-                              blurRadius: 36,
-                              spreadRadius: 8,
+                  return Transform.rotate(
+                    angle: _rotateAnimation.value,
+                    child: Transform.scale(
+                      scale: _scaleAnimation.value,
+                      child: Opacity(
+                        opacity: _fadeAnimation.value,
+                        child: Container(
+                          padding: const EdgeInsets.all(28),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primaryDark.withValues(alpha: 0.35),
+                            border: Border.all(
+                              color: AppColors.primaryLight.withValues(alpha: 0.3 + (_scaleAnimation.value - 0.94) * 2),
+                              width: 2,
                             ),
-                          ],
-                        ),
-                        child: const MbgTrustLogo(
-                          size: 110,
-                          showText: false,
-                          isDark: true,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.5),
+                                blurRadius: 42 * _scaleAnimation.value,
+                                spreadRadius: 10 * _scaleAnimation.value,
+                              ),
+                              BoxShadow(
+                                color: AppColors.secondary.withValues(alpha: 0.25),
+                                blurRadius: 60,
+                                spreadRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: const MbgTrustLogo(
+                            size: 110,
+                            showText: false,
+                            isDark: true,
+                          ),
                         ),
                       ),
                     ),
@@ -162,16 +182,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   letterSpacing: 0.8,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 10),
+              // Sub-title 2 Baris Presisi
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.0),
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
-                  'Platform Digital Berbasis AI untuk Mitigasi Food Waste\npada Program Makan Bergizi',
+                  'Mitigasi Food Waste Berbasis AI\npada Program Makan Bergizi Gratis',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white70,
-                    fontSize: 13,
-                    height: 1.4,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.45,
                   ),
                 ),
               ),
@@ -180,7 +202,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
               // Interactive Animated Loading Section
               Padding(
-                padding: const EdgeInsets.only(bottom: 40.0),
+                padding: const EdgeInsets.only(bottom: 32.0),
                 child: Column(
                   children: [
                     const SizedBox(
@@ -206,11 +228,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Copyright 2 Baris Presisi
                     const Text(
-                      '© 2026 MBGTrust Platform • BGN Republik Indonesia',
+                      '© 2026 MBGTrust Platform\nBadan Gizi Nasional Republik Indonesia',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white54,
                         fontSize: 11,
+                        height: 1.4,
                         letterSpacing: 0.3,
                       ),
                     ),

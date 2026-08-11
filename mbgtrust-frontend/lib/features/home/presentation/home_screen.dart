@@ -373,7 +373,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 640),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -383,12 +383,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       Row(
                         children: [
-                          const MbgTrustLogo(size: 30),
+                          const MbgTrustLogo(size: 28),
                           const SizedBox(width: 8),
                           const Text(
                             'MBGTrust',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryDark,
                             ),
@@ -397,7 +397,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       // Notification Bell Button
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(7),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           shape: BoxShape.circle,
@@ -406,13 +406,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            const Icon(Icons.notifications_outlined, size: 18, color: AppColors.textPrimary),
+                            const Icon(Icons.notifications_outlined, size: 17, color: AppColors.textPrimary),
                             Positioned(
                               right: -1,
                               top: -1,
                               child: Container(
-                                width: 7,
-                                height: 7,
+                                width: 6,
+                                height: 6,
                                 decoration: const BoxDecoration(
                                   color: AppColors.error,
                                   shape: BoxShape.circle,
@@ -424,24 +424,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
                   // Banner Selamat Datang Siswa (Kompak, Elegan, Ada Chip XP)
                   Container(
                     width: double.infinity,
-                    height: 125,
+                    height: 112,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.25),
-                          blurRadius: 14,
-                          offset: const Offset(0, 5),
+                          color: AppColors.primary.withValues(alpha: 0.22),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                       child: Stack(
                         children: [
                           // Background Image
@@ -471,7 +471,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           // Content Padding
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -481,15 +481,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   children: [
                                     // School & Class Tag
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                                       decoration: BoxDecoration(
                                         color: Colors.white.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(10),
                                         border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.school_rounded, color: Colors.white, size: 12),
+                                          const Icon(Icons.school_rounded, color: Colors.white, size: 11),
                                           const SizedBox(width: 4),
                                           Text(
                                             '$schoolName • $classGrade',
@@ -504,21 +504,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     // XP Chip Emas Frosted Glass
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFD97706).withValues(alpha: 0.85),
-                                        borderRadius: BorderRadius.circular(12),
+                                        color: const Color(0xFFD97706).withValues(alpha: 0.88),
+                                        borderRadius: BorderRadius.circular(10),
                                         border: Border.all(color: const Color(0xFFFDE68A), width: 1.2),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFDE68A), size: 14),
+                                          const Icon(Icons.workspace_premium_rounded, color: Color(0xFFFDE68A), size: 13),
                                           const SizedBox(width: 4),
                                           Text(
                                             _hasEvaluatedToday ? '1.402 XP' : '922 XP',
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 11,
+                                              fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -539,7 +539,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             'Selamat Datang,',
                                             style: TextStyle(
                                               color: Colors.white70,
-                                              fontSize: 11,
+                                              fontSize: 10,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -549,7 +549,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 18,
+                                              fontSize: 17,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -559,22 +559,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     const SizedBox(width: 8),
                                     // Date Pill
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withValues(alpha: 0.25),
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(8),
                                         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.calendar_today_rounded, color: AppColors.secondary, size: 11),
+                                          const Icon(Icons.calendar_today_rounded, color: AppColors.secondary, size: 10),
                                           const SizedBox(width: 4),
                                           Text(
                                             _dateString.isNotEmpty ? '$_dateString • ${_timeString.split(' ')[0]}' : '11 Agustus 2026',
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 10,
+                                              fontSize: 9.5,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -590,17 +590,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
                   // Interactive Streak Presensi & Piring Bersih Card
                   _buildInteractiveStreakCard(),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
                   // ==========================================
                   // PRESENSI & EVALUASI MBG HARI INI (WITH MINI FOOD PREVIEW)
                   // ==========================================
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
@@ -1018,7 +1018,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
