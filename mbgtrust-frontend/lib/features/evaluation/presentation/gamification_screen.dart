@@ -176,22 +176,20 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
     ];
 
     List<Map<String, dynamic>> list = [];
-
     int userTargetRank = rankedUp ? 15 : 30;
-    int userXp = rankedUp ? 820 : 520;
-    double userWaste = rankedUp ? 2.3 : 1.8;
-
-    int currentXp = 1850;
-    double currentWaste = 6.2;
 
     for (int i = 1; i <= 50; i++) {
+      int rankXp = 1850 - ((i - 1) * 32);
+      double rankWaste = double.parse((6.2 - ((i - 1) * 0.1)).toStringAsFixed(1));
+      if (rankWaste < 0.5) rankWaste = 0.5;
+
       if (i == userTargetRank) {
         list.add({
           'rank': i,
           'name': 'Faizullatif Fajran',
           'class': 'Kelas XII.FA-3',
-          'xp': userXp,
-          'wasteSavedKg': userWaste,
+          'xp': rankXp,
+          'wasteSavedKg': rankWaste,
           'isUser': true,
         });
       } else {
@@ -205,14 +203,11 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
           'rank': i,
           'name': studentNames[nameIndex],
           'class': 'Kelas $classIndex',
-          'xp': currentXp,
-          'wasteSavedKg': double.parse(currentWaste.toStringAsFixed(1)),
+          'xp': rankXp,
+          'wasteSavedKg': rankWaste,
           'isUser': false,
         });
       }
-      currentXp -= 32;
-      currentWaste -= 0.1;
-      if (currentWaste < 0.5) currentWaste = 0.5;
     }
 
     return list;
@@ -302,7 +297,7 @@ class _GamificationScreenState extends ConsumerState<GamificationScreen>
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            _isRankedUp ? '820 XP' : '520 XP',
+                            _isRankedUp ? '1.402 XP' : '922 XP',
                             style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                           ),
                         ),
