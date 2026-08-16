@@ -7,13 +7,13 @@ import 'package:flutter/foundation.dart';
 ///   Dev Web/Desktop        : flutter run -d chrome  (otomatis localhost:3000)
 ///   Dev Android Emulator   : flutter run -d emulator (otomatis 10.0.2.2:3000)
 ///   Dev Device Fisik       : flutter run --dart-define=BASE_URL=http://192.168.x.x:3000/api/v1
-///   Production             : flutter build --dart-define=BASE_URL=https://mbgtrust-backend.railway.app/api/v1
+///   Production             : flutter build --dart-define=BASE_URL=https://mbgtrust-production.up.railway.app/api/v1
 class AppConfig {
   AppConfig._();
 
   /// URL produksi Railway.
   static const String _productionBaseUrl =
-      'https://mbgtrust-backend.railway.app/api/v1';
+      'https://mbgtrust-production.up.railway.app/api/v1';
 
   /// URL dev lokal untuk Android Emulator (10.0.2.2 = localhost PC dari emulator).
   static const String _emulatorBaseUrl = 'http://10.0.2.2:3000/api/v1';
