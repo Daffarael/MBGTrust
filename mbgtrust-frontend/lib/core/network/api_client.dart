@@ -5,7 +5,7 @@ import 'api_response.dart';
 
 /// HTTP Client terpusat menggunakan Dio untuk MBGTrust
 class ApiClient {
-  static const String defaultBaseUrl = AppConfig.baseUrl;
+  static String get defaultBaseUrl => AppConfig.baseUrl;
   static const Duration connectTimeoutDuration = Duration(seconds: 15);
   static const Duration receiveTimeoutDuration = Duration(seconds: 15);
 
@@ -20,7 +20,7 @@ class ApiClient {
     String? baseUrl,
   }) : _storage = storage ?? const FlutterSecureStorage() {
     final options = BaseOptions(
-      baseUrl: baseUrl ?? defaultBaseUrl,
+      baseUrl: baseUrl ?? AppConfig.baseUrl,
       connectTimeout: connectTimeoutDuration,
       receiveTimeout: receiveTimeoutDuration,
       headers: const {
