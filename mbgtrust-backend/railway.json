@@ -1,5 +1,5 @@
 {
-  "build": { "builder": "NIXPACKS" },
+  "build": { "builder": "DOCKER" },
   "deploy": {
     "startCommand": "npx prisma migrate deploy && node src/server.js",
     "healthcheckPath": "/health"
