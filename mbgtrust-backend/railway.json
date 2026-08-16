@@ -1,5 +1,5 @@
 {
-  "build": { "builder": "DOCKER" },
+  "build": { "builder": "DOCKERFILE" },
   "deploy": {
     "startCommand": "npx prisma migrate deploy && node src/server.js",
     "healthcheckPath": "/health"
