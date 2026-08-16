@@ -30,37 +30,37 @@ const ambilDataAlternatif = async (idMenu, tanggalMulai, tanggalSelesai) => {
   if (jadwalList.length === 0) return null;
   const idJadwalList = jadwalList.map((j) => j.id);
 
-  // C1–C4 dari evaluasi_menu
+  // C1–C4 dari evaluasi_menu (Semua Benefit)
   const evaluasi = await prisma.evaluasiMenu.findMany({
     where: { idJadwal: { in: idJadwalList } },
     select: {
-      penilaianRasa:    true,
-      tingkatKesukaan:  true,
-      kesesuaianPorsi:  true,
-      persentaseSisa:   true,
+      penilaianRasa:        true,
+      tingkatKesukaan:      true,
+      kesesuaianPorsi:      true,
+      persentaseDikonsumsi: true,
     },
   });
 
-  const c1 = avgAtauNol(evaluasi.filter((e) => e.penilaianRasa   !== null).map((e) => e.penilaianRasa));
-  const c2 = avgAtauNol(evaluasi.filter((e) => e.tingkatKesukaan !== null).map((e) => e.tingkatKesukaan));
-  const c3 = avgAtauNol(evaluasi.filter((e) => e.kesesuaianPorsi !== null).map((e) => e.kesesuaianPorsi));
-  const c4 = avgAtauNol(evaluasi.filter((e) => e.persentaseSisa  !== null).map((e) => e.persentaseSisa));
+  const c1 = avgAtauNol(evaluasi.filter((e) => e.penilaianRasa        !== null).map((e) => e.penilaianRasa));
+  const c2 = avgAtauNol(evaluasi.filter((e) => e.tingkatKesukaan      !== null).map((e) => e.tingkatKesukaan));
+  const c3 = avgAtauNol(evaluasi.filter((e) => e.kesesuaianPorsi      !== null).map((e) => e.kesesuaianPorsi));
+  const c4 = avgAtauNol(evaluasi.filter((e) => e.persentaseDikonsumsi !== null).map((e) => e.persentaseDikonsumsi));
 
-  // C5 dari konfirmasi: % TIDAK_HADIR dari total konfirmasi per jadwal
+  // C5 dari konfirmasi: % HADIR dari total konfirmasi per jadwal (Tingkat Penerimaan MBG -> Benefit)
   const konfirmasi = await prisma.konfirmasi.findMany({
     where: { idJadwal: { in: idJadwalList } },
     select: { status: true },
   });
   const totalKonfirmasi = konfirmasi.length;
-  const totalTidakHadir = konfirmasi.filter((k) => k.status === 'TIDAK_HADIR').length;
-  const c5 = totalKonfirmasi === 0 ? 0 : (totalTidakHadir / totalKonfirmasi) * 100;
+  const totalHadir = konfirmasi.filter((k) => k.status === 'HADIR').length;
+  const c5 = totalKonfirmasi === 0 ? 0 : (totalHadir / totalKonfirmasi) * 100;
 
   return { id_menu: menu.id, nama_menu: menu.namaMenu, c1, c2, c3, c4, c5 };
 };
 
 // ─── 6.1 Eksekusi TOPSIS ───────────────────────────────────────
 
-export const jalankanEksekusi = async ({ tanggal_mulai, tanggal_selesai, daftar_id_menu }) => {
+export const jalankanEksekusi = async ({ tanggal_mulai, tanggal_selesai, daftar_id_menu, id_sekolah = null }) => {
   const alternatifRaw = await Promise.all(
     daftar_id_menu.map((id) => ambilDataAlternatif(id, tanggal_mulai, tanggal_selesai))
   );
@@ -86,6 +86,7 @@ export const jalankanEksekusi = async ({ tanggal_mulai, tanggal_selesai, daftar_
 
   const eksekusi = await prisma.eksekusiTopsis.create({
     data: {
+      idSekolah:      id_sekolah,
       periodeAwal:    new Date(tanggal_mulai),
       periodeAkhir:   new Date(tanggal_selesai),
       hasilJson,

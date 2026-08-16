@@ -10,19 +10,20 @@ datasource db {
 // TABEL 1: pengguna
 // ============================================================
 model Pengguna {
-  id            Int      @id @default(autoincrement())
-  nikNisn       String?  @unique @map("nik_nisn")
-  namaLengkap   String   @map("nama_lengkap")
-  email         String?  @unique
-  katasandi     String
-  peran         Peran    @default(PENERIMA_MANFAAT)
-  tingkatKelas  String?  @map("tingkat_kelas")
-  riwayatAlergi Json?    @map("riwayat_alergi")
-  nomorKontak   String?  @map("nomor_kontak")
-  poinXp        Int      @default(0) @map("poin_xp")
-  idSekolah     Int?     @map("id_sekolah")
-  dibuatPada    DateTime @default(now()) @map("dibuat_pada")
-  diubahPada    DateTime @updatedAt @map("diubah_pada")
+  id                   Int      @id @default(autoincrement())
+  nikNisn              String?  @unique @map("nik_nisn")
+  namaLengkap          String   @map("nama_lengkap")
+  email                String?  @unique
+  katasandi            String
+  peran                Peran    @default(PENERIMA_MANFAAT)
+  tingkatKelas         String?  @map("tingkat_kelas")
+  riwayatAlergi        Json?    @map("riwayat_alergi")
+  nomorKontak          String?  @map("nomor_kontak")
+  poinXp               Int      @default(0) @map("poin_xp")
+  dampakLingkunganGram Float    @default(0) @map("dampak_lingkungan_gram")
+  idSekolah            Int?     @map("id_sekolah")
+  dibuatPada           DateTime @default(now()) @map("dibuat_pada")
+  diubahPada           DateTime @updatedAt @map("diubah_pada")
 
   sekolah       Sekolah?        @relation(fields: [idSekolah], references: [id])
   evaluasiMenu  EvaluasiMenu[]
@@ -58,14 +59,34 @@ model Sekolah {
   alamat     String?
   dibuatPada DateTime @default(now()) @map("dibuat_pada")
 
-  pengguna   Pengguna[]
-  jadwalMenu JadwalMenu[]
+  pengguna       Pengguna[]
+  jadwalMenu     JadwalMenu[]
+  eksekusiTopsis EksekusiTopsis[]
 
   @@map("sekolah")
 }
 
 // ============================================================
-// TABEL 4: menu
+// TABEL 4: bahan_baku
+// ============================================================
+model BahanBaku {
+  id             Int      @id @default(autoincrement())
+  namaBahan      String   @map("nama_bahan")
+  satuan         String
+  kaloriPer100g  Float?   @map("kalori_per_100g")
+  proteinPer100g Float?   @map("protein_per_100g")
+  potensiAlergen Boolean  @default(false) @map("potensi_alergen")
+  hargaPerSatuan Int?     @map("harga_per_satuan")
+  dibuatPada     DateTime @default(now()) @map("dibuat_pada")
+  diubahPada     DateTime @updatedAt @map("diubah_pada")
+
+  menuBahanBaku MenuBahanBaku[]
+
+  @@map("bahan_baku")
+}
+
+// ============================================================
+// TABEL 5: menu
 // ============================================================
 model Menu {
   id                    Int          @id @default(autoincrement())
@@ -83,13 +104,30 @@ model Menu {
   dibuatPada            DateTime     @default(now()) @map("dibuat_pada")
   diubahPada            DateTime     @updatedAt @map("diubah_pada")
 
-  jadwalMenu JadwalMenu[]
+  jadwalMenu    JadwalMenu[]
+  menuBahanBaku MenuBahanBaku[]
 
   @@map("menu")
 }
 
 // ============================================================
-// TABEL 5: jadwal_menu
+// TABEL 6: menu_bahan_baku (Tabel Pivot Many-to-Many)
+// ============================================================
+model MenuBahanBaku {
+  id           Int   @id @default(autoincrement())
+  idMenu       Int   @map("id_menu")
+  idBahanBaku  Int   @map("id_bahan_baku")
+  porsiPerMenu Float @default(1.0) @map("porsi_per_menu")
+
+  menu      Menu      @relation(fields: [idMenu], references: [id], onDelete: Cascade)
+  bahanBaku BahanBaku @relation(fields: [idBahanBaku], references: [id], onDelete: Cascade)
+
+  @@unique([idMenu, idBahanBaku])
+  @@map("menu_bahan_baku")
+}
+
+// ============================================================
+// TABEL 7: jadwal_menu
 // ============================================================
 model JadwalMenu {
   id               Int      @id @default(autoincrement())
@@ -106,6 +144,7 @@ model JadwalMenu {
   rencanaProduksi RencanaProduksi?
   produksi        Produksi?
   distribusi      Distribusi[]
+  hasilNlp        HasilNlp[]
 
   @@unique([idSekolah, tanggal])
   @@index([tanggal])
@@ -114,24 +153,25 @@ model JadwalMenu {
 }
 
 // ============================================================
-// TABEL 6: evaluasi_menu
-// C1: penilaian_rasa | C2: tingkat_kesukaan
-// C3: kesesuaian_porsi | C4: persentase_sisa_makanan
+// TABEL 8: evaluasi_menu
+// C1, C2, C3, C4 (Semua Benefit)
 // ============================================================
 model EvaluasiMenu {
-  id                Int      @id @default(autoincrement())
-  idPengguna        Int      @map("id_pengguna")
-  idJadwal          Int      @map("id_jadwal")
-  menerimaPorsi     Boolean? @map("menerima_porsi")
-  penilaianRasa     Int?     @map("penilaian_rasa")
-  tingkatKesukaan   Int?     @map("tingkat_kesukaan")
-  kesesuaianPorsi   Int?     @map("kesesuaian_porsi")
-  persentaseSisa    Float?   @map("persentase_sisa_makanan")
-  masukanKualitatif String?  @map("masukan_kualitatif")
-  dibuatPada        DateTime @default(now()) @map("dibuat_pada")
+  id                   Int      @id @default(autoincrement())
+  idPengguna           Int      @map("id_pengguna")
+  idJadwal             Int      @map("id_jadwal")
+  menerimaPorsi        Boolean? @map("menerima_porsi")
+  penilaianRasa        Int?     @map("penilaian_rasa")          // C1 TOPSIS (Benefit)
+  tingkatKesukaan      Int?     @map("tingkat_kesukaan")        // C2 TOPSIS (Benefit)
+  kesesuaianPorsi      Int?     @map("kesesuaian_porsi")        // C3 TOPSIS (Benefit)
+  persentaseDikonsumsi Float?   @map("persentase_dikonsumsi")   // C4 TOPSIS (Benefit)
+  volumeSisaGram       Float?   @map("volume_sisa_gram")
+  ulasanTeks           String?  @map("ulasan_teks")
+  dibuatPada           DateTime @default(now()) @map("dibuat_pada")
 
   pengguna   Pengguna   @relation(fields: [idPengguna], references: [id])
   jadwalMenu JadwalMenu @relation(fields: [idJadwal], references: [id])
+  hasilNlp   HasilNlp[]
 
   @@unique([idPengguna, idJadwal])
   @@index([idJadwal])
@@ -139,8 +179,8 @@ model EvaluasiMenu {
 }
 
 // ============================================================
-// TABEL 7: konfirmasi
-// C5 TOPSIS: COUNT(TIDAK_HADIR) / COUNT(total) * 100
+// TABEL 9: konfirmasi
+// C5 TOPSIS (Tingkat Penerimaan MBG -> Benefit)
 // ============================================================
 model Konfirmasi {
   id                Int              @id @default(autoincrement())
@@ -163,7 +203,7 @@ model Konfirmasi {
 }
 
 // ============================================================
-// TABEL 8: alasan_penolakan
+// TABEL 10: alasan_penolakan
 // ============================================================
 model AlasanPenolakan {
   id    Int    @id @default(autoincrement())
@@ -176,7 +216,7 @@ model AlasanPenolakan {
 }
 
 // ============================================================
-// TABEL 9: rencana_produksi
+// TABEL 11: rencana_produksi
 // Formula: CEIL(total_hadir × (1 + buffer_persentase / 100))
 // ============================================================
 model RencanaProduksi {
@@ -195,7 +235,7 @@ model RencanaProduksi {
 }
 
 // ============================================================
-// TABEL 10: produksi
+// TABEL 12: produksi
 // ============================================================
 model Produksi {
   id            Int            @id @default(autoincrement())
@@ -212,7 +252,7 @@ model Produksi {
 }
 
 // ============================================================
-// TABEL 11: distribusi
+// TABEL 13: distribusi
 // ============================================================
 model Distribusi {
   id           Int              @id @default(autoincrement())
@@ -230,50 +270,64 @@ model Distribusi {
 }
 
 // ============================================================
-// TABEL 12: eksekusi_topsis
+// TABEL 14: eksekusi_topsis
 // ============================================================
 model EksekusiTopsis {
   id              Int      @id @default(autoincrement())
+  idSekolah       Int?     @map("id_sekolah")
   periodeAwal     DateTime @db.Date @map("periode_awal")
   periodeAkhir    DateTime @db.Date @map("periode_akhir")
   hasilJson       Json     @map("hasil_json")
   rekomendasiJson Json     @map("rekomendasi_json")
   dibuatPada      DateTime @default(now()) @map("dibuat_pada")
 
+  sekolah Sekolah? @relation(fields: [idSekolah], references: [id])
+
+  @@index([idSekolah])
   @@index([periodeAwal, periodeAkhir])
   @@map("eksekusi_topsis")
 }
 
 // ============================================================
-// ENUM: Peran
+// TABEL 15: hasil_nlp
 // ============================================================
-enum Peran {
-  PENERIMA_MANFAAT
-  SPPG_ADMIN
-  PETUGAS
+model HasilNlp {
+  id           Int         @id @default(autoincrement())
+  idEvaluasi   Int         @map("id_evaluasi")
+  idJadwal     Int         @map("id_jadwal")
+  sentimen     SentimenNlp
+  kataKunci    Json?       @map("kata_kunci")
+  skorSentimen Float?      @map("skor_sentimen")
+  dibuatPada   DateTime    @default(now()) @map("dibuat_pada")
+
+  evaluasiMenu EvaluasiMenu @relation(fields: [idEvaluasi], references: [id])
+  jadwalMenu   JadwalMenu   @relation(fields: [idJadwal], references: [id])
+
+  @@index([idJadwal])
+  @@map("hasil_nlp")
 }
 
 // ============================================================
-// ENUM: KategoriMenu
+// ENUM
 // ============================================================
+enum Peran {
+  SUPER_ADMIN
+  SPPG_ADMIN
+  PENERIMA_MANFAAT
+}
+
 enum KategoriMenu {
   MAKANAN_BERAT
   SNACK
   MINUMAN
 }
 
-// ============================================================
-// ENUM: StatusKonfirmasi
-// ============================================================
 enum StatusKonfirmasi {
   HADIR
   TIDAK_HADIR
   BELUM_KONFIRMASI
 }
 
-// ============================================================
-// ENUM: StatusProduksi
-// ============================================================
 enum StatusProduksi {
   PERSIAPAN
   MEMASAK
@@ -281,12 +335,15 @@ enum StatusProduksi {
   DIBATALKAN
 }
 
-// ============================================================
-// ENUM: StatusDistribusi
-// ============================================================
 enum StatusDistribusi {
   DISIAPKAN
   DIKIRIM
   TIBA_DI_SEKOLAH
   GAGAL
+}
+
+enum SentimenNlp {
+  POSITIF
+  NEGATIF
+  NETRAL
 }

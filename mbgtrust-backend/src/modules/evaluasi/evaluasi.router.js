@@ -12,7 +12,7 @@ import {
 // (di-merge ke jadwalRouter di app.js)
 export const evaluasiJadwalRouter = Router({ mergeParams: true });
 evaluasiJadwalRouter.post('/evaluasi', authGuard, rbacGuard('PENERIMA_MANFAAT'), kirimEvaluasiSiswa);
-evaluasiJadwalRouter.post('/evaluasi-kolektif', authGuard, rbacGuard('PETUGAS'), kirimEvaluasiKolektif);
+evaluasiJadwalRouter.post('/evaluasi-kolektif', authGuard, rbacGuard('SPPG_ADMIN'), kirimEvaluasiKolektif);
 evaluasiJadwalRouter.post('/konfirmasi', authGuard, rbacGuard('PENERIMA_MANFAAT'), kirimKonfirmasi);
 
 // ─── Route /api/v1/alasan-penolakan ────────────────────────────

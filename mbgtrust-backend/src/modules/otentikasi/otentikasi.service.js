@@ -102,8 +102,8 @@ export const masukSppg = async (email, kataSandi) => {
     throw err;
   }
 
-  if (!['SPPG_ADMIN', 'PETUGAS'].includes(pengguna.peran)) {
-    const err = new Error('Akun ini bukan akun Admin SPPG.');
+  if (!['SUPER_ADMIN', 'SPPG_ADMIN'].includes(pengguna.peran)) {
+    const err = new Error('Akun ini bukan akun Admin.');
     err.status = 403;
     throw err;
   }

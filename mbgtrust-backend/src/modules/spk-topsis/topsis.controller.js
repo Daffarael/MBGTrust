@@ -13,7 +13,10 @@ const tangkapZodError = (res, err) =>
 export const jalankanEksekusi = async (req, res, next) => {
   try {
     const data = skemaEksekusiTopsis.parse(req.body);
-    const hasil = await topsisService.jalankanEksekusi(data);
+    const hasil = await topsisService.jalankanEksekusi({
+      ...data,
+      id_sekolah: req.pengguna?.idSekolah ?? data.id_sekolah ?? null,
+    });
     return responBerhasil(res, 'Kalkulasi SPK TOPSIS selesai dieksekusi.', hasil);
   } catch (err) {
     if (err.name === 'ZodError') return tangkapZodError(res, err);

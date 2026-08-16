@@ -21,5 +21,5 @@ produksiRouter.patch('/:idProduksi/status', authGuard, rbacGuard('SPPG_ADMIN'), 
 
 // ─── /api/v1/distribusi ────────────────────────────────────────
 export const distribusiRouter = Router();
-// 5.3: bisa diakses SPPG_ADMIN dan PETUGAS
-distribusiRouter.patch('/:idDistribusi/status', authGuard, rbacGuard('SPPG_ADMIN', 'PETUGAS'), updateStatusDistribusi);
+// 5.3: bisa diakses SPPG_ADMIN
+distribusiRouter.patch('/:idDistribusi/status', authGuard, rbacGuard('SPPG_ADMIN'), updateStatusDistribusi);

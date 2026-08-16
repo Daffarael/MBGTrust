@@ -151,7 +151,7 @@ export const plottingJadwal = async (data) => {
   });
 
   return {
-    id_jadwal: jadwal.id,
+    id_jadwal: String(jadwal.id),
     tanggal_jadwal: jadwal.tanggal.toISOString().split('T')[0],
   };
 };
@@ -179,10 +179,10 @@ export const ambilJadwalHariIni = async (idSekolah, idPengguna) => {
   }
 
   return {
-    id_jadwal: jadwal.id,
+    id_jadwal: String(jadwal.id),
     tanggal_jadwal: jadwal.tanggal.toISOString().split('T')[0],
     menu: {
-      id_menu: jadwal.menu.id,
+      id_menu: String(jadwal.menu.id),
       nama_menu: jadwal.menu.namaMenu,
       kalori_kkal: jadwal.menu.kaloriKkal,
     },
@@ -204,7 +204,7 @@ export const ambilJadwalBesok = async (idSekolah, idPengguna) => {
         select: { id: true, namaMenu: true, kaloriKkal: true },
       },
       konfirmasi: idPengguna
-        ? { where: { idPengguna }, select: { id: true, statusKehadiran: true } }
+        ? { where: { idPengguna }, select: { id: true, status: true } }
         : false,
     },
   });
@@ -218,16 +218,16 @@ export const ambilJadwalBesok = async (idSekolah, idPengguna) => {
   const konfirmasi = idPengguna && jadwal.konfirmasi?.length > 0 ? jadwal.konfirmasi[0] : null;
 
   return {
-    id_jadwal: jadwal.id,
+    id_jadwal: String(jadwal.id),
     tanggal_jadwal: jadwal.tanggal.toISOString().split('T')[0],
     menu: {
-      id_menu: jadwal.menu.id,
+      id_menu: String(jadwal.menu.id),
       nama_menu: jadwal.menu.namaMenu,
       kalori_kkal: jadwal.menu.kaloriKkal,
     },
     status_konfirmasi_pengguna: {
       sudah_konfirmasi: idPengguna ? konfirmasi !== null : null,
-      status_kehadiran: konfirmasi?.statusKehadiran ?? null,
+      status_kehadiran: konfirmasi?.status ?? null,
     },
   };
 };

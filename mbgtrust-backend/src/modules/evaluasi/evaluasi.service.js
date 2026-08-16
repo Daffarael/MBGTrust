@@ -1,4 +1,5 @@
 import prisma from '../../config/prisma.js';
+import { analisaSentimenUlasan } from './nlp.service.js';
 
 const XP_PER_EVALUASI = 50;
 
@@ -28,6 +29,19 @@ export const kirimEvaluasiSiswa = async (idJadwal, idPengguna, data) => {
     throw err;
   }
 
+  const persentaseDikonsumsi =
+    data.persentase_dikonsumsi ??
+    (data.persentase_sisa_makanan !== undefined ? 100 - data.persentase_sisa_makanan : 100);
+
+  const ulasanTeks = data.ulasan_teks ?? data.masukan_kualitatif ?? null;
+
+  // Hitung perkiraan food waste dicegah (asumsi 1 porsi rata-rata 350 gram)
+  const gramDicegah = (persentaseDikonsumsi / 100) * 350;
+
+  // Normalisasi field alias dari frontend Flutter
+  const tingkatKesukaan = data.penilaian_kesukaan ?? data.tingkat_kesukaan ?? null;
+  const kesesuaianPorsi = data.penilaian_porsi ?? data.kesesuaian_porsi ?? null;
+
   const [evaluasi] = await prisma.$transaction([
     prisma.evaluasiMenu.create({
       data: {
@@ -35,22 +49,47 @@ export const kirimEvaluasiSiswa = async (idJadwal, idPengguna, data) => {
         idJadwal,
         menerimaPorsi: data.menerima_porsi,
         penilaianRasa: data.penilaian_rasa,
-        tingkatKesukaan: data.tingkat_kesukaan,
-        kesesuaianPorsi: data.kesesuaian_porsi,
-        persentaseSisa: data.persentase_sisa_makanan,
-        masukanKualitatif: data.masukan_kualitatif,
+        tingkatKesukaan,
+        kesesuaianPorsi,
+        persentaseDikonsumsi,
+        volumeSisaGram: data.volume_sisa_gram ?? null,
+        ulasanTeks,
       },
     }),
     prisma.pengguna.update({
       where: { id: idPengguna },
-      data: { poinXp: { increment: XP_PER_EVALUASI } },
+      data: {
+        poinXp: { increment: XP_PER_EVALUASI },
+        dampakLingkunganGram: { increment: gramDicegah },
+      },
     }),
   ]);
 
-  return { id_evaluasi: evaluasi.id, xp_diperoleh: XP_PER_EVALUASI };
+  // Eksekusi NLP Asinkron jika ada ulasan teks
+  let sentimenHasil = null;
+  if (ulasanTeks && ulasanTeks.trim().length > 0) {
+    const nlp = analisaSentimenUlasan(ulasanTeks);
+    await prisma.hasilNlp.create({
+      data: {
+        idEvaluasi: evaluasi.id,
+        idJadwal,
+        sentimen: nlp.sentimen,
+        kataKunci: nlp.kataKunci,
+        skorSentimen: nlp.skorSentimen,
+      },
+    });
+    sentimenHasil = nlp.sentimen;
+  }
+
+  return {
+    id_evaluasi: evaluasi.id,
+    xp_diperoleh: XP_PER_EVALUASI,
+    dampak_lingkungan_gram: gramDicegah,
+    sentimen_nlp: sentimenHasil,
+  };
 };
 
-// ─── Evaluasi Kolektif (Petugas) ───────────────────────────────
+// ─── Evaluasi Kolektif (SPPG Admin) ───────────────────────────
 
 export const kirimEvaluasiKolektif = async (idJadwal, data) => {
   await cekJadwalAda(idJadwal);
@@ -69,7 +108,13 @@ export const kirimEvaluasiKolektif = async (idJadwal, data) => {
     });
     if (sudahAda) { gagal++; continue; }
 
-    await prisma.$transaction([
+    const persentaseDikonsumsi =
+      item.persentase_dikonsumsi ??
+      (item.persentase_sisa_makanan !== undefined ? 100 - item.persentase_sisa_makanan : 100);
+
+    const ulasanTeks = item.ulasan_teks ?? item.masukan_kualitatif ?? null;
+
+    const [evaluasiBaru] = await prisma.$transaction([
       prisma.evaluasiMenu.create({
         data: {
           idPengguna: pengguna.id,
@@ -78,7 +123,8 @@ export const kirimEvaluasiKolektif = async (idJadwal, data) => {
           penilaianRasa: item.penilaian_rasa,
           tingkatKesukaan: item.tingkat_kesukaan,
           kesesuaianPorsi: item.kesesuaian_porsi,
-          persentaseSisa: item.persentase_sisa_makanan,
+          persentaseDikonsumsi,
+          ulasanTeks,
         },
       }),
       prisma.pengguna.update({
@@ -86,6 +132,20 @@ export const kirimEvaluasiKolektif = async (idJadwal, data) => {
         data: { poinXp: { increment: XP_PER_EVALUASI } },
       }),
     ]);
+
+    if (ulasanTeks && ulasanTeks.trim().length > 0) {
+      const nlp = analisaSentimenUlasan(ulasanTeks);
+      await prisma.hasilNlp.create({
+        data: {
+          idEvaluasi: evaluasiBaru.id,
+          idJadwal,
+          sentimen: nlp.sentimen,
+          kataKunci: nlp.kataKunci,
+          skorSentimen: nlp.skorSentimen,
+        },
+      });
+    }
+
     berhasil++;
   }
 

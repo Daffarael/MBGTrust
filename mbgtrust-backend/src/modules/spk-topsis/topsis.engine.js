@@ -1,16 +1,16 @@
 /**
  * TOPSIS Engine — Pure Mathematical Functions
  *
- * Kriteria & Bobot (Σw = 1.0):
- *   C1 penilaian_rasa      benefit  w=0.20
- *   C2 tingkat_kesukaan    benefit  w=0.15
- *   C3 kesesuaian_porsi    benefit  w=0.10
- *   C4 potensi_food_waste  cost     w=0.30
- *   C5 tingkat_penolakan   cost     w=0.25
+ * Kriteria & Bobot (Σw = 1.0) — All Benefit:
+ *   C1 penilaian_rasa           benefit  w=0.20
+ *   C2 tingkat_kesukaan         benefit  w=0.15
+ *   C3 kesesuaian_porsi         benefit  w=0.10
+ *   C4 tingkat_konsumsi_makanan benefit  w=0.30 (persentase makanan dihabiskan)
+ *   C5 tingkat_penerimaan_mbg   benefit  w=0.25 (rasio konfirmasi hadir)
  */
 
 export const BOBOT = [0.20, 0.15, 0.10, 0.30, 0.25];
-export const SIFAT = ['benefit', 'benefit', 'benefit', 'cost', 'cost'];
+export const SIFAT = ['benefit', 'benefit', 'benefit', 'benefit', 'benefit'];
 
 const AMBANG_DIPERTAHANKAN = 0.6;
 const AMBANG_DIEVALUASI   = 0.4;

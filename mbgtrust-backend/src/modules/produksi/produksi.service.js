@@ -116,11 +116,11 @@ export const ambilProduksiAktif = async () => {
   });
 
   return data.map((p) => ({
-    id_produksi: p.id,
+    id_produksi: String(p.id),
     nama_menu: p.jadwalMenu.menu.namaMenu,
     status_produksi: p.status,
-    total_porsi_dimasak: p.jumlahDimasak,
-    catatan_dapur: p.catatanDapur,
+    total_porsi_dimasak: p.jumlahDimasak ?? 0,
+    catatan_dapur: p.catatanDapur ?? null,
   }));
 };
 

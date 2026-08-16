@@ -19,20 +19,20 @@ export const ambilRingkasanDasbor = async (tanggalMulai, tanggalSelesai) => {
   const jadwalList = await prisma.jadwalMenu.findMany({
     where: { tanggal: { gte: tglMulai, lte: tglSelesai } },
     include: {
-      evaluasi:    { select: { penilaianRasa: true, tingkatKesukaan: true, kesesuaianPorsi: true, persentaseSisa: true, menerimaPorsi: true } },
+      evaluasiMenu:    { select: { penilaianRasa: true, tingkatKesukaan: true, kesesuaianPorsi: true, persentaseDikonsumsi: true, menerimaPorsi: true } },
       konfirmasi:  { select: { status: true } },
       rencanaProduksi: { select: { estimasiPorsi: true } },
     },
   });
 
   // ── C1: Skor kepuasan keseluruhan (rata-rata penilaian_rasa) ─
-  const semuaRasa = jadwalList.flatMap((j) => j.evaluasi.map((e) => e.penilaianRasa)).filter(Boolean);
+  const semuaRasa = jadwalList.flatMap((j) => j.evaluasiMenu.map((e) => e.penilaianRasa)).filter(Boolean);
   const skorKepuasan = semuaRasa.length === 0
     ? 0
     : Math.round((semuaRasa.reduce((s, v) => s + v, 0) / semuaRasa.length) * 100) / 100;
 
   // ── Tingkat penerimaan (% evaluasi dengan menerima_porsi = true) ─
-  const semuaEvaluasi = jadwalList.flatMap((j) => j.evaluasi);
+  const semuaEvaluasi = jadwalList.flatMap((j) => j.evaluasiMenu);
   const totalEvaluasi = semuaEvaluasi.length;
   const totalMenerima = semuaEvaluasi.filter((e) => e.menerimaPorsi === true).length;
   const persentasePenerimaan = totalEvaluasi === 0
@@ -50,7 +50,7 @@ export const ambilRingkasanDasbor = async (tanggalMulai, tanggalSelesai) => {
   }
 
   const porsiTercegah = Math.max(0, totalPorsiDasar - totalPorsiPresisi);
-  const semuaSisa = jadwalList.flatMap((j) => j.evaluasi.map((e) => e.persentaseSisa)).filter(Boolean);
+  const semuaSisa = jadwalList.flatMap((j) => j.evaluasiMenu.map((e) => e.persentaseDikonsumsi)).filter(Boolean);
   const rataRataSisa = semuaSisa.length === 0 ? 0 : semuaSisa.reduce((s, v) => s + v, 0) / semuaSisa.length;
 
   // kg = porsi_tercegah × (rata_sisa% / 100) × berat_porsi_gram / 1000
@@ -62,12 +62,12 @@ export const ambilRingkasanDasbor = async (tanggalMulai, tanggalSelesai) => {
   const menuIds = [...new Set(jadwalList.map((j) => j.idMenu))];
   const menuData = await prisma.menu.findMany({
     where: { id: { in: menuIds } },
-    select: { id: true, estimasiBiayaPerPorsi: true },
+    select: { id: true, estimasiHargaPerPorsi: true },
   });
 
   const hargaRataRata = menuData.length === 0
     ? 0
-    : menuData.reduce((s, m) => s + (m.estimasiBiayaPerPorsi ?? 0), 0) / menuData.length;
+    : menuData.reduce((s, m) => s + (m.estimasiHargaPerPorsi ?? 0), 0) / menuData.length;
 
   const estimasiEfisiensiAnggaran = Math.round(porsiTercegah * hargaRataRata);
 
@@ -92,12 +92,12 @@ export const ambilDataLaporan = async (tanggalMulai, tanggalSelesai) => {
     where: { tanggal: { gte: tglMulai, lte: tglSelesai } },
     include: {
       menu:         { select: { namaMenu: true, kategori: true } },
-      evaluasi: {
+      evaluasiMenu: {
         select: {
           penilaianRasa: true,
           tingkatKesukaan: true,
           kesesuaianPorsi: true,
-          persentaseSisa: true,
+          persentaseDikonsumsi: true,
           menerimaPorsi: true,
         },
       },
@@ -108,7 +108,7 @@ export const ambilDataLaporan = async (tanggalMulai, tanggalSelesai) => {
   });
 
   const detailMenu = jadwalList.map((jadwal) => {
-    const evalList = jadwal.evaluasi;
+    const evalList = jadwal.evaluasiMenu;
     const konfList = jadwal.konfirmasi;
     const rata = (arr) => arr.length === 0 ? 0 : Math.round(arr.reduce((s, v) => s + v, 0) / arr.length * 100) / 100;
 
@@ -122,7 +122,7 @@ export const ambilDataLaporan = async (tanggalMulai, tanggalSelesai) => {
       rata_rasa: rata(evalList.map((e) => e.penilaianRasa).filter(Boolean)),
       rata_kesukaan: rata(evalList.map((e) => e.tingkatKesukaan).filter(Boolean)),
       rata_porsi: rata(evalList.map((e) => e.kesesuaianPorsi).filter(Boolean)),
-      rata_sisa_persen: rata(evalList.map((e) => e.persentaseSisa).filter(Boolean)),
+      rata_sisa_persen: rata(evalList.map((e) => e.persentaseDikonsumsi).filter(Boolean)),
       total_hadir: konfList.filter((k) => k.status === 'HADIR').length,
       total_tidak_hadir: konfList.filter((k) => k.status === 'TIDAK_HADIR').length,
     };

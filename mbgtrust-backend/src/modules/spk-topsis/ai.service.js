@@ -80,7 +80,7 @@ export const generateNarasi = async (rekomendasiList) => {
   }
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
     const prompt = buildPrompt(rekomendasiList);
 
     // Timeout wrapper
