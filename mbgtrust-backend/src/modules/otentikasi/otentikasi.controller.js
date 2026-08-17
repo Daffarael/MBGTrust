@@ -94,3 +94,21 @@ export const perbaruiProfil = async (req, res, next) => {
     next(err);
   }
 };
+
+export const ambilPapanPeringkat = async (req, res, next) => {
+  try {
+    const hasil = await otentikasiService.ambilPapanPeringkat(req.pengguna.id, req.query);
+    return responBerhasil(res, 'Papan peringkat berhasil diambil.', hasil);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const daftarSiswaSppg = async (req, res, next) => {
+  try {
+    const hasil = await otentikasiService.daftarSiswaSppg(req.pengguna.id, req.query);
+    return responBerhasil(res, 'Daftar siswa berhasil diambil.', hasil);
+  } catch (err) {
+    next(err);
+  }
+};

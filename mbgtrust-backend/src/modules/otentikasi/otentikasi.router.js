@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authGuard from '../../middlewares/authGuard.js';
+import rbacGuard from '../../middlewares/rbacGuard.js';
 import {
   pendaftaran,
   masuk,
@@ -7,6 +8,8 @@ import {
   perbaruiToken,
   ambilProfil,
   perbaruiProfil,
+  ambilPapanPeringkat,
+  daftarSiswaSppg,
 } from './otentikasi.controller.js';
 
 const router = Router();
@@ -21,5 +24,7 @@ router.post('/perbarui-token', perbaruiToken);
 export const penggunaRouter = Router();
 penggunaRouter.get('/profil-saya', authGuard, ambilProfil);
 penggunaRouter.patch('/profil-saya', authGuard, perbaruiProfil);
+penggunaRouter.get('/gamifikasi/papan-peringkat', authGuard, rbacGuard('PENERIMA_MANFAAT'), ambilPapanPeringkat);
+penggunaRouter.get('/siswa', authGuard, rbacGuard('SPPG_ADMIN', 'SUPER_ADMIN'), daftarSiswaSppg);
 
 export default router;
